@@ -1,0 +1,561 @@
+openapi: 3.1.0
+info:
+  title: Playtest Ingestion API
+  version: "3.0"
+  summary: Cross-tenant ingestion contract between xPlaytest and xCloud (Game Streaming Services).
+  description: |
+    Defines the two SAGE routes used by xPlaytest to onboard a published Playtest
+    into xCloud's streaming pipeline and to poll the resulting workflow's terminal
+    state.
+
+    See SPEC.md §6 for prose context and SPEC.md §3.11 for the versioning strategy
+    (additive-only on /v3, breaking changes go to /v4 with a deprecation window).
+
+    Auth on both routes is cross-tenant S2S bearer; the calling SPN must be in
+    SAGE's AuthorizedClientAppIds allow-list for the route (XC2).
+  contact:
+    name: Melanie Chen
+  license:
+    name: Microsoft Internal
+
+servers:
+  - url: https://{sageHost}
+    description: |
+      SAGE proxy. Routes documented here are the **external** SAGE paths that
+      xPlaytest calls. SAGE forwards them to `services.contentingestion` at
+      `/v3/workflows/playtestingestion[/{jobId}]` (see SPEC.md §6 and
+      ARCHITECTURE.md §3.2 / §3.3). Downstream consumers should treat the
+      downstream paths as an implementation detail and program against the
+      external paths in this document.
+    variables:
+      sageHost:
+        default: sage.gamestreaming.xboxlive.com
+        description: SAGE host per environment
+
+tags:
+  - name: PlaytestIngestion
+    description: Trigger and poll the playtest ingestion workflow.
+
+paths:
+  /playtest/ingestion:
+    post:
+      tags: [PlaytestIngestion]
+      operationId: triggerPlaytestIngestion
+      summary: Trigger asynchronous playtest ingestion into xCloud.
+      description: |
+        Schedules a `PlaytestTitleIngestionWorkflow` in services.contentingestion.
+        Returns immediately with a `jobId` that the caller polls via
+        `GET /playtest/ingestion/{jobId}`.
+
+        **Idempotency:** The xCloud workflow upserts the offering keyed on the
+        derived `xpt-{shortId(PlaytestId)}`. Re-submitting the same `PlaytestId`
+        while a previous job is still running returns 409 Conflict with a body
+        that names the in-flight `jobId` + `statusUrl` so the caller can rejoin
+        polling instead of starting a fresh job. After the previous job reaches
+        a terminal state, re-submitting starts a new job that updates the
+        existing offering in place.
+      security:
+        - s2sBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaytestIngestionJobParameters"
+            examples:
+              minimal:
+                summary: Minimal valid request (required fields only)
+                value:
+                  playtestId: "8a3b1f0c-4e6a-4f9b-9d3c-7b2e1a4d6f0e"
+                  allowedDnaGroups:
+                    - "4f9b9d3c-7b2e-1a4d-6f0e-8a3b1f0c4e6a"
+                  storeAsset:
+                    storeEntry:
+                      productId: "9NXYZ12345PT"
+                      flags: "GAME"
+                      name: "Example Game Playtest"
+                      description: "Pre-release build for closed beta."
+                      publisherId: "PUB12345"
+                      isPrivateAudience: true
+                      parentProductIds: []
+                    markets: ["US"]
+                    platform: "WINDOWS.DESKTOP"
+                    contentId: "01234567-89ab-cdef-0123-456789abcdef"
+                    xboxTitleId: 4294967040
+                    packageFamilyName: "ExamplePub.ExampleGame_8wekyb3d8bbwe"
+                    aumId: "ExamplePub.ExampleGame_8wekyb3d8bbwe!App"
+              full:
+                summary: Full request with all optional fields
+                value:
+                  playtestId: "8a3b1f0c-4e6a-4f9b-9d3c-7b2e1a4d6f0e"
+                  allowedDnaGroups:
+                    - "4f9b9d3c-7b2e-1a4d-6f0e-8a3b1f0c4e6a"
+                    - "5a0c0e4d-8c3f-2b5e-7a1f-9b4c2d1d5f7b"
+                  expirationTime: "2026-08-01T00:00:00Z"
+                  allowedSandboxId: "RETAIL"
+                  isGreenSigned: true
+                  correlationId: "playtest-publish-2026-05-29-abc123"
+                  storeAsset:
+                    storeEntry:
+                      productId: "9NXYZ12345PT"
+                      flags: "GAME"
+                      name: "Example Game Playtest"
+                      description: "Pre-release build for closed beta."
+                      publisherId: "PUB12345"
+                      isPrivateAudience: true
+                      parentProductIds: []
+                    markets: ["US"]
+                    platform: "WINDOWS.DESKTOP"
+                    contentId: "01234567-89ab-cdef-0123-456789abcdef"
+                    xboxTitleId: 4294967040
+                    packageFamilyName: "ExamplePub.ExampleGame_8wekyb3d8bbwe"
+                    aumId: "ExamplePub.ExampleGame_8wekyb3d8bbwe!App"
+      responses:
+        "202":
+          description: Accepted; workflow scheduled.
+          headers:
+            Location:
+              description: Convenience URL for the polling endpoint.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobAccepted"
+        "400":
+          description: |
+            Invalid request. Body validation failed (missing required fields,
+            StoreAsset.Validate() rejection, etc.).
+          content:
+            application/problem+json:
+              schema: { $ref: "#/components/schemas/ProblemDetails" }
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: |
+            Forbidden — caller SPN is not in the AuthorizedClientAppIds allow-list
+            for this route, or the cross-tenant auth scheme rejected the token.
+        "409":
+          description: |
+            Conflict — a non-terminal job already exists for this `playtestId`.
+            Response body names the in-flight `jobId` and `statusUrl` so the
+            caller can rejoin polling on the existing job.
+          content:
+            application/problem+json:
+              schema: { $ref: "#/components/schemas/JobConflict" }
+        "5XX":
+          description: |
+            Server error. Caller should treat as retryable and rely on the existing
+            xPlaytest workflow retry policy (exponential backoff).
+          content:
+            application/problem+json:
+              schema: { $ref: "#/components/schemas/ProblemDetails" }
+
+  /playtest/ingestion/{jobId}:
+    parameters:
+      - $ref: "#/components/parameters/JobId"
+    get:
+      tags: [PlaytestIngestion]
+      operationId: getPlaytestIngestionStatus
+      summary: Poll the playtest ingestion workflow's current state.
+      description: |
+        Used by xPlaytest with exponential backoff (30 s → 60 s → 2 min → 5 min cap,
+        60 min foreground wall clock; see SPEC.md §3.1). After the foreground
+        deadline xPlaytest persists the `jobId` and a background reconciliation
+        job continues polling indefinitely (default 15 min interval, capped at
+        24 h) until the workflow reaches a terminal state. The endpoint itself
+        has no foreground timeout — the workflow may legitimately stay in
+        `Running` for hours when asset ingestion is slow.
+      security:
+        - s2sBearer: []
+      responses:
+        "200":
+          description: Current workflow state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobStatus"
+              examples:
+                running:
+                  value:
+                    jobId: "wf-abc123"
+                    status: "Running"
+                    updatedAt: "2026-05-29T21:10:00Z"
+                streamable:
+                  value:
+                    jobId: "wf-abc123"
+                    status: "Streamable"
+                    terminalState: "Streamable"
+                    offeringId: "xpt-8a3b1f0c4e6a"
+                    titleId: "ExampleGamePlaytest9NXYZ12345PT"
+                    updatedAt: "2026-05-29T21:18:42Z"
+                failed:
+                  value:
+                    jobId: "wf-abc123"
+                    status: "Failed"
+                    terminalState: "Failed"
+                    errors:
+                      - code: "ASSET_INGESTION_FAILED"
+                        message: "AssetIngestionWorkflow returned Failed after 3 retries."
+                    updatedAt: "2026-05-29T21:25:00Z"
+                installNotFound:
+                  value:
+                    jobId: "wf-abc123"
+                    status: "InstallNotFound"
+                    terminalState: "InstallNotFound"
+                    errors:
+                      - code: "SUCU_FLIGHT_NOT_RESOLVABLE"
+                        message: "Install pipeline could not resolve a package version for the supplied DNA-group flight id."
+                    updatedAt: "2026-05-29T21:25:00Z"
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Forbidden — caller SPN not in allow-list.
+        "404":
+          description: Unknown `jobId`.
+          content:
+            application/problem+json:
+              schema: { $ref: "#/components/schemas/ProblemDetails" }
+
+  /playtest/ingestion/by-playtest/{playtestId}:
+    parameters:
+      - name: playtestId
+        in: path
+        required: true
+        description: The xPlaytest-owned identifier (same value used in POST body).
+        schema:
+          type: string
+          format: uuid
+    delete:
+      tags: [PlaytestIngestion]
+      operationId: tombstonePlaytestIngestion
+      summary: Tear down a published playtest's xCloud offering.
+      description: |
+        Called by xPlaytest's delete workflow (PT6.d). Causes the workflow to:
+          * Set `offering.PlayerAuthorizationOptions.AllowedDnaGroups = []` —
+            effectively denying everyone, preserving history.
+          * Schedule a follow-up GC pass to fully delete the offering and
+            its asset entries after a grace period (default 7 days).
+        Idempotent: deleting an already-tombstoned offering returns 200.
+      security:
+        - s2sBearer: []
+      responses:
+        "200":
+          description: Tombstone complete (or already tombstoned).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [playtestId, offeringId, tombstoneTime]
+                properties:
+                  playtestId: { type: string, format: uuid }
+                  offeringId: { type: string }
+                  tombstoneTime: { type: string, format: date-time }
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Forbidden.
+        "404":
+          description: No offering exists for this `playtestId` (never ingested).
+
+components:
+  securitySchemes:
+    s2sBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Cross-tenant S2S bearer issued for the xCloud audience. Caller SPN must
+        be allow-listed on the SAGE route (`AuthorizedClientAppIds`).
+
+  parameters:
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      description: Workflow identifier returned by POST /playtestingestion.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+
+  schemas:
+    PlaytestIngestionJobParameters:
+      type: object
+      description: |
+        Sent by xPlaytest to xCloud through SAGE. Encodes the Playtest identity,
+        allowed testers, expiry/sandbox, and a fully-formed StoreAsset.
+
+        **Conditional validation:** When `storeAsset.storeEntry.flags = GAME`
+        and `storeAsset.platform = WINDOWS.DESKTOP` (v1 default for Playtest),
+        the StoreAsset validator additionally requires `xboxTitleId`,
+        `packageFamilyName`, and `aumId`. The base schema marks these as
+        nullable to keep the contract reusable for v1.1+ platforms; the
+        `if/then` block below makes the v1 PC-game subset explicit.
+      required:
+        - playtestId
+        - allowedDnaGroups
+        - storeAsset
+      if:
+        properties:
+          storeAsset:
+            properties:
+              platform: { const: "WINDOWS.DESKTOP" }
+              storeEntry:
+                properties:
+                  flags: { const: "GAME" }
+      then:
+        properties:
+          storeAsset:
+            required: [storeEntry, markets, platform, contentId, xboxTitleId, packageFamilyName, aumId]
+      properties:
+        playtestId:
+          type: string
+          format: uuid
+          description: |
+            The stable Playtest identifier (recommended: `PartnerCenterProductId`
+            per SPEC.md §9 Q1). xCloud derives the offering id as
+            `xpt-{shortId(playtestId)}`. The chosen id MUST be stable across
+            republishes — otherwise every nightly build creates a new offering.
+        allowedDnaGroups:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          description: |
+            DNA group GUIDs (resolved by GMS) authorized to access the offering.
+            xCloud wraps each as `XusAudience(g, RetailSandboxId)`. The install
+            pipeline uses the lexicographically smallest GUID as the deterministic
+            flight identifier (SPEC.md §3.3).
+          items:
+            type: string
+            format: uuid
+        expirationTime:
+          type: string
+          format: date-time
+          nullable: true
+          description: |
+            When the offering should expire. Defaults to `DateTime.MaxValue`
+            server-side to match current Playtest behavior. No hard cap in v1
+            (SPEC.md §9 Q3); xCloud may apply a soft cap of 180 days for
+            capacity reclaim in a future release.
+        allowedSandboxId:
+          type: string
+          default: "RETAIL"
+          description: Sandbox the offering is gated to. RETAIL for all Playtests today.
+        isGreenSigned:
+          type: boolean
+          default: true
+          description: |
+            Whether the build is Green-signed (true for all Playtests today).
+            Reserved as optional so the contract does not break when alternative
+            signing schemes are introduced.
+        callbackUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: |
+            **Reserved for v1.1.** When cross-tenant messaging exists, xCloud
+            will POST terminal-state notifications here. Ignored in v1 — caller
+            must poll the GET endpoint.
+        correlationId:
+          type: string
+          maxLength: 128
+          nullable: true
+          description: |
+            Optional caller-supplied trace id. xCloud echoes it back in the
+            status response for log correlation.
+        storeAsset:
+          $ref: "#/components/schemas/StoreAsset"
+
+    StoreAsset:
+      type: object
+      description: |
+        Existing xCloud contract (`StoreAsset.cs:17`). xPlaytest must produce
+        values that pass `StoreAsset.Validate()` (`StoreAsset.cs:25-61`).
+      required:
+        - storeEntry
+        - markets
+        - platform
+        - contentId
+      properties:
+        storeEntry:
+          $ref: "#/components/schemas/StoreEntry"
+        markets:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            description: ISO 3166-1 alpha-2 country code (wrapped in `Id` server-side).
+            example: "US"
+        platform:
+          type: string
+          enum: ["WINDOWS.DESKTOP", "XBOX.SCARLETT", "XBOX.ANACONDA", "XBOX.LOCKHART"]
+          description: |
+            v1 supports `WINDOWS.DESKTOP` only (SPEC.md §3.6). Xbox values
+            reserved for v1.1+.
+        contentId:
+          type: string
+          format: uuid
+          description: |
+            Asset content id. Must equal the `SourceId` derived inside the
+            workflow (`AssetIngestion.JobParameters.Validate()` enforces this).
+        xboxTitleId:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 4294967295
+          nullable: true
+          description: |
+            Xbox Live Title ID (uint). REQUIRED for games — validator rejects
+            null/0. Today `PlaytestProductDocumentBuilder.cs:53-70` hardcodes
+            empty; new XProduct resolver lands as part of PT2.
+        packageFamilyName:
+          type: string
+          nullable: true
+          description: Required for PC builds.
+          example: "ExamplePub.ExampleGame_8wekyb3d8bbwe"
+        aumId:
+          type: string
+          nullable: true
+          description: |
+            `{PackageFamilyName}!{ApplicationId}`. Required for PC builds by the
+            validator. In v1 a constant default is acceptable (Timi confirmed
+            telemetry-only server-side); v1.1 sources the real ApplicationId
+            from the AppX manifest.
+          example: "ExamplePub.ExampleGame_8wekyb3d8bbwe!App"
+
+    StoreEntry:
+      type: object
+      required:
+        - productId
+        - flags
+        - name
+        - publisherId
+        - isPrivateAudience
+      properties:
+        productId:
+          type: string
+          description: |
+            `PlaytestPublishJobParameters.PlaytestGeneratedXProductBigId`.
+            NOT the retail Partner Center product id.
+        flags:
+          type: string
+          enum: ["GAME", "APP", "ADDON"]
+          description: Always `GAME` for Playtest.
+        name:
+          type: string
+          description: From `PlaytestResponse.Name`.
+        description:
+          type: string
+          nullable: true
+          description: From `PlaytestResponse.Description`.
+        publisherId:
+          type: string
+          description: From `PublishedPlaytestEntity.SellerId`.
+        isPrivateAudience:
+          type: boolean
+          description: Always `true` for Playtest.
+        parentProductIds:
+          type: array
+          default: []
+          items: { type: string }
+          description: Empty for Playtest (no hub-game relationships).
+
+    JobAccepted:
+      type: object
+      required: [jobId, statusUrl]
+      properties:
+        jobId:
+          type: string
+          description: Opaque workflow identifier; supply to GET to poll status.
+          minLength: 1
+        statusUrl:
+          type: string
+          format: uri
+          description: Fully-qualified URL of the polling endpoint for this job.
+        correlationId:
+          type: string
+          nullable: true
+          description: Echoes the request's `correlationId` if supplied.
+
+    JobStatus:
+      type: object
+      required: [jobId, status, updatedAt]
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+          enum: [Running, Streamable, Failed, InstallNotFound]
+        terminalState:
+          type: string
+          nullable: true
+          enum: [Streamable, Failed, InstallNotFound]
+          description: Populated when `status` is terminal.
+        offeringId:
+          type: string
+          nullable: true
+          description: Populated on `Streamable` (`xpt-{shortId}`).
+        titleId:
+          type: string
+          nullable: true
+          description: Populated on `Streamable`.
+        errors:
+          type: array
+          default: []
+          items:
+            type: object
+            required: [code, message]
+            properties:
+              code:
+                type: string
+                description: Stable, machine-readable error code.
+              message:
+                type: string
+        updatedAt:
+          type: string
+          format: date-time
+        correlationId:
+          type: string
+          nullable: true
+
+    ProblemDetails:
+      type: object
+      description: |
+        RFC 7807 ProblemDetails. NB: SAGE today strips bodies in favor of an
+        `x-Proxy-Error` header (`ProxyController.cs:255-270`); for the two
+        Playtest routes, SAGE must forward the response body unchanged
+        (tracked in XC1).
+      required: [title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code: { type: string }
+              field: { type: string }
+              message: { type: string }
+
+    JobConflict:
+      allOf:
+        - $ref: "#/components/schemas/ProblemDetails"
+        - type: object
+          required: [jobId, statusUrl]
+          properties:
+            jobId:
+              type: string
+              description: |
+                The in-flight job that already exists for this `playtestId`.
+                Callers should POLL this job instead of starting a new one.
+            statusUrl:
+              type: string
+              format: uri
+              description: Fully-qualified URL to GET the existing job's status.
