@@ -36,7 +36,7 @@
 
 | ID | Title | SWAG (days) |
 |----|-------|-------------|
-| **EPIC** | Instantly Shareable Playtest — streaming opt-in for xPlaytest via xCloud | **51 dev-days across 2 teams** (xCloud 28 + xPlaytest 23) |
+| **EPIC** | Instantly Shareable Playtest — streaming opt-in for xPlaytest via xCloud | **54 dev-days across 2 teams** (xCloud core 27 + M1.demo 2 + xPlaytest 25 = 54) |
 
 The Epic is delivered across 5 milestones (SPEC.md §11) and 4 phases
 (SPEC.md §4.3). Phase A and B contain the foundational demo (Milestone 1)
@@ -52,9 +52,9 @@ and the first end-to-end ingestion (Milestone 2) respectively.
 | **F-XCLOUD-AUTH** | xCloud — User auth path enforces DNA-group membership | streaming-token / Bayside | XC5 | 5 |
 | **F-XCLOUD-SAGE** | xCloud — SAGE exposes playtest ingestion routes to xPlaytest | services.serviceapigateway | XC1, XC2 | 4 |
 | **F-XCLOUD-CI**   | xCloud — Content Ingestion runs the PlaytestTitleIngestionWorkflow | services.contentingestion | XC3 | 9 |
-| **F-XCLOUD-INSTALL** | xCloud — Install pipeline tolerates DNA-group as flight id | install / SUCU | XC6 | 3 |
+| **F-XCLOUD-INSTALL** | xCloud — Install pipeline tolerates DNA-group as flight id + PC fork | install / SUCU | XC6 | 4 |
 | **F-XPT-CONTRACT**   | xPlaytest — Build the StoreAsset + ingestion payload | Xbox.Xbet.Service | PT2, PT3 | 5 |
-| **F-XPT-WORKFLOW**   | xPlaytest — Workflow integration + status polling | Xbox.Xbet.Service | PT1, PT4, PT5 | 13 |
+| **F-XPT-WORKFLOW**   | xPlaytest — Workflow integration + status polling | Xbox.Xbet.Service | PT1, PT4, PT5 | 15 |
 | **F-XPT-LIFECYCLE**  | xPlaytest — Lifecycle propagation (republish, audience, delete) | Xbox.Xbet.Service | PT6 | 5 |
 
 ---
@@ -117,10 +117,10 @@ Feature SWAG total: **9 days**.
 
 | ID | Title | Owner | SWAG | Depends on | Acceptance |
 |----|-------|-------|------|------------|------------|
-| **XC6.a** | Audit install pipeline tolerance for non-GA flight id | install dev | 1 | XC3.b (something to test against) | Documented walk of `TitleIngestionWorker.cs:197-225` and SUCU client confirms either (a) the path tolerates a non-GA flight id, or (b) lists the changes required. Audit posted as ADO comment. |
-| **XC6.b** | Wire deterministic "smallest GUID" selection | install dev | 2 | XC6.a | When resolving package version for a playtest title, pick the lexicographically smallest `AllowedDnaGroups[i]` as the flight identifier. Behind feature flag. Unit + integration tests confirm (a) same playtest with same DNA set always resolves to the same package version; (b) when the DNA set changes (e.g., new tester DNA group added), the selected flight id and resolved package remain unchanged so long as the previously-selected smallest GUID is still in the set; (c) only when the previously-smallest GUID is *removed* does the resolved package potentially flip — this case is documented as expected behaviour and surfaces a telemetry event. |
+| **XC6.a** | Audit install pipeline tolerance for non-GA flight id + PC fork | install dev | 2 | XC3.b (something to test against) | Documented walk of `TitleIngestionWorker.cs:197-225` and SUCU client confirms (a) the path tolerates a non-GA flight id, and (b) the PC code path for `ServerType` + pool id (today the code hardcodes `ServerType.XboxV3SeriesS` and `XBOX_*` pools — see SPEC.md §3.6 risk callout). Audit posted as ADO comment. If a PC server type / pool id exists in the allocator client today, document its values; if not, file a follow-up task for the PC pipeline owner. |
+| **XC6.b** | Wire deterministic "smallest GUID" selection + platform-aware filter | install dev | 2 | XC6.a | When resolving package version for a playtest title, pick the lexicographically smallest GUID **of the current `AllowedDnaGroups` set at resolve time** as the flight identifier (per SPEC.md §3.3). **Branch the `ServerFilter` build on `Platform`** so PC playtests pick the PC pool id + PC `ServerType` (audit findings from XC6.a). Behind feature flag. Unit + integration tests confirm: (a) same `AllowedDnaGroups` set always resolves to the same flight id, and therefore the same package version (deterministic); (b) **adding a GUID that sorts *higher* than the current smallest** does not change the selected flight id or resolved package; (c) **adding a GUID that sorts *lower* than the current smallest** *does* flip the selection — this is acceptable v1 behavior because flights are addressable by GUID alone and there is no notion of "first-chosen flight," but the flip emits a `XCloudFlightSelectionFlipped` telemetry event with both old and new GUIDs so the install team can detect churn; (d) removing the previously-smallest GUID flips selection to the next-smallest and likewise emits telemetry; (e) a PC playtest does not hit Xbox-only allocator parameters (no `ServerType.XboxV3SeriesS` or `XBOX_*` pool ids on the resolved request). *Design note: a sticky "first-chosen flight" model was considered but rejected for v1 because it requires extra per-playtest state in the install pipeline that doesn't exist today — see SPEC.md §3.3.* |
 
-Feature SWAG total: **3 days**.
+Feature SWAG total: **4 days**.
 
 ---
 
@@ -141,7 +141,8 @@ Feature SWAG total: **5 days**. PT2.a + PT3.a are independent and can run in par
 | ID | Title | Owner | SWAG | Depends on | Acceptance |
 |----|-------|-------|------|------------|------------|
 | **PT1.a** | Insert `XCloudIngestionTriggerState` into `XPackagePlaytestPublishWorkflow` | xPlaytest dev | 3 | PT2.a, PT2.b, PT3.a | New state inserted between `PlaytestProductCreation` and `SuccessCompletion`. Gated on `IsStreamingEnabled` flag (false by default). Failure of the new state does NOT block publish — it logs + emits telemetry. Workflow unit tests cover both flag states + xCloud-down failure. |
-| **PT1.b** | Add `IsStreamingEnabled` opt-in field to publish request | xPlaytest dev | 1 | — | New boolean on the publish API surface, defaulting to `false`. Documented in the public Playtest API contract. |
+| **PT1.b** | Add `IsStreamingEnabled` opt-in field + streaming-expiration validation to publish request | xPlaytest dev | 1 | — | New boolean `IsStreamingEnabled` on the publish API surface, defaulting to `false`. When `true`, validate that `PlaytestEndDate` is non-null and in the future, returning `400` with a clear message otherwise (SPEC.md §9 Q3 + §7 blocker row). Documented in the public Playtest API contract. Unit tests cover both flag states and the new validation. |
+| **PT1.c** | Seller / title allow-list gate for streaming publish | xPlaytest dev | 2 | PT1.b | New publish-side validator: when `IsStreamingEnabled = true`, reject publish unless the publisher's `SellerId` (and optionally `ProductId`) is on a configurable allow-list. Allow-list is read from xPlaytest config (initially an in-config hardcoded list; future task tracks moving to a dynamic config service). Returns `403 StreamingNotEnabledForSeller` with a clear error code. SPEC.md §10 P0 — "Creation of a private offering can be limited to a specific title / allow list of sellers." Unit tests cover allowed-seller, denied-seller, allowed-seller + denied-title, and missing-config (fail-closed) cases. |
 | **PT4.a** | `XCloudIngestionClient` (HTTP client) | xPlaytest dev | 2 | XC1.a, XC2.a | New typed HTTP client wrapping SAGE's `POST /playtest/ingestion`. Cross-tenant S2S token acquisition. Returns `(jobId, statusUrl)`. Polly-style retry on 5xx. Integration test against INT SAGE. |
 | **PT4.b** | Persist `jobId` on `PublishedPlaytestEntity` | xPlaytest dev | 1 | PT4.a | Schema migration adds `XCloudIngestionJobId`, `XCloudOfferingId`, `XCloudTitleId`, `XCloudStatus`. Backfill = nullable. Persisted at end of `PT1.a`'s state. |
 | **PT5.a** | Polling loop with exponential backoff | xPlaytest dev | 2 | XC1.b, XC3.c, PT4.b | Backoff per SPEC.md §3.1: 30s → 60s → 2min → 5min cap, 60min wall-clock. On terminal `Streamable` → set `PlaytestStatus = StreamingReady` + persist `OfferingId` / `TitleId`. On `Failed` / `InstallNotFound` → set `StreamingFailed` and persist error. Integration test asserts state transitions. |
@@ -149,7 +150,7 @@ Feature SWAG total: **5 days**. PT2.a + PT3.a are independent and can run in par
 | **PT5.c** | Surface launch URL on Playtest GET API | xPlaytest dev | 1 | PT5.b | `PlaytestResponse.StreamingLaunchUrl` populated when status is `StreamingReady`. API contract bump (additive, non-breaking, still on v3). |
 | **PT5.d** | Background reconciliation job for stuck ingestions | xPlaytest dev | 2 | PT5.a, PT4.b | New singleton timer service polls `XCloudIngestionJobId` from `PublishedPlaytestEntity` for any playtest stuck in `WaitingForXCloud` past the 60-min foreground deadline. Polls at 15-min intervals indefinitely up to 24 h, then alerts an on-call alias for manual triage (SPEC.md §3.1). On terminal state, transitions to `StreamingReady` / `StreamingFailed` exactly as PT5.a does. Integration test simulates a slow ingestion crossing the deadline and confirms eventual `StreamingReady`. |
 
-Feature SWAG total: **13 days**. PT4.* and PT5.* can pipeline against PT1.a once PT1.a is unblocked.
+Feature SWAG total: **15 days**. PT1.c gates PT4.a (no point making the SAGE call if the publish is denied). PT4.* and PT5.* can pipeline against PT1.a once PT1.a is unblocked.
 
 ---
 
@@ -171,14 +172,16 @@ Feature SWAG total: **5 days**.
 | Phase | Milestone | Tasks in scope | SWAG (days) |
 |-------|-----------|----------------|-------------|
 | A | M1 — Foundational demo | XC4.a, XC4.b, XC4.c, XC5.a, XC5.b, XC5.c, XC2.a, PT3.a, **M1.demo** | 14 (parallel across teams) |
-| B | M2 — End-to-end ingestion | XC3.a, XC3.b, XC3.c, XC3.d, XC1.a, XC1.b, XC1.c, XC6.a, XC6.b, PT2.a, PT2.b | 19 |
-| C | M3 — xPlaytest integration | PT1.a, PT1.b, PT4.a, PT4.b, PT5.a, PT5.b, PT5.c, PT5.d | 13 |
+| B | M2 — End-to-end ingestion | XC3.a, XC3.b, XC3.c, XC3.d, XC1.a, XC1.b, XC1.c, XC6.a, XC6.b, PT2.a, PT2.b | 20 |
+| C | M3 — xPlaytest integration | PT1.a, PT1.b, PT1.c, PT4.a, PT4.b, PT5.a, PT5.b, PT5.c, PT5.d | 15 |
 | D | M4 — Lifecycle | PT6.a, PT6.b, PT6.c, PT6.d | 5 |
 | — | M5 — Soak + handoff | (no new tasks; bug-fix + documentation) | 0 |
 
-Grand total dev-days: **~51 days of focused work** (xCloud 28 + xPlaytest 23),
+Grand total dev-days: **~54 days of focused work** (xCloud core 27 + M1.demo 2 + xPlaytest 25 = 54),
 parallelizable across the 2 teams into roughly **7–8 calendar weeks** with
 1 engineer per team (matching the ~10-week internship including ramp + buffer).
+
+> SWAG accounting note (reconciles SPEC.md §4.2): SPEC.md lists *xCloud feature subtotal = 27* and *xPlaytest feature subtotal = 25 (after PT1.c)*. This roll-up adds **M1.demo (2 days)** to the xCloud column because the foundational demo is run primarily by the xCloud engineer. Cross-team totals therefore reconcile as `xCloud (27 core + 2 demo) + xPlaytest 25 = 54`.
 
 ---
 

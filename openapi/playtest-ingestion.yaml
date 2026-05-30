@@ -69,6 +69,7 @@ paths:
                   playtestId: "8a3b1f0c-4e6a-4f9b-9d3c-7b2e1a4d6f0e"
                   allowedDnaGroups:
                     - "4f9b9d3c-7b2e-1a4d-6f0e-8a3b1f0c4e6a"
+                  expirationTime: "2026-08-01T00:00:00Z"
                   storeAsset:
                     storeEntry:
                       productId: "9NXYZ12345PT"
@@ -296,6 +297,7 @@ components:
       required:
         - playtestId
         - allowedDnaGroups
+        - expirationTime
         - storeAsset
       if:
         properties:
@@ -333,12 +335,17 @@ components:
         expirationTime:
           type: string
           format: date-time
-          nullable: true
           description: |
-            When the offering should expire. Defaults to `DateTime.MaxValue`
-            server-side to match current Playtest behavior. No hard cap in v1
-            (SPEC.md §9 Q3); xCloud may apply a soft cap of 180 days for
-            capacity reclaim in a future release.
+            When the offering should expire. **Required** — the
+            `POST /playtest/ingestion` endpoint exists only for streaming-enabled
+            playtests, and the June 3 2026 sync ratified that every streaming
+            playtest must carry an explicit end date. The xPlaytest publish-side
+            validator rejects streaming publishes without it (`400 BadRequest`)
+            before this endpoint is ever called; xCloud also rejects requests
+            missing the field as defense in depth. No hard cap in v1; xCloud
+            may apply a soft cap of 180 days for capacity reclaim in a future
+            release. The Partner Center UI pre-fills a 90-day default — see
+            SPEC.md §9 Q3.
         allowedSandboxId:
           type: string
           default: "RETAIL"
