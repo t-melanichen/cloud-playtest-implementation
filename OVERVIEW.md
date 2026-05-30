@@ -25,21 +25,19 @@ A code-grounded sequence diagram lives in `ARCHITECTURE.md`.
 
 ## 3. Design decisions
 
-| # | Decision | Why |
-|---|---|---|
-| 1 | **Streaming is opt-in, additive** to the download flow | Avoids surprising the existing creator base; keeps the new path low-risk. |
-| 2 | **One playtest = one title = one offering** | Each playtest can target a distinct audience, so the auth boundary stays 1:1. Clustering is a v1.1 concern. |
-| 3 | **PC only in v1** (Xbox console deferred) | The existing publish path already targets `WINDOWS.DESKTOP`. Console adds Xbox-only allocator and title-id handling. |
-| 4 | **Auth gated at the offering level**, not per title | A single DNA-group check at offering entry; matches the pattern TestX already uses. |
-| 5 | **Bespoke `POST /playtest/ingestion`**, not a generic `CreateOfferingFromStoreData` | Keeps the contract small. Lets us encode playtest defaults (RETAIL sandbox, private audience) server-side. A generic surface is the future direction but out of summer scope. |
-| 6 | **Polling for terminal state**, not callbacks | SAGE is a request/response proxy today; cross-tenant callbacks need a message bus that does not yet exist. Polling reuses the publish workflow's existing primitives. |
-| 7 | **Single flight id for install lookup** = lex-smallest DNA-group GUID | The install pipeline expects one flight id. All groups in a playtest point to the same build, so the choice is deterministic and re-run-stable. Audience check (XC5) still uses the full set. |
-| 8 | **Opaque offering id** (`xpt-{shortId}`); title id is name-derived for readability | Offering id has a 32-char cap and is auth-critical. Title id is more user-visible, so we strip the playtest name to alphanumeric and append the product id for uniqueness. |
-| 9 | **Short-term cross-tenant auth: Green → Corp** via SAGE | Rides an in-flight SAGE PR. The long-term PME story is owned by the GSS platform team and is out of scope. |
-| 10 | **Delete = tombstone + 7-day GC**, not synchronous hard delete | SFI requires manual PR approval for Partner Registry writes, so a true hard delete is not achievable in v1. Tombstoning clears `AllowedDnaGroups` immediately so testers lose access, and the offering disappears from the DevApi listing. *Needs explicit sign-off from xCloud reviewers.* |
-| 11 | **Streaming-enabled playtests must carry an explicit expiration** | xCloud needs a bounded end date. Download-only playtests are unaffected. UI default = 90 days; soft warning above 180. |
-| 12 | **Bundle offering write + title attach into a single PR** | Cuts the manual SFI approval cost in half (1 PR per publish instead of 2). |
-| 13 | **External API unversioned today; internal `/v3/...`** | Matches existing SAGE and `WorkflowsControllerV3` conventions. Future breaking changes bump to `/v2/playtest/ingestion`. Additive optional fields do not require a bump. |
+- **Streaming is opt-in, additive** to the download flow — keeps the existing creator path unaffected and the new path low-risk.
+- **One playtest = one title = one offering** in v1. Each playtest targets a distinct audience, so the auth boundary stays 1:1. Clustering is a v1.1 concern.
+- **PC only in v1.** The existing publish path already targets `WINDOWS.DESKTOP`; console support adds Xbox-only allocator and title-id handling and is deferred.
+- **Auth is gated at the offering level**, not per title — one DNA-group check at offering entry, matching the pattern TestX already uses.
+- **Bespoke `POST /playtest/ingestion`** rather than a generic `CreateOfferingFromStoreData`. Keeps the contract small and lets us encode playtest defaults (RETAIL sandbox, private audience) server-side. A generic surface is the future direction but out of summer scope.
+- **Polling for terminal state**, not callbacks. SAGE is a request/response proxy today; cross-tenant callbacks need a message bus that does not yet exist. Polling reuses the publish workflow's existing retry primitives.
+- **Install lookup uses a single flight id** — the lex-smallest DNA-group GUID. The install pipeline only accepts one, and all groups in a playtest point to the same build, so the choice is deterministic and re-run-stable. The audience check (XC5) still evaluates the full set.
+- **Offering id is opaque** (`xpt-{shortId}`) because it has a 32-char cap and is auth-critical. **Title id is name-derived** for readability — strip the playtest name to alphanumeric and append the product id for uniqueness.
+- **Short-term cross-tenant auth runs Green → Corp** via SAGE, riding an in-flight PR. The long-term PME story is owned by the GSS platform team and is out of scope.
+- **Delete is a tombstone + 7-day GC**, not a synchronous hard delete. SFI requires manual PR approval for Partner Registry writes, so a true hard delete is not achievable in v1. Tombstoning clears `AllowedDnaGroups` immediately so testers lose access, and the offering disappears from the DevApi listing. *Needs explicit sign-off from xCloud reviewers.*
+- **Streaming-enabled playtests must carry an explicit expiration.** xCloud needs a bounded end date; download-only playtests are unaffected. UI default is 90 days with a soft warning above 180.
+- **Offering write + title attach are bundled into one PR** — cuts the manual SFI approval cost in half (one PR per publish instead of two).
+- **External API is unversioned today; internal routes live under `/v3/...`** to match existing SAGE and `WorkflowsControllerV3` conventions. Future breaking changes bump to `/v2/playtest/ingestion`; additive optional fields do not require a bump.
 
 ## 4. Work breakdown
 
@@ -79,13 +77,9 @@ Soak  (wk 7–10)    end-to-end stabilization, OpenAPI publish, runbooks
 
 ## 5. Contracts
 
-| Surface | Where |
-|---|---|
-| External REST (xPlaytest ↔ SAGE) | [`openapi/playtest-ingestion.yaml`](./openapi/playtest-ingestion.yaml) |
-| Internal contract types & code references | [`ARCHITECTURE.md`](./ARCHITECTURE.md) |
-| Long-form spec (rationale, alternatives, code citations) | [`SPEC.md`](./SPEC.md) |
+The external REST contract lives in [`openapi/playtest-ingestion.yaml`](./openapi/playtest-ingestion.yaml). Internal contract types and code references live in [`ARCHITECTURE.md`](./ARCHITECTURE.md). Full rationale, alternatives, and code citations live in [`SPEC.md`](./SPEC.md).
 
-The single most important payload is `PlaytestIngestionJobParameters`. Required fields: `PlaytestId`, `AllowedDnaGroups` (min 1), `ExpirationTime`, `StoreAsset`. Optional with server defaults: `AllowedSandboxId` (→ `RETAIL`), `IsGreenSigned` (→ `true`). Reserved for future: `CallbackUrl`, `CorrelationId`.
+The central payload is `PlaytestIngestionJobParameters`. Required fields are `PlaytestId`, `AllowedDnaGroups` (min 1), `ExpirationTime`, and `StoreAsset`. `AllowedSandboxId` and `IsGreenSigned` are optional and default server-side to `RETAIL` and `true`. `CallbackUrl` and `CorrelationId` are reserved for future use.
 
 ## 6. Milestones
 
@@ -117,15 +111,13 @@ A v1 release passes when **all** of the following hold:
 
 ## 8. Known risks and open items
 
-| Item | Status | Plan |
-|---|---|---|
-| Cross-tenant S2S long-term (PME) | Open | GSS platform team owns the PME story. xPlaytest rides the short-term Green → Corp PR; the call site is marked for revisit. |
-| Manual PR approval on Partner Registry writes | Mitigated | One bundled PR per publish instead of two; xCloud reviewers approve out-of-band for the internship. |
-| `XboxTitleId` resolver | Open (P0 in PT2) | Read `alternateIds[XboxTitleId]` from XProduct; replaces today's empty hardcode. |
-| `AumID` for PC | Decided | Ship a constant default for v1 (telemetry-only on server side); v1.1 plumbs the real `ApplicationId` from the AppX manifest. |
-| PC install poll path | Open (audit in XC6) | Today's allocator parameters are Xbox-only. XC6 audits and branches `ServerFilter` on `Platform`. |
-| Stable playtest identity for offering id | Open | xPlaytest confirms whether `PartnerCenterProductId` is stable across republishes (recommended); otherwise we use the equivalent stable upstream id. Materially changes the offering-proliferation story on nightly republishes. |
-| Delete model (tombstone vs hard delete) | Decision pending sign-off | v1 ships tombstone + 7d GC. User-visible behavior matches the P0 wording. Needs explicit xCloud sign-off. |
+- **Cross-tenant S2S long-term (PME).** *Open.* The GSS platform team owns the PME story. xPlaytest rides the short-term Green → Corp PR; the call site is marked for revisit.
+- **Manual PR approval on Partner Registry writes.** *Mitigated.* One bundled PR per publish instead of two; xCloud reviewers approve out-of-band for the duration of the internship.
+- **`XboxTitleId` resolver.** *Open — P0 inside PT2.* Read `alternateIds[XboxTitleId]` from XProduct; replaces today's empty hardcode.
+- **`AumID` for PC.** *Decided.* Ship a constant default for v1 (telemetry-only on the server side); v1.1 plumbs the real `ApplicationId` from the AppX manifest.
+- **PC install poll path.** *Open — audit lives in XC6.* Today's allocator parameters are Xbox-only. XC6 audits the path and branches `ServerFilter` on `Platform`.
+- **Stable playtest identity for offering id.** *Open.* xPlaytest confirms whether `PartnerCenterProductId` is stable across republishes (the recommended option); otherwise we use the equivalent stable upstream id. This is the one open item that materially changes the offering-proliferation story on nightly republishes.
+- **Delete model (tombstone vs. hard delete).** *Decision pending sign-off.* v1 ships tombstone + 7-day GC. User-visible behavior matches the P0 wording, but the deviation needs explicit xCloud sign-off.
 
 ## Glossary
 
