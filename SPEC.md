@@ -434,7 +434,8 @@ Each open question now has a recommended close (resolves comment B72).
 
 **Recommendation:**
 - v1: **honor the existing `PlaytestEndDate` as-is.** Default = `DateTime.MaxValue`. No hard cap.
-- If/when capacity becomes the constraint: introduce a **soft cap of 180 days** on the xCloud-derived offering expiration (capacity reclaim) while keeping the playtest itself active for download. The download playtest is cheap; only the streaming offering needs the soft cap.
+- Playtest expiration is currently uncapped — a playtest will persist indefinitely unless the developer explicitly sets an end date. Before we change that, confirm with xCloud whether long-lived streaming offerings present a real capacity / storage constraint. If they do, introduce a **soft cap of 100 days** on the xCloud-derived offering expiration (capacity reclaim) — enforced server-side at publish time with a clear validation error and an override path for studios that legitimately need longer windows — while keeping the playtest itself active for download. The download playtest is cheap; only the streaming offering needs the soft cap.
+- A soft cap is preferable to a hard one because it preserves the existing developer-controlled lifecycle while giving xCloud a knob to pull back on if usage grows faster than capacity.
 - The 3-day cap is too aggressive for studio-led private testing cycles and would break parity with the existing download flow.
 
 **Action:** Document the soft-cap intention in the OpenAPI; do not enforce in v1.
