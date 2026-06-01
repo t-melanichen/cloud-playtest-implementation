@@ -19,13 +19,13 @@ flowchart LR
     PR["services.partnerregistry<br/>(xCloud)"]
     SUCU["SUCU / install pipeline<br/>(xCloud)"]
 
-    PC -->|Publish<br/>(Enable Cloud Streaming ✓)| XPT
-    XPT -->|POST /playtest/ingestion<br/>(S2S bearer)| SAGE
-    XPT -->|GET /playtest/ingestion/{jobId}<br/>poll, exp backoff| SAGE
-    XPT -->|DELETE /playtest/ingestion/by-playtest/{id}<br/>on playtest delete| SAGE
-    SAGE -->|/v3/workflows/playtestingestion| CI
-    CI -->|BulkEditAsync<br/>(offering write + title attach<br/>in one ADO PR)| PR
-    CI -->|PollFirstInstall<br/>(flight = lex-smallest DNA group)| SUCU
+    PC -->|"Publish<br/>(Enable Cloud Streaming ✓)"| XPT
+    XPT -->|"POST /playtest/ingestion<br/>(S2S bearer)"| SAGE
+    XPT -->|"GET /playtest/ingestion/{jobId}<br/>poll, exp backoff"| SAGE
+    XPT -->|"DELETE /playtest/ingestion/by-playtest/{id}<br/>on playtest delete"| SAGE
+    SAGE -->|"/v3/workflows/playtestingestion"| CI
+    CI -->|"BulkEditAsync<br/>(offering write + title attach<br/>in one ADO PR)"| PR
+    CI -->|"PollFirstInstall<br/>(flight = lex-smallest DNA group)"| SUCU
 
     classDef green fill:#dff2d8,stroke:#3a7d2c,color:#000
     classDef corp fill:#dde6f5,stroke:#2a4a7a,color:#000
@@ -47,9 +47,9 @@ The four phases the user sees from "click Publish" to "playtest is streamable."
 sequenceDiagram
     autonumber
     actor Creator
-    participant XPT as xPlaytest<br/>(XPackagePlaytestPublishWorkflow)
+    participant XPT as "xPlaytest<br/>(XPackagePlaytestPublishWorkflow)"
     participant SAGE
-    participant CI as services.contentingestion<br/>(PlaytestTitleIngestionWorkflow)
+    participant CI as "services.contentingestion<br/>(PlaytestTitleIngestionWorkflow)"
     participant PR as services.partnerregistry
     participant SUCU as Install pipeline
 
@@ -68,7 +68,7 @@ sequenceDiagram
 
     par xCloud ingestion (async)
         CI->>CI: validate PlaytestIngestionJobParameters
-        CI->>CI: AssetIngestionWorkflow<br/>(no BigCat lookup; uses StoreAsset)
+        CI->>CI: AssetIngestionWorkflow<br/>(no BigCat lookup, uses StoreAsset)
         CI->>PR: BulkEditAsync<br/>(offering xpt-{shortId} + title attach,<br/>AllowedDnaGroups, ExpirationTime, RETAIL sandbox)
         PR-->>CI: PR merged (manual SFI approval)
         CI->>SUCU: PollFirstInstall<br/>(flight = lex-smallest DNA group GUID)
