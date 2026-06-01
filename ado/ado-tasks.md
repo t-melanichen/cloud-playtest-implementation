@@ -68,8 +68,9 @@ and the first end-to-end ingestion (Milestone 2) respectively.
 | **XC4.a** | Extend `PlayerAuthorizationOptions` schema | partner-registry dev | 2 | — | `AllowedDnaGroups: List<Guid>` and `AllowedSandboxId: string` added to `PlayerAuthorizationOptions`. JSON schema in `Schemas/` updated. Existing `OfferingV2` documents continue to deserialize (backfill on read: missing fields → empty list / `"RETAIL"`). Round-trip serialization test added. |
 | **XC4.b** | Bulk-edit support for two-write playtest upsert + content-ingestion SPN allow-list | partner-registry dev | 2 | XC4.a | `RegistryProvider.BulkEditAsync` exposes a path that combines (create offering, attach title) into one PR to satisfy SFI manual-approval policy (SPEC.md §3.10). Unit test confirms a single commit / single PR is produced when both edits are queued together. Additionally, the `services.contentingestion` service identity is added to Partner Registry's write-route allow-list (per ARCHITECTURE.md §3.4 item 5). Verified by integration test from content-ingestion INT. |
 | **XC4.c** | `OfferingV2.ToShortId()` helper (≤ 32 chars) | partner-registry dev | 1 | XC4.a | New static helper produces a deterministic ≤ 32-char id from an input GUID (e.g., 12-hex-char prefix). Collision probability documented. Used by the workflow's `xpt-{shortId}` derivation. Unit tests cover round-trip + collision behaviour. |
+| **XC4.d** | Surface `AllowedDnaGroups` + `AllowedSandboxId` in the DevAPI Add/Edit Offering admin UI | DevAPI UI dev (TBD — repo location to confirm with partner-registry team) | 2 | XC4.a | The internal admin UI at `americas.gssv-dev-prod.xboxlive.com/Partners/MICROSOFT` Add Offering and Edit Offering forms expose a multi-select for `AllowedDnaGroups` (GUIDs) and a single-select / free-text for `AllowedSandboxId` (default `RETAIL`). Values round-trip correctly via the existing Partner Registry write path (XC4.a + XC4.b). **Not on the M1 critical path** — M1.demo and the production ingestion flow (xPlaytest → SAGE → content-ingestion) both write these fields programmatically. This task only unblocks the operator/ops convenience of inspecting and hand-editing playtest offerings in the admin UI; can ship after M2. |
 
-Feature SWAG total: **5 days**. XC4.a is the critical sub-task for Milestone 1.
+Feature SWAG total: **7 days**. XC4.a is the critical sub-task for Milestone 1. XC4.d is off the critical path and can ship after M2.
 
 ---
 
@@ -176,6 +177,7 @@ Feature SWAG total: **5 days**.
 | C | M3 — xPlaytest integration | PT1.a, PT1.b, PT1.c, PT4.a, PT4.b, PT5.a, PT5.b, PT5.c, PT5.d | 15 |
 | D | M4 — Lifecycle | PT6.a, PT6.b, PT6.c, PT6.d | 5 |
 | — | M5 — Soak + handoff | (no new tasks; bug-fix + documentation) | 0 |
+| Off-critical-path | Operator UI (post-M2) | XC4.d | 2 |
 
 Grand total dev-days: **~54 days of focused work** (xCloud core 27 + M1.demo 2 + xPlaytest 25 = 54),
 parallelizable across the 2 teams into roughly **7–8 calendar weeks** with
