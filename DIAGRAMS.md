@@ -68,8 +68,10 @@ sequenceDiagram
 
     par xCloud ingestion (async)
         CI->>CI: validate PlaytestIngestionJobParameters
-        CI->>CI: AssetIngestionWorkflow<br/>(no BigCat lookup, uses StoreAsset)
-        CI->>PR: BulkEditAsync<br/>(offering xpt-{shortId} + title attach,<br/>AllowedDnaGroups, ExpirationTime, RETAIL sandbox)
+        CI->>SUCU: AssetIngestionWorkflow<br/>(create asset + ingest versions,<br/>no BigCat lookup, uses StoreAsset)
+        SUCU-->>CI: versions live, flight mappings wired<br/>(asset ingestion READY)
+        Note over CI: Precondition: asset/content ingestion<br/>must reach READY before any<br/>partner-registry write
+        CI->>PR: BulkEditAsync — single PR, two writes:<br/>(1) upsert offering xpt-{shortId}<br/>(AllowedDnaGroups, ExpirationTime, RETAIL sandbox)<br/>(2) attach title to that offering
         PR-->>CI: PR merged (manual SFI approval)
         CI->>SUCU: PollFirstInstall<br/>(flight = lex-smallest DNA group GUID)
         SUCU-->>CI: install available
