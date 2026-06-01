@@ -3,7 +3,7 @@
 **Status:** Draft v2, post May 29 2026 alignment meeting + June 3 follow-up sync
 **Owner:** Melanie Chen (xPlaytest intern)
 **Reviewers:** Brian Bowman (xPlaytest), Anthony Keller (xPlaytest), David Kushmerick (xPlaytest), Timi Bolaji (xCloud), Jack Heuberger (xCloud), Aditya Toney (xCloud)
-**Companion docs:** [`ARCHITECTURE.md`](./ARCHITECTURE.md) (code-grounded), [`openapi/playtest-ingestion.yaml`](./openapi/playtest-ingestion.yaml), [`ado/ado-tasks.md`](./ado/ado-tasks.md)
+**Companion docs:** [`ARCHITECTURE.md`](./ARCHITECTURE.md) (code-grounded), [`DIAGRAMS.md`](./DIAGRAMS.md) (visual reference), [`openapi/playtest-ingestion.yaml`](./openapi/playtest-ingestion.yaml), [`ado/ado-tasks.md`](./ado/ado-tasks.md)
 **Source inputs:** `Documentation/XD-Chen Melanie-Instantly Shareable Playtest.pdf` (formal project description), `Documentation/Xbox Playtest - Partner Intro Deck -- May 2026.pdf`, `Transcripts/Sync1.docx` (May 29 group sync, authoritative), `Transcripts/Jack.docx` / `Jack2.docx`, `Transcripts/Timi.docx`, `Documentation/Instantly Shareable Playtest - Gaming Intern Project Sync 2026-06-03.pdf` (June 3 sync agenda + AI-generated summary of May 29), `Files/` (real `TitleIngestion.cs`, `TitleIngestionWorker.cs`, `ProductIngestionWorkflow.cs`, and an actual XProduct document JSON sample).
 
 > This document is the **dev spec** for cross-team alignment. It captures *what* we're building, *who owns what*, *why* the contract looks the way it does, and *how long* each piece should take. The deeper *how* (file-level code citations, validators, exact line numbers) lives in `ARCHITECTURE.md`.
