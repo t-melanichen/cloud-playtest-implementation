@@ -100,7 +100,7 @@ Four services participate. None of them owns the whole flow.
      2. derive workflow fields
           PartnerId        = "PLAYTEST"
           OfferingId       = "xpt-{ToShortId(PlaytestId)}"   (≤ 32 chars)
-          TitleId          = same as OfferingId (one title per offering)
+          TitleId          = alphanumOnly(StoreAsset.Name) + PlaytestGeneratedXProductBigId   (see §5.3)
           Audiences        = AllowedDnaGroups → XusAudience(g, RetailSandboxId)
      3. chain AssetIngestionWorkflow
           uses pre-built StoreAsset (no xProduct call)
@@ -298,7 +298,7 @@ These fields are **never sent by xPlaytest** — the workflow computes them.
 |---|---|
 | `PartnerId` | Constant `Id.Parse("PLAYTEST")` |
 | `OfferingId` | `$"xpt-{ToShortId(PlaytestId)}"`, must be ≤ 32 chars |
-| `TitleId` | Same as `OfferingId` (single-title-per-offering convention; not enforced by schema — see `TitlesProcessor.cs:50-68` which returns many titles) |
+| `TitleId` | `<alphanumOnly(StoreAsset.StoreEntry.Name)><PlaytestGeneratedXProductBigId>` (see SPEC.md §5.3 — `OfferingId` is the catalog/auth key, `TitleId` is the install/streaming key; the two are intentionally distinct). |
 | `SourceId` | `StoreAsset.ContentId` |
 | `PackageNameOverride` | `StoreAsset.StoreEntry.Name` |
 | `Audiences` | `AllowedDnaGroups.Select(g => new XusAudience(g, XusAudience.RetailSandboxId))` |
