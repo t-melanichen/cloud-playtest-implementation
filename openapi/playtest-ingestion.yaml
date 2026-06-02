@@ -22,11 +22,13 @@ servers:
   - url: https://{sageHost}
     description: |
       SAGE proxy. Routes documented here are the **external** SAGE paths that
-      xPlaytest calls. SAGE forwards them to `services.contentingestion` at
-      `/v3/workflows/playtestingestion[/{jobId}]` (see SPEC.md §6 and
-      ARCHITECTURE.md §3.2 / §3.3). Downstream consumers should treat the
-      downstream paths as an implementation detail and program against the
-      external paths in this document.
+      xPlaytest calls. SAGE matches them against its `appsettings.xcloud.json`
+      `ApiRouteConfiguration` block (ServiceRouteName=`playtest`, Version=`v3`,
+      Apis with PathTemplate `playtestingestion` / `playtestingestion/{jobId}`)
+      and forwards them to `services.contentingestion` at
+      `/v3/workflows/playtestingestion[/{jobId}]` (see ARCHITECTURE.md §3.2 / §3.3).
+      Downstream consumers should treat the downstream paths as an implementation
+      detail and program against the external paths in this document.
     variables:
       sageHost:
         default: sage.gamestreaming.xboxlive.com
@@ -37,23 +39,30 @@ tags:
     description: Trigger and poll the playtest ingestion workflow.
 
 paths:
-  /playtest/ingestion:
+  /v3/playtest/playtestingestion:
     post:
       tags: [PlaytestIngestion]
       operationId: triggerPlaytestIngestion
       summary: Trigger asynchronous playtest ingestion into xCloud.
       description: |
-        Schedules a `PlaytestTitleIngestionWorkflow` in services.contentingestion.
-        Returns immediately with a `jobId` that the caller polls via
-        `GET /playtest/ingestion/{jobId}`.
+        Schedules a `PlaytestIngestion` workflow in services.contentingestion.
+        Returns immediately with an `OperationStatus` whose `id` is the workflow
+        instance id; the caller polls via
+        `GET /v3/playtest/playtestingestion/{jobId}`.
 
-        **Idempotency:** The xCloud workflow upserts the offering keyed on the
-        derived `xpt-{shortId(PlaytestId)}`. Re-submitting the same `PlaytestId`
-        while a previous job is still running returns 409 Conflict with a body
-        that names the in-flight `jobId` + `statusUrl` so the caller can rejoin
-        polling instead of starting a fresh job. After the previous job reaches
-        a terminal state, re-submitting starts a new job that updates the
-        existing offering in place.
+        **Idempotency (XC3 — receiver-side dedup not yet implemented):** The
+        xCloud workflow upserts the offering keyed on the derived
+        `xpt-{shortId(PlaytestId)}`. The intended contract is that re-submitting
+        the same `PlaytestId` while a previous job is still running returns
+        `409 Conflict` with a body that names the in-flight `jobId` + `statusUrl`
+        so the caller can rejoin polling instead of starting a fresh job. After
+        the previous job reaches a terminal state, re-submitting starts a new
+        job that updates the existing offering in place. The contract-tier
+        scheduler (`WorkflowProcessor.TryAcquireJobCreationLockAsync`) already
+        emits `ServiceException(IngestionWorkflowAlreadyRunning, Conflict)` for
+        races on the same lock id — XC3 will surface that exception as a
+        `JobConflict` body, until then the dedup signal is best-effort and
+        documented here for forward compatibility.
       security:
         - s2sBearer: []
       requestBody:
@@ -113,21 +122,28 @@ paths:
                     aumId: "ExamplePub.ExampleGame_8wekyb3d8bbwe!App"
       responses:
         "202":
-          description: Accepted; workflow scheduled.
+          description: |
+            Accepted; workflow scheduled. The body is SAGE's standard
+            `OperationStatus` envelope — `id` is the workflow instance id used
+            for the subsequent polling URL.
           headers:
             Location:
-              description: Convenience URL for the polling endpoint.
+              description: |
+                Convenience URL for the polling endpoint
+                (`/v3/playtest/playtestingestion/{id}`).
               schema:
                 type: string
                 format: uri
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JobAccepted"
+                $ref: "#/components/schemas/OperationStatus"
         "400":
           description: |
-            Invalid request. Body validation failed (missing required fields,
-            StoreAsset.Validate() rejection, etc.).
+            Invalid request. Body validation failed — missing required field
+            (`playtestId`, `allowedDnaGroups`, `expirationTime`, or `storeAsset`),
+            `correlationId` over 128 characters, empty
+            `allowedDnaGroups`, or `StoreAsset.Validate()` rejection.
           content:
             application/problem+json:
               schema: { $ref: "#/components/schemas/ProblemDetails" }
@@ -139,9 +155,18 @@ paths:
             for this route, or the cross-tenant auth scheme rejected the token.
         "409":
           description: |
-            Conflict — a non-terminal job already exists for this `playtestId`.
-            Response body names the in-flight `jobId` and `statusUrl` so the
-            caller can rejoin polling on the existing job.
+            **Conflict — XC3 scope.** A non-terminal job already exists for this
+            `playtestId`. HTTP 409 is the standard "the request can't be applied
+            because it conflicts with the current state of the target resource"
+            status; here the conflicting state is an in-flight workflow holding
+            the per-playtest lock (`playtest_{playtestId}`). Response body names
+            the in-flight `jobId` and `statusUrl` so the caller can rejoin polling
+            on the existing job instead of starting a duplicate.
+
+            **Not surfaced by the receiver in v1.** The workflow scheduler raises
+            the conflict internally but the route does not yet translate it into
+            this body shape — XC3 will. Documented here so xPlaytest can code
+            the polling-rejoin path once.
           content:
             application/problem+json:
               schema: { $ref: "#/components/schemas/JobConflict" }
@@ -153,7 +178,7 @@ paths:
             application/problem+json:
               schema: { $ref: "#/components/schemas/ProblemDetails" }
 
-  /playtest/ingestion/{jobId}:
+  /v3/playtest/playtestingestion/{jobId}:
     parameters:
       - $ref: "#/components/parameters/JobId"
     get:
@@ -166,49 +191,47 @@ paths:
         deadline xPlaytest persists the `jobId` and a background reconciliation
         job continues polling indefinitely (default 15 min interval, capped at
         24 h) until the workflow reaches a terminal state. The endpoint itself
-        has no foreground timeout — the workflow may legitimately stay in
-        `Running` for hours when asset ingestion is slow.
+        has no foreground timeout — the workflow may legitimately stay running
+        for hours when asset ingestion is slow.
       security:
         - s2sBearer: []
       responses:
         "200":
-          description: Current workflow state.
+          description: |
+            Current workflow state, returned as SAGE's standard `OperationStatus`
+            envelope. `isSuccess = null` while running; `true`/`false` once the
+            workflow reaches a terminal state. The `description` field carries
+            the human-readable summary (and, on success, the resulting
+            `offeringId`).
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JobStatus"
+                $ref: "#/components/schemas/OperationStatus"
               examples:
                 running:
+                  summary: Workflow still in progress.
                   value:
-                    jobId: "wf-abc123"
-                    status: "Running"
-                    updatedAt: "2026-05-29T21:10:00Z"
-                streamable:
+                    id: "8a3b1f0c-4e6a-4f9b-9d3c-7b2e1a4d6f0e"
+                    startTime: "2026-05-29T21:10:00Z"
+                    completionTime: null
+                    description: "Asset ingestion in progress."
+                    isSuccess: null
+                succeeded:
+                  summary: Terminal success — offering published.
                   value:
-                    jobId: "wf-abc123"
-                    status: "Streamable"
-                    terminalState: "Streamable"
-                    offeringId: "xpt-8a3b1f0c4e6a"
-                    titleId: "ExampleGamePlaytest9NXYZ12345PT"
-                    updatedAt: "2026-05-29T21:18:42Z"
+                    id: "8a3b1f0c-4e6a-4f9b-9d3c-7b2e1a4d6f0e"
+                    startTime: "2026-05-29T21:10:00Z"
+                    completionTime: "2026-05-29T21:18:42Z"
+                    description: "Offering xpt-8a3b1f0c4e6a published."
+                    isSuccess: true
                 failed:
+                  summary: Terminal failure.
                   value:
-                    jobId: "wf-abc123"
-                    status: "Failed"
-                    terminalState: "Failed"
-                    errors:
-                      - code: "ASSET_INGESTION_FAILED"
-                        message: "AssetIngestionWorkflow returned Failed after 3 retries."
-                    updatedAt: "2026-05-29T21:25:00Z"
-                installNotFound:
-                  value:
-                    jobId: "wf-abc123"
-                    status: "InstallNotFound"
-                    terminalState: "InstallNotFound"
-                    errors:
-                      - code: "SUCU_FLIGHT_NOT_RESOLVABLE"
-                        message: "Install pipeline could not resolve a package version for the supplied DNA-group flight id."
-                    updatedAt: "2026-05-29T21:25:00Z"
+                    id: "8a3b1f0c-4e6a-4f9b-9d3c-7b2e1a4d6f0e"
+                    startTime: "2026-05-29T21:10:00Z"
+                    completionTime: "2026-05-29T21:25:00Z"
+                    description: "AssetIngestionWorkflow returned Failed after 3 retries."
+                    isSuccess: false
         "401":
           description: Unauthenticated.
         "403":
@@ -219,7 +242,7 @@ paths:
             application/problem+json:
               schema: { $ref: "#/components/schemas/ProblemDetails" }
 
-  /playtest/ingestion/by-playtest/{playtestId}:
+  /v3/playtest/playtestingestion/by-playtest/{playtestId}:
     parameters:
       - name: playtestId
         in: path
@@ -233,7 +256,14 @@ paths:
       operationId: tombstonePlaytestIngestion
       summary: Tear down a published playtest's xCloud offering.
       description: |
-        Called by xPlaytest's delete workflow (PT6.d). Causes the workflow to:
+        **Not implemented in v1 (XC1 scope only documents this route).** The
+        receiver currently rejects all calls with `404`; the endpoint is kept in
+        the contract so xPlaytest's PT6.d delete workflow can be written against
+        the final shape and so the SAGE gateway route can be provisioned without
+        a follow-up spec change. Implementation lands as part of the XC1.c /
+        XC3.d task pair.
+
+        When implemented, the call will cause the workflow to:
           * Set `offering.PlayerAuthorizationOptions.AllowedDnaGroups = []` —
             effectively denying everyone, preserving history.
           * Schedule a follow-up GC pass to fully delete the offering and
@@ -243,22 +273,20 @@ paths:
         - s2sBearer: []
       responses:
         "200":
-          description: Tombstone complete (or already tombstoned).
+          description: Tombstone complete (or already tombstoned). XC3 scope.
           content:
             application/json:
               schema:
-                type: object
-                required: [playtestId, offeringId, tombstoneTime]
-                properties:
-                  playtestId: { type: string, format: uuid }
-                  offeringId: { type: string }
-                  tombstoneTime: { type: string, format: date-time }
+                $ref: "#/components/schemas/OperationStatus"
         "401":
           description: Unauthenticated.
         "403":
           description: Forbidden.
         "404":
-          description: No offering exists for this `playtestId` (never ingested).
+          description: |
+            No offering exists for this `playtestId` (never ingested), OR the
+            endpoint is not yet implemented in v1 (current behaviour for every
+            call until XC3.d ships).
 
 components:
   securitySchemes:
@@ -275,7 +303,7 @@ components:
       name: jobId
       in: path
       required: true
-      description: Workflow identifier returned by POST /playtestingestion.
+      description: Workflow instance id returned by POST /v3/playtest/playtestingestion (the `id` field of `OperationStatus`).
       schema:
         type: string
         minLength: 1
@@ -337,7 +365,7 @@ components:
           format: date-time
           description: |
             When the offering should expire. **Required** — the
-            `POST /playtest/ingestion` endpoint exists only for streaming-enabled
+            `POST /v3/playtest/playtestingestion` endpoint exists only for streaming-enabled
             playtests, and the June 3 2026 sync ratified that every streaming
             playtest must carry an explicit end date. The xPlaytest publish-side
             validator rejects streaming publishes without it (`400 BadRequest`)
@@ -470,63 +498,54 @@ components:
           items: { type: string }
           description: Empty for Playtest (no hub-game relationships).
 
-    JobAccepted:
+    OperationStatus:
       type: object
-      required: [jobId, statusUrl]
-      properties:
-        jobId:
-          type: string
-          description: Opaque workflow identifier; supply to GET to poll status.
-          minLength: 1
-        statusUrl:
-          type: string
-          format: uri
-          description: Fully-qualified URL of the polling endpoint for this job.
-        correlationId:
-          type: string
-          nullable: true
-          description: Echoes the request's `correlationId` if supplied.
+      description: |
+        SAGE's standard async-operation envelope (see
+        `Microsoft.GameStreaming.Services.Common.Content.Operations.OperationStatus`
+        in services.contentingestion). The same shape is used for the asset and
+        asset-version ingestion endpoints (`/v3/workflows/assetingestion`,
+        `/v3/workflows/assetversioningestion`); the Playtest endpoint reuses it
+        so xPlaytest can share a single typed client across SAGE workflows.
 
-    JobStatus:
-      type: object
-      required: [jobId, status, updatedAt]
+        The receiver derives the values from `PlaytestIngestion.JobStateV3`
+        (which implements `IOperationState`): `description` carries the
+        human-readable summary, and once the workflow succeeds it embeds the
+        resulting `offeringId`.
+      required: [id, startTime, description]
       properties:
-        jobId:
+        id:
           type: string
-        status:
-          type: string
-          enum: [Running, Streamable, Failed, InstallNotFound]
-        terminalState:
-          type: string
-          nullable: true
-          enum: [Streamable, Failed, InstallNotFound]
-          description: Populated when `status` is terminal.
-        offeringId:
-          type: string
-          nullable: true
-          description: Populated on `Streamable` (`xpt-{shortId}`).
-        titleId:
-          type: string
-          nullable: true
-          description: Populated on `Streamable`.
-        errors:
-          type: array
-          default: []
-          items:
-            type: object
-            required: [code, message]
-            properties:
-              code:
-                type: string
-                description: Stable, machine-readable error code.
-              message:
-                type: string
-        updatedAt:
+          description: |
+            Workflow instance id assigned by the scheduler when the job was
+            accepted. Stable for the lifetime of the job; used as the path
+            segment of the polling URL.
+          minLength: 1
+        startTime:
           type: string
           format: date-time
-        correlationId:
+          description: UTC timestamp at which the workflow began.
+        completionTime:
           type: string
+          format: date-time
           nullable: true
+          description: |
+            UTC timestamp at which the workflow reached a terminal state.
+            `null` while the job is still running.
+        description:
+          type: string
+          description: |
+            Human-readable summary of current state. On success this includes
+            the resulting `offeringId`; on failure it includes the underlying
+            error message.
+        isSuccess:
+          type: boolean
+          nullable: true
+          description: |
+            Tri-state success indicator:
+              * `null` — the job has not yet reached a terminal state.
+              * `true` — the job completed successfully.
+              * `false` — the job completed with failure; consult `description`.
 
     ProblemDetails:
       type: object
@@ -552,6 +571,13 @@ components:
               message: { type: string }
 
     JobConflict:
+      description: |
+        Returned with HTTP 409 when a non-terminal Playtest ingestion job
+        already exists for the requested `playtestId`. xPlaytest should rejoin
+        polling on the in-flight `jobId` rather than starting a duplicate; the
+        deduplication is keyed on the workflow lock id
+        `playtest_{playtestId}`. **XC3 scope** — the receiver does not surface
+        this body in v1.
       allOf:
         - $ref: "#/components/schemas/ProblemDetails"
         - type: object
