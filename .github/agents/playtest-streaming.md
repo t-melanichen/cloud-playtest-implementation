@@ -2,7 +2,7 @@
 name: playtest-streaming
 description: >-
   Cross-repo assistant for the Instantly Shareable Playtest project (xPlaytest ×
-  xCloud streaming). Knows the end-to-end flow and the five repositories it spans,
+  xCloud streaming). Knows the end-to-end flow and the six repositories it spans,
   the authoritative spec, and the active feature branches. Use it for design,
   implementation, and review work across those repos.
 ---
@@ -21,6 +21,23 @@ addition to the existing download flow. The behavior is purely additive.
 - `ARCHITECTURE.md` remains the reference for existing-code file/line citations.
 - Unresolved blockers live in [`Blockers/`](../../Blockers); post-end-to-end work
   lives in [`FuturePlans/`](../../FuturePlans).
+- **PR status across all repos lives in [`PRProgress/`](../../PRProgress)** — one file per PR
+  (`[<AREA>] PR <id> — <title>`), indexed in [`PRProgress/README.md`](../../PRProgress/README.md).
+  Consult it to see which pieces of the flow are merged vs. still in review/draft.
+
+## PRs delivering this project (see `PRProgress/` for details)
+| PR | Area | Repo | Status | Title |
+|---|---|---|---|---|
+| 15732852 | PTNR | services.partnerregistry | Merged | Add AllowedDnaGroups to PlayerAuthorizationOptions |
+| 15738761 | AUTH | services.auth | Merged | XC5.a: Enforce AllowedDnaGroups in user login authorization |
+| 15739964 | DEVAPI | services.devapi | Merged | Add Allowed DNA Groups field to Offering edit page |
+| 15751527 | PTNR-DATA | services.data.partnerregistry | Merged | Updated OfferingV2.json (DNATEST allowed DNA group) |
+| 15800964 | CING | services.contentingestion | Active | Playtest Title Ingestion Workflow |
+| 15829639 | SAGE | services.serviceapigateway | Draft | Register Playtest ingestion proxy routes for services.contentingestion |
+| 15834601 | XBET | Xbox.Xbet.Service | Draft | Playtest Ingestion Payload Builder |
+| 15849944 | PTNR | services.partnerregistry | Merged | Remove GetPackageSourceId from Playtest contract |
+| 15860243 | PTNR | services.partnerregistry | Merged | Refactor playtest title ID |
+| 15876080 | DEVAPI | services.devapi | Active | Testing workflow ingestion (Playtest Title Ingestion UI/client) |
 
 ## Repositories this project spans
 All paths are on the user's Desktop. **This agent's file does not by itself grant
@@ -31,6 +48,7 @@ access to repos outside this git root** — at the start of a session, add them 
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\services.contentingestion"
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\services.serviceapigateway"
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\services.partnerregistry"
+/add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\Xbox.Gpx.PartnerCenter.Client"
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\Xbox.JS"
 ```
 
@@ -40,7 +58,8 @@ access to repos outside this git root** — at the start of a session, add them 
 | `services.contentingestion` | `…\Desktop\services.contentingestion` | `PlaytestIngestionWorkflow` (validate → asset ingest → package/version → configure offering) + V3 controller routes | `t-melanichen/playtest-title-ingestion-workflow` |
 | `services.serviceapigateway` | `…\Desktop\services.serviceapigateway` | SAGE proxy routes (`/v3/playtest/playtestingestion[/{jobId}]`) in `appsettings.xcloud.json` | `t-melanichen/sage-playtest-ingestion-routes` |
 | `services.partnerregistry` | `…\Desktop\services.partnerregistry` | Offering + title: `AllowedDnaGroups`/`AllowedSandboxId` on `PlayerAuthorizationOptions`, `ConfigurePlaytestAsync` (one-PR offering+title) | `t-melanichen/playtest-offering-id-on-request` |
-| `Xbox.JS` | `…\Desktop\Xbox.JS` | Front-end / client surfaces (TBD which) | _tbd_ |
+| `Xbox.Gpx.PartnerCenter.Client` | `…\Desktop\Xbox.Gpx.PartnerCenter.Client` | **Partner Center Playtest UI (GPM, creator-facing).** Yarn/TS/React monorepo; playtest code lives under `apps/packages/src` (`pages/PlaytestWizard`, `components/PlaytestForm`, `components/AudienceSelection`, `helpers/featureFlags.ts`, `constants/playtest.ts`). This is where the streaming-enable toggle, the 7-day max duration cap for streaming playtests, and the Xbox-Live-ID-only audience restriction are surfaced. | `_tbd (off `main`)_` |
+| `Xbox.JS` | `…\Desktop\Xbox.JS` | Player-side / consumer client surfaces (TBD which) | _tbd_ |
 
 ## End-to-end flow (for orientation)
 1. **xPlaytest** publish workflow gains an `XCloudIngestionTrigger` state that builds one
@@ -67,8 +86,19 @@ access to repos outside this git root** — at the start of a session, add them 
 - PC-first (`WINDOWS.DESKTOP`); console deferred. The install poll path must **fork for PC**
   (the existing path is Xbox-only).
 
+## Partner Center UI changes (planned, `Xbox.Gpx.PartnerCenter.Client`)
+These land in `apps/packages/src` and are additive to the existing playtest wizard:
+- **Enable Cloud Streaming toggle** — a new boolean field on the playtest form
+  (`components/PlaytestForm`, `playtestTypes.ts`/`playtestFormSchema.ts`), gated behind a
+  feature flag (add to `helpers/featureFlags.ts`, e.g. alongside `XboxPlaytest`). When off,
+  behavior is unchanged (download-only).
+- **7-day max duration for streaming playtests** — when streaming is enabled, the
+  start/end-date validation (`playtestFormSchema.ts` `superRefine`, `fields/PlaytestDatesField.tsx`)
+  must cap duration at 7 days and disallow `noEndDate`. Non-streaming playtests keep today's rules.
+- **Xbox Live IDs only** — when streaming is enabled, restrict the audience
+  (`components/AudienceSelection`) to groups backed by Xbox Live IDs; surface a validation
+  error reusing the `playtestServiceErrorMap` pattern in `constants/playtest.ts`.
+
 ## How to work
 - Confirm which repo a change belongs in before editing; respect each repo's existing patterns.
-- When the spec and older docs conflict, follow `SPEC.md` v3 and flag the drift.
 - Check `Blockers/` and `FuturePlans/` before proposing work that may already be tracked or deferred.
-- Don't self-approve Partner Registry PRs (SFI); bundle offering+title into one PR.
