@@ -1,7 +1,15 @@
 # Blocker: PC streaming-package readiness polling
 
-**Status:** Open — path identified, not yet wired
+**Status:** In progress — version-aware poll implemented in PR `t-melanichen/playtest-pc-install-polling`; upstream install enablement (Timi) still pending
 **Owners:** Melanie Chen (xPlaytest) · Timi Bolaji (content/install)
+
+## Update (2026-06-15)
+The version-aware PC poll is implemented in branch `t-melanichen/playtest-pc-install-polling`
+(services.contentingestion): `PollFirstInstallAsync` now resolves the ingested version (install id +
+hash) and queries the PC server pool by `LocalPackageId` + `LocalPackageHash`. Full step list, the
+remaining repo work (PC-playtest SUG constant, region config), and Timi's upstream prerequisites
+(enable install-on-attach + set the PC server quota) are tracked in
+[`FuturePlans/pc-install-readiness-polling-implementation.md`](../FuturePlans/pc-install-readiness-polling-implementation.md).
 
 ## Problem
 Before a streaming playtest can be marked ready, we need to know that the streaming package has been **installed and is ready on a PC server**. The existing install-poll path is console-only: `TitleIngestionWorker.PollFirstInstallAsync` hardcodes Xbox allocator parameters (e.g. `ServerType.XboxV3SeriesS`, `XBOX_*` pool ids), so PC playtests fall into Xbox-only logic and the PC readiness signal isn't available today.

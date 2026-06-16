@@ -14,15 +14,17 @@ a direct link, and a Summary. Files are numbered in chronological order of creat
 | 02 | 15738761 | AUTH | services.auth | Merged | XC5.a: Enforce AllowedDnaGroups in user login authorization |
 | 03 | 15739964 | DEVAPI | services.devapi | Merged | Add Allowed DNA Groups field to Offering edit page |
 | 04 | 15751527 | PTNR-DATA | services.data.partnerregistry | Merged | Updated OfferingV2.json (DNATEST allowed DNA group) |
-| 05 | 15800964 | CING | services.contentingestion | Active | Playtest Title Ingestion Workflow |
+| 05 | 15800964 | CTIN | services.contentingestion | Merged | Playtest Title Ingestion Workflow |
 | 06 | 15829639 | SAGE | services.serviceapigateway | Draft | Register Playtest ingestion proxy routes for services.contentingestion |
 | 07 | 15834601 | XBET | Xbox.Xbet.Service | Draft | Playtest Ingestion Payload Builder |
 | 08 | 15849944 | PTNR | services.partnerregistry | Merged | Remove GetPackageSourceId from Playtest contract |
 | 09 | 15860243 | PTNR | services.partnerregistry | Merged | Refactor playtest title ID |
 | 10 | 15876080 | DEVAPI | services.devapi | Active | Testing workflow ingestion (Playtest Title Ingestion UI/client) |
+| 11 | 15892276 | PTNR | services.partnerregistry | Merged | Set Xbox AuthenticationOptions on playtest offerings |
+| 12 | 15905881 | CTIN | services.contentingestion | Merged | Gate playtest title ingestion endpoints with CrossTenantS2S policy |
 
 **Status legend:** Merged = completed/merged · Active = open and in review · Draft = open draft.
 
 **Area legend:** PTNR = services.partnerregistry · PTNR-DATA = services.data.partnerregistry ·
-AUTH = services.auth · DEVAPI = services.devapi · CING = services.contentingestion ·
+AUTH = services.auth · DEVAPI = services.devapi · CTIN = services.contentingestion ·
 SAGE = services.serviceapigateway · XBET = Xbox.Xbet.Service.

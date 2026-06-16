@@ -17,15 +17,16 @@ Open questions raised in Sync 3:
 
 ## v1 decision
 - Persist the returned **`jobId`** on `PublishedPlaytestEntity`.
-- Poll the SAGE status endpoint with **infinite retry** (no hard timeout in v1).
+- Poll ingestion status with **infinite retry** (no hard timeout in v1). The SAGE/CTIN caller and status-poll implementation details are consolidated in [`FuturePlans/s2s-cross-tenant-call.md`](../FuturePlans/s2s-cross-tenant-call.md).
 - Hold the playtest in a "waiting for ingestion" state until the workflow reaches a terminal state *and* the offering is complete (mirrors how playtest handles waiting-for-ingestion today, per David K).
 - **Document the human-approval requirement** prominently as a known gap.
 
 ## Next actions
-- Confirm the precise id to poll and the status contract with xCloud (Jack/Anthony).
+- Confirm the precise id to poll and the status contract with xCloud (Jack/Anthony); implementation tracking lives in [`FuturePlans/s2s-cross-tenant-call.md`](../FuturePlans/s2s-cross-tenant-call.md).
 - Refinement (timeouts, background reconciliation, 24h cap, operator alerts) is deferred to [`FuturePlans/polling-strategy-refinement.md`](../FuturePlans/polling-strategy-refinement.md).
 
 ## References
 - `Transcripts/Sync3.docx` — polling / PR-approval discussion.
 - `SPEC.md` §6.2 (one-PR offering+title via `BulkEditAsync`), §3.1 (polling strategy).
-- Outdated spec §3.10 "Polling vs Callback" was marked *FINALIZE THIS SECTION* — this file + the FuturePlans item supersede it.
+- Outdated spec §3.10 "Polling vs Callback" was marked *FINALIZE THIS SECTION* — this file + the FuturePlans items supersede it.
+- [`FuturePlans/s2s-cross-tenant-call.md`](../FuturePlans/s2s-cross-tenant-call.md).

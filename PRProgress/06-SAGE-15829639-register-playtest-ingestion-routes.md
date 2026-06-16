@@ -15,6 +15,31 @@ Registers the SAGE gateway proxy routes for the V3 playtest ingestion workflow:
 The backend lives in services.contentingestion (`BackendPathPrefix v3/workflows`). Routes are restricted
 to the xPlaytest SPI and MSI client app ids.
 
+## Cross-tenant ingress (Green → Corp)
+The Playtest Service / Partner Center workflow (xPackage) runs in **MSFTGreen**; SAGE and
+contentingestion (CTIN) run in **Corp**. CTIN is registered as a multi-tenant app **in the Green
+tenant** (`MultiTenantAuthConfig.AppId` = `xcloud-contentingestion-<env>` Green app reg) and validates
+incoming Green tokens via Lakshey's cross-tenant bearer scheme, authorizing the **xPackage** client id.
+
+Because CTIN authorizes the xPackage identity directly, the xPackage token must reach CTIN **unchanged**.
+SAGE therefore uses **pass-through** for the playtest route (`"AuthPassThroughEnabled": true`) — it does
+**not** mint a backend token for the `ctin` alias. SAGE's controller gate `[Authorize("DelegatedAuth")]`
+is a no-op (`RequireAssertion(context => true)` in `ServiceConfiguration.cs`), and the pass-through branch
+(`ProxyController.cs:115`) forwards the request and Authorization header with no checks. Auth is enforced
+entirely at CTIN.
+
+**Fix applied (local, not pushed):** Set `"AuthPassThroughEnabled": true` on both playtest APIs in
+`appsettings.xcloud.json` (replacing an earlier `UseCrossTenantAuth` attempt — that would have made SAGE
+mint its own token, which breaks the Green xPackage → CTIN identity chain).
+
+### xPackage app ids (the client CTIN authorizes)
+| Env | xPackage App Id | CTIN `AuthorizedClientIds` |
+|-----|-----------------|----------------------------|
+| Prod | `d60e3360-830b-4a09-b4bb-0f759ca83e06` | matches (Prod) |
+| Staging/Test/Int | `bf3fb5e5-6f18-40ef-b0e5-1403d2b9ac6d` | matches (Test/Int) |
+
 ## Blocker
-- Alias `cing` requires SRE to provision the contentingestion AppId in the K8s
-  `ServiceIdentitySettings` ConfigMap before this route can be exercised.
+- Alias `ctin` is **no longer required** for this route under pass-through (SAGE does not mint a token),
+  but the route still proxies to `contentingestion-svc.contentingestion`.
+- The xPackage caller must acquire its token with **audience = CTIN's Green app registration**
+  (`893629d4` Test / `41db6237` Int / `33a17a2a` Prod), not SAGE, for CTIN's cross-tenant scheme to validate it.

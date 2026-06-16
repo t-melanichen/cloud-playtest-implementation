@@ -1,10 +1,10 @@
-# [CING] PR 15800964 — Playtest Title Ingestion Workflow
+# [CTIN] PR 15800964 — Playtest Title Ingestion Workflow
 
 - **Pull Request:** 15800964
 - **Repo:** services.contentingestion (Xbox.Streaming)
 - **Source branch:** `t-melanichen/playtest-title-ingestion-workflow` → `main`
-- **Status:** Active (in review)
-- **Opened:** 2026-06-05  |  **Closed:** —
+- **Status:** Merged
+- **Opened:** 2026-06-05  |  **Closed:** 2026-06-15
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contentingestion/pullrequest/15800964
 
 ## Summary
