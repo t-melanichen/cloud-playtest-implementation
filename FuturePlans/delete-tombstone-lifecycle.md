@@ -6,6 +6,7 @@
 - v1 model: **tombstone + 7-day GC**.
   - Set `offering.PlayerAuthorizationOptions.AllowedDnaGroups = []` immediately → denies everyone, so testers lose access right away and the offering drops out of the DevApi listing.
   - Schedule a follow-up **GC pass** to fully delete the offering and its asset entries after a grace period (default 7 days).
+  - **Note:** This 7-day GC grace period is post-delete cleanup and is separate from the streaming expiration cap, which InternSync4 set to 30 days; see [`FuturePlans/expiration-cap-30-days.md`](./expiration-cap-30-days.md) and [`explanations/expiration-cap-and-storage.md`](../explanations/expiration-cap-and-storage.md).
   - Idempotent: deleting an already-tombstoned offering returns 200.
 - The `DELETE /v3/playtest/playtestingestion/by-playtest/{playtestId}` route is **documented in the contract but not yet implemented** (receiver returns 404 today).
 - SAGE / cross-tenant integration task tracking is consolidated in [`FuturePlans/s2s-cross-tenant-call.md`](./s2s-cross-tenant-call.md).

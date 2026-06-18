@@ -10,6 +10,8 @@
 ## Summary
 Adds the xPlaytest-side payload builder and contract types that enable streaming-enabled playtest
 ingestion into the xCloud pipeline via services.contentingestion.
+> **Note (2026-06-18):** The 7-day clamp described below is superseded by the 30-day cap decided in InternSync4; forward work is tracked in [`FuturePlans/expiration-cap-30-days.md`](../FuturePlans/expiration-cap-30-days.md).
+
 - `PlaytestIngestionPayloadBuilder.cs`: builds and validates `PlaytestIngestionJobParameters` from the
   playtest publish state — offering creation with DNA-group gating, 7-day expiration clamping, and
   StoreAsset configuration with Xbox Live title-id requirements.

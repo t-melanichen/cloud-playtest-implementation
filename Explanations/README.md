@@ -1,0 +1,31 @@
+# Explanations
+
+Conceptual companion docs for the Instantly Shareable Playtest project: how xPlaytest publishes into xCloud, where xPackage fits, and which platform differences drive the implementation plan.
+
+## Index
+
+| Doc | Description |
+|---|---|
+| [InternSync4 summary](./internsync4-summary.md) | Summarizes the 2026-06-18 meeting decisions on expiration, future dates, title-level configuration, and follow-ups. |
+| [xCloud vs xPlaytest vs xPackage](./xcloud-xplaytest-xpackage.md) | Defines the three layers, where each lives in code, and the end-to-end xPackage → xPlaytest → xCloud flow. |
+| [Ingestion creates new things](./ingestion-creates-new-things.md) | Explains how ingestion mints per-playtest title IDs, attaches content to offerings, triggers installs, and handles PC version hashes. |
+| [Future start dates and provisioning](./future-start-dates-and-provisioning.md) | Explains why future start dates do not require go-live trigger logic: provisioning starts before player-facing availability. |
+| [Expiration cap and storage](./expiration-cap-and-storage.md) | Explains the storage reason for the 30-day cap and why expiry changes are title metadata updates, not content re-ingests. |
+| [Handling Xbox vs PC differences](./handling-xbox-vs-pc-differences.md) | Actionable guide for implementing the known platform differences: expiration, dates, polling, future starts, and metadata updates. |
+
+## Relationship to the rest of the repo
+
+- [`../Blockers/`](../Blockers/) tracks open problems and decisions still blocking the v1 flow, such as [Xbox Live Title ID resolution](../Blockers/xbox-live-title-id.md), [PC install readiness polling](../Blockers/pc-install-readiness-poll.md), and [cross-tenant S2S](../Blockers/cross-tenant-s2s.md).
+- [`../FuturePlans/`](../FuturePlans/) tracks concrete forward work, including [the 30-day expiration cap](../FuturePlans/expiration-cap-30-days.md), [PC polling implementation](../FuturePlans/pc-install-readiness-polling-implementation.md), [S2S calls](../FuturePlans/s2s-cross-tenant-call.md), and related lifecycle work.
+- [`../Repos/`](../Repos/README.md) is the per-repo change log for branches and PRs across xCloud, xPlaytest, Partner Center, and player surfaces.
+- [`../PRProgress/`](../PRProgress/) remains the live PR-status ledger, including [XBET PR 15834601](../PRProgress/07-XBET-15834601-playtest-ingestion-payload-builder.md).
+
+## Sources
+
+- `Transcripts/InternSync4.docx`
+- `Transcripts/XCloudIngestion.docx`
+- `Transcripts/InternSync3.docx`
+- [`../Repos/README.md`](../Repos/README.md)
+- [`../Repos/services.contentingestion.md`](../Repos/services.contentingestion.md)
+- [`../Repos/Xbox.Xbet.Service.md`](../Repos/Xbox.Xbet.Service.md)
+- [`../Repos/Xbox.Gpx.PartnerCenter.Client.md`](../Repos/Xbox.Gpx.PartnerCenter.Client.md)
