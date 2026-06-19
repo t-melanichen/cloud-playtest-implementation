@@ -1,30 +1,54 @@
 # PR Progress — Instantly Shareable Playtest
 
-Tracker for every pull request @t-melanichen has started or completed on the Instantly Shareable
+Tracker for every meaningful pull request @t-melanichen has started or completed on the Instantly Shareable
 Playtest project (xPlaytest × xCloud streaming). One file per PR, all titled with the same format:
 
 `# [<AREA>] PR <id> — <PR title>`
 
 Each file records: Pull Request id, Repo (project), source → target branch, Status, open/close dates,
-a direct link, and a Summary. Files are numbered in chronological order of creation.
+a direct link, and a Summary.
+
+**Ordering:** The table below is listed in **chronological order (by PR creation)**. The numeric prefix on
+each file (e.g. `13-…`) reflects the order the PR was *added to this tracker*, not its chronological slot —
+so the on-disk file numbers are not strictly ascending in the table. Click a title to open its file.
 
 | # | PR | Area | Repo | Status | Title |
 |---|----|------|------|--------|-------|
-| 01 | 15732852 | PTNR | services.partnerregistry | Merged | Add AllowedDnaGroups to PlayerAuthorizationOptions |
-| 02 | 15738761 | AUTH | services.auth | Merged | XC5.a: Enforce AllowedDnaGroups in user login authorization |
-| 03 | 15739964 | DEVAPI | services.devapi | Merged | Add Allowed DNA Groups field to Offering edit page |
-| 04 | 15751527 | PTNR-DATA | services.data.partnerregistry | Merged | Updated OfferingV2.json (DNATEST allowed DNA group) |
-| 05 | 15800964 | CTIN | services.contentingestion | Merged | Playtest Title Ingestion Workflow |
-| 06 | 15829639 | SAGE | services.serviceapigateway | Draft | Register Playtest ingestion proxy routes for services.contentingestion |
-| 07 | 15834601 | XBET | Xbox.Xbet.Service | Draft | Playtest Ingestion Payload Builder |
-| 08 | 15849944 | PTNR | services.partnerregistry | Merged | Remove GetPackageSourceId from Playtest contract |
-| 09 | 15860243 | PTNR | services.partnerregistry | Merged | Refactor playtest title ID |
-| 10 | 15876080 | DEVAPI | services.devapi | Active | Testing workflow ingestion (Playtest Title Ingestion UI/client) |
-| 11 | 15892276 | PTNR | services.partnerregistry | Merged | Set Xbox AuthenticationOptions on playtest offerings |
-| 12 | 15905881 | CTIN | services.contentingestion | Merged | Gate playtest title ingestion endpoints with CrossTenantS2S policy |
+| 01 | 15732852 | PTNR | services.partnerregistry | Merged | [Add AllowedDnaGroups to PlayerAuthorizationOptions](./01-PTNR-15732852-add-allowed-dna-groups.md) |
+| 02 | 15738761 | AUTH | services.auth | Merged | [XC5.a: Enforce AllowedDnaGroups in user login authorization](./02-AUTH-15738761-enforce-allowed-dna-groups-login.md) |
+| 03 | 15739964 | DEVAPI | services.devapi | Merged | [Add Allowed DNA Groups field to Offering edit page](./03-DEVAPI-15739964-allowed-dna-groups-offering-edit.md) |
+| 04 | 15751527 | PTNR-DATA | services.data.partnerregistry | Merged | [Updated OfferingV2.json (DNATEST allowed DNA group)](./04-PTNR-DATA-15751527-offeringv2-dnatest-allowed-group.md) |
+| 05 | 15773366 | PTNR | services.partnerregistry | Merged | [New Playtest Endpoint](./13-PTNR-15773366-new-playtest-endpoint.md) |
+| 06 | 15800964 | CTIN | services.contentingestion | Merged | [Playtest Title Ingestion Workflow](./05-CTIN-15800964-playtest-title-ingestion-workflow.md) |
+| 07 | 15815668 | PTNR | services.partnerregistry | Merged | [Configure playtest offering regions and id naming](./14-PTNR-15815668-configure-offering-regions-id-naming.md) |
+| 08 | 15821813 | PTNR | services.partnerregistry | Merged | [Centralize playtest offering id on PlaytestRequest.GetOfferingId](./15-PTNR-15821813-centralize-offering-id-on-request.md) |
+| 09 | 15829639 | SAGE | services.serviceapigateway | Draft | [Register Playtest ingestion proxy routes for services.contentingestion](./06-SAGE-15829639-register-playtest-ingestion-routes.md) |
+| 10 | 15834601 | XBET | Xbox.Xbet.Service | Draft | [Playtest Ingestion Payload Builder](./07-XBET-15834601-playtest-ingestion-payload-builder.md) |
+| 11 | 15849944 | PTNR | services.partnerregistry | Merged | [Remove GetPackageSourceId from Playtest contract](./08-PTNR-15849944-remove-getpackagesourceid.md) |
+| 12 | 15860243 | PTNR | services.partnerregistry | Merged | [Refactor playtest title ID](./09-PTNR-15860243-refactor-playtest-title-id.md) |
+| 13 | 15876080 | DEVAPI | services.devapi | Active | [Testing workflow ingestion (Playtest Title Ingestion UI/client)](./10-DEVAPI-15876080-testing-workflow-ingestion.md) |
+| 14 | 15892276 | PTNR | services.partnerregistry | Merged | [Set Xbox AuthenticationOptions on playtest offerings](./11-PTNR-15892276-playtest-offering-authentication-type.md) |
+| 15 | 15894506 | XORC | xorc | Merged | [Expose Xbox Live TitleId on the product Xbox Live config response](./16-XORC-15894506-expose-xbox-live-title-id.md) |
+| 16 | 15896502 | CTIN | services.contentingestion | Draft | [Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow](./17-CTIN-15896502-pc-install-readiness-polling.md) |
+| 17 | 15905881 | CTIN | services.contentingestion | Merged | [Gate playtest title ingestion endpoints with CrossTenantS2S policy](./12-CTIN-15905881-gate-playtest-ingestion-crosstenant-s2s.md) |
+| 18 | 15946980 | CTGT | services.contenttargets | Draft | [Enable PC playtest install-on-attach + quota (PC_PLAYTEST SUG, Int)](./18-CTGT-15946980-pc-playtest-install-on-attach.md) |
+
+**Totals:** 18 tracked PRs — **13 merged**, **1 active**, **4 draft**.
 
 **Status legend:** Merged = completed/merged · Active = open and in review · Draft = open draft.
 
 **Area legend:** PTNR = services.partnerregistry · PTNR-DATA = services.data.partnerregistry ·
 AUTH = services.auth · DEVAPI = services.devapi · CTIN = services.contentingestion ·
-SAGE = services.serviceapigateway · XBET = Xbox.Xbet.Service.
+SAGE = services.serviceapigateway · XBET = Xbox.Xbet.Service · XORC = xorc (Xbox.Services) ·
+CTGT = services.contenttargets.
+
+## Superseded / abandoned PRs
+
+Earlier exploratory PRs that were abandoned once a better approach landed. Kept here for a complete record;
+they have no individual file. (Trivial throwaway PRs — `g`, `Remove Hyphen`, `Unused PR` — are omitted.)
+
+| PR | Area | Repo | Closed | Title & why superseded |
+|----|------|------|--------|------------------------|
+| 15680234 | XBET | Xbox.Xbet.Service | 2026-05-31 | *feat(PlayTest): add Partner Registry offering publish (Path B / AllowedFlights)* — early in-PlayTest scaffold using **Path B** (`AuthorizationOptions.AllowedFlights`); superseded by the **AllowedDnaGroups (Path A)** audience model (PRs 15732852 / 15738761 / 15739964). |
+| 15733268 | XBET | Xbox.Xbet.Service | 2026-06-02 | *Add PlaytestIngestionJobParameters + StoreAsset contracts* — early hand-written local wire contracts; superseded by PR 15834601 (payload builder) and the move to consume the published GSSV contract (board task 62696974). |
+| 15737351 | SAGE | services.serviceapigateway | 2026-06-16 | *Register Playtest ingestion proxy routes* — first attempt at the SAGE proxy routes; superseded by PR 15829639 (the live routes PR, #09 above). |

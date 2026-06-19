@@ -235,6 +235,8 @@ Melanie Chen · Xbox.JS / Bayside (Play Xbox) game-stream + auth package owners 
 - `FuturePlans/ecs-feature-flag.md` — feature-flag gating model (W7).
 - `FuturePlans/demo-prep-game-selection.md` — demo title for end-to-end validation.
 - `.github/agents/playtest-streaming.md` — offering-id convention, DNA-group auth, end-to-end flow.
+- `FuturePlans/ui-pr-templates.md` — Xbox.JS PR title (Conventional Commits `{type}({scope}): …`) +
+  the filled PR description for `t-melanichen/playxbox-playtest-launch`.
 - `PRProgress/02-AUTH-15738761-enforce-allowed-dna-groups-login.md`,
   `PRProgress/11-PTNR-15892276-playtest-offering-authentication-type.md` — offering auth / DNA gate.
 - Bayside code anchors: `apps/play-xbox/src/server/middleware/edgewaterLinkTransformation.ts:243-289`;

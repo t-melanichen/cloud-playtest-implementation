@@ -2,12 +2,14 @@
 name: playtest-streaming
 description: >-
   Cross-repo assistant for the Instantly Shareable Playtest project (xPlaytest ×
-  xCloud streaming).   Knows the end-to-end flow and the seven repositories it spans,
+  xCloud streaming).   Knows the end-to-end flow and the repositories it spans,
   the authoritative spec, and the active feature branches. Use it for design,
   implementation, and review work across those repos.
 ---
 
 # Instantly Shareable Playtest — streaming agent
+
+Fleet index: see [`.github/agents/README.md`](./README.md) for the full agent roster.
 
 You assist with the **Instantly Shareable Playtest** project: wiring xPlaytest into
 Xbox Cloud Gaming so a creator who checks **Enable Cloud Streaming** gets their
@@ -27,18 +29,27 @@ the XORc service-config read API that resolves the numeric Xbox Live Title ID.
   Consult it to see which pieces of the flow are merged vs. still in review/draft.
 
 ## PRs delivering this project (see `PRProgress/` for details)
+This table is a snapshot; [`PRProgress/README.md`](../../PRProgress/README.md) is the source of truth and is kept current by the `pr-progress-sync` agent.
+
 | PR | Area | Repo | Status | Title |
 |---|---|---|---|---|
 | 15732852 | PTNR | services.partnerregistry | Merged | Add AllowedDnaGroups to PlayerAuthorizationOptions |
 | 15738761 | AUTH | services.auth | Merged | XC5.a: Enforce AllowedDnaGroups in user login authorization |
 | 15739964 | DEVAPI | services.devapi | Merged | Add Allowed DNA Groups field to Offering edit page |
 | 15751527 | PTNR-DATA | services.data.partnerregistry | Merged | Updated OfferingV2.json (DNATEST allowed DNA group) |
-| 15800964 | CTIN | services.contentingestion | Active | Playtest Title Ingestion Workflow |
+| 15773366 | PTNR | services.partnerregistry | Merged | New Playtest Endpoint |
+| 15800964 | CTIN | services.contentingestion | Merged | Playtest Title Ingestion Workflow |
+| 15815668 | PTNR | services.partnerregistry | Merged | Configure playtest offering regions and id naming |
+| 15821813 | PTNR | services.partnerregistry | Merged | Centralize playtest offering id on PlaytestRequest.GetOfferingId |
 | 15829639 | SAGE | services.serviceapigateway | Draft | Register Playtest ingestion proxy routes for services.contentingestion |
 | 15834601 | XBET | Xbox.Xbet.Service | Draft | Playtest Ingestion Payload Builder |
 | 15849944 | PTNR | services.partnerregistry | Merged | Remove GetPackageSourceId from Playtest contract |
 | 15860243 | PTNR | services.partnerregistry | Merged | Refactor playtest title ID |
 | 15876080 | DEVAPI | services.devapi | Active | Testing workflow ingestion (Playtest Title Ingestion UI/client) |
+| 15892276 | PTNR | services.partnerregistry | Merged | Set Xbox AuthenticationOptions on playtest offerings |
+| 15894506 | XORC | xorc | Merged | Expose Xbox Live TitleId on the product Xbox Live config response |
+| 15896502 | CTIN | services.contentingestion | Draft | Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow |
+| 15905881 | CTIN | services.contentingestion | Merged | Gate playtest title ingestion endpoints with CrossTenantS2S policy |
 
 ## Repositories this project spans
 All paths are on the user's Desktop. **This agent's file does not by itself grant
@@ -49,6 +60,8 @@ access to repos outside this git root** — at the start of a session, add them 
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\services.contentingestion"
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\services.serviceapigateway"
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\services.partnerregistry"
+/add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\services.auth"
+/add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\services.devapi"
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\Xbox.Gpx.PartnerCenter.Client"
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\Xbox.JS"
 /add-dir "C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\xorc-1"
@@ -57,10 +70,12 @@ access to repos outside this git root** — at the start of a session, add them 
 | Repo | Path | Role | Active branch |
 |---|---|---|---|
 | `Xbox.Xbet.Service` | `…\Desktop\Xbox.Xbet.Service` | xPlaytest: publish workflow, `StoreAsset` + `PlaytestIngestionJobParameters` payload builder, SAGE call, status polling | `t-melanichen/playtest-ingestion-payload-builder` |
-| `services.contentingestion` | `…\Desktop\services.contentingestion` | `PlaytestIngestionWorkflow` (validate → asset ingest → package/version → configure offering) + V3 controller routes | `t-melanichen/playtest-title-ingestion-workflow` |
+| `services.contentingestion` | `…\Desktop\services.contentingestion` | `PlaytestIngestionWorkflow` (validate → asset ingest → package/version → configure offering) + V3 controller routes, PC install polling, cross-tenant S2S | `t-melanichen/playtest-pc-install-polling` |
 | `services.serviceapigateway` | `…\Desktop\services.serviceapigateway` | SAGE proxy routes (`/v3/playtest/playtestingestion[/{jobId}]`) in `appsettings.xcloud.json` | `t-melanichen/sage-playtest-ingestion-routes` |
-| `services.partnerregistry` | `…\Desktop\services.partnerregistry` | Offering + title: `AllowedDnaGroups`/`AllowedSandboxId` on `PlayerAuthorizationOptions`, `ConfigurePlaytestAsync` (one-PR offering+title) | `t-melanichen/playtest-offering-id-on-request` |
-| `Xbox.Gpx.PartnerCenter.Client` | `…\Desktop\Xbox.Gpx.PartnerCenter.Client` | **Partner Center Playtest UI (GPM, creator-facing).** Yarn/TS/React monorepo; playtest code lives under `apps/packages/src` (`pages/PlaytestWizard`, `components/PlaytestForm`, `components/AudienceSelection`, `helpers/featureFlags.ts`, `constants/playtest.ts`). This is where the streaming-enable toggle, the 7-day max duration cap for streaming playtests, and the Xbox-Live-ID-only audience restriction are surfaced. | `_tbd (off `main`)_` |
+| `services.partnerregistry` | `…\Desktop\services.partnerregistry` | Offering + title: `AllowedDnaGroups`/`AllowedSandboxId` on `PlayerAuthorizationOptions`, `ConfigurePlaytestAsync` (one-PR offering+title), title id, regions | `t-melanichen/refactor-title-id` |
+| `services.auth` | `…\Desktop\services.auth` | Enforce `AllowedDnaGroups` in offering login | `t-melanichen/xc5a-enforce-allowed-dna-groups` |
+| `services.devapi` | `…\Desktop\services.devapi` | DevApi Reader portal: DNA-groups UI + ingestion testing UI | `t-melanichen/testing-workflow-ingestion` |
+| `Xbox.Gpx.PartnerCenter.Client` | `…\Desktop\Xbox.Gpx.PartnerCenter.Client` | **Partner Center Playtest UI (GPM, creator-facing).** Yarn/TS/React monorepo; playtest code lives under `apps/packages/src` (`pages/PlaytestWizard`, `components/PlaytestForm`, `components/AudienceSelection`, `helpers/featureFlags.ts`, `constants/playtest.ts`). This is where the streaming-enable toggle, the 7-day max duration cap for streaming playtests, and the Xbox-Live-ID-only audience restriction are surfaced. | `t-melanichen/pc-s2s-cing-token` |
 | `Xbox.JS` | `…\Desktop\Xbox.JS` | Player-side / consumer client surfaces (TBD which) | _tbd_ |
 | `xorc` (XORc) | `…\Desktop\xorc-1` | **XORc service** (`Xbox.Services/xorc`). Owns the Xbox Live **service-config read API** that xPlaytest queries to resolve the numeric **Xbox Live Title ID** required on `StoreAsset.XboxTitleId` (see [`Blockers/xbox-live-title-id.md`](../../Blockers/xbox-live-title-id.md)). | `t-melanichen/playtest-xbox-live-title-id` |
 

@@ -23,12 +23,12 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1473158606,
+   "seed": 1816087198,
    "version": 1,
-   "versionNonce": 339081663,
+   "versionNonce": 642730241,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -52,9 +52,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 153710184,
+   "seed": 799878127,
    "version": 1,
-   "versionNonce": 1692467581,
+   "versionNonce": 523729283,
    "isDeleted": false,
    "boundElements": [
     {
@@ -62,7 +62,7 @@
      "id": "text-003"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -84,12 +84,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 690620971,
+   "seed": 616455894,
    "version": 1,
-   "versionNonce": 625901256,
+   "versionNonce": 514743897,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "xPlaytest \u00b7 xPackage\n(Xbox.Xbet.Service)",
@@ -121,12 +121,12 @@
    "roundness": {
     "type": 3
    },
-   "seed": 579341423,
+   "seed": 1866425269,
    "version": 1,
-   "versionNonce": 399655412,
+   "versionNonce": 347094926,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -150,9 +150,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1681559892,
+   "seed": 727763166,
    "version": 1,
-   "versionNonce": 320106707,
+   "versionNonce": 1122710673,
    "isDeleted": false,
    "boundElements": [
     {
@@ -160,7 +160,7 @@
      "id": "text-006"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -182,12 +182,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1553201078,
+   "seed": 1298069806,
    "version": 1,
-   "versionNonce": 1690571865,
+   "versionNonce": 1412827761,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "SAGE\n(serviceapigateway)",
@@ -219,12 +219,12 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1271165722,
+   "seed": 610694214,
    "version": 1,
-   "versionNonce": 286699713,
+   "versionNonce": 412397592,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -248,9 +248,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1368073012,
+   "seed": 1293766472,
    "version": 1,
-   "versionNonce": 1006070220,
+   "versionNonce": 1454311809,
    "isDeleted": false,
    "boundElements": [
     {
@@ -258,7 +258,7 @@
      "id": "text-009"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -280,12 +280,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 168252793,
+   "seed": 1519745620,
    "version": 1,
-   "versionNonce": 163989047,
+   "versionNonce": 1175072793,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "xCloud \u00b7 Content Ingestion + SUCU\n(services.contentingestion)",
@@ -317,12 +317,12 @@
    "roundness": {
     "type": 3
    },
-   "seed": 301209005,
+   "seed": 105210123,
    "version": 1,
-   "versionNonce": 569521477,
+   "versionNonce": 1927763782,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -346,9 +346,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 599635468,
+   "seed": 701167581,
    "version": 1,
-   "versionNonce": 1185242216,
+   "versionNonce": 160883825,
    "isDeleted": false,
    "boundElements": [
     {
@@ -356,7 +356,7 @@
      "id": "text-012"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -378,21 +378,21 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1392825378,
+   "seed": 1894062152,
    "version": 1,
-   "versionNonce": 156985561,
+   "versionNonce": 1167621639,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "Partner Registry\n(offerings \u00b7 audience)",
+   "text": "Partner Registry\n(offerings \u00b7 audience \u00b7 GMS)",
    "fontSize": 14,
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
    "containerId": "box-011",
-   "originalText": "Partner Registry\n(offerings \u00b7 audience)",
+   "originalText": "Partner Registry\n(offerings \u00b7 audience \u00b7 GMS)",
    "lineHeight": 1.25
   },
   {
@@ -415,12 +415,12 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1305264595,
+   "seed": 470827150,
    "version": 1,
-   "versionNonce": 527000596,
+   "versionNonce": 1801748852,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -444,9 +444,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1637640408,
+   "seed": 1846667133,
    "version": 1,
-   "versionNonce": 1495616196,
+   "versionNonce": 510664858,
    "isDeleted": false,
    "boundElements": [
     {
@@ -454,7 +454,7 @@
      "id": "text-015"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -476,12 +476,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1606083910,
+   "seed": 1189450433,
    "version": 1,
-   "versionNonce": 1270252923,
+   "versionNonce": 1894638472,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Player \u00b7 Bayside",
@@ -498,7 +498,7 @@
    "type": "text",
    "x": 60,
    "y": 28,
-   "width": 869,
+   "width": 1078,
    "height": 37.5,
    "angle": 0,
    "strokeColor": "#1f3864",
@@ -511,21 +511,21 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1000911954,
+   "seed": 934411673,
    "version": 1,
-   "versionNonce": 573392624,
+   "versionNonce": 492718981,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "Instantly Shareable Playtest \u2014 Streaming Ingestion",
+   "text": "Instantly Shareable Playtest \u2014 Streaming Ingestion  (detailed)",
    "fontSize": 30,
    "fontFamily": 5,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "Instantly Shareable Playtest \u2014 Streaming Ingestion",
+   "originalText": "Instantly Shareable Playtest \u2014 Streaming Ingestion  (detailed)",
    "lineHeight": 1.25
   },
   {
@@ -533,7 +533,7 @@
    "type": "text",
    "x": 62,
    "y": 66,
-   "width": 812,
+   "width": 1112,
    "height": 17.5,
    "angle": 0,
    "strokeColor": "#5c6670",
@@ -546,21 +546,21 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1064669077,
+   "seed": 811867347,
    "version": 1,
-   "versionNonce": 1365438422,
+   "versionNonce": 790377927,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "One published playtest \u2192 one shared xCloud streaming build; DNA groups gate the audience end-to-end.",
+   "text": "One published playtest \u2192 one shared xCloud build. Audience = DNA groups via GMS; package ingestion stages the same build into SUCU (XUS).",
    "fontSize": 14,
    "fontFamily": 5,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "One published playtest \u2192 one shared xCloud streaming build; DNA groups gate the audience end-to-end.",
+   "originalText": "One published playtest \u2192 one shared xCloud build. Audience = DNA groups via GMS; package ingestion stages the same build into SUCU (XUS).",
    "lineHeight": 1.25
   },
   {
@@ -583,9 +583,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 697409992,
+   "seed": 351917617,
    "version": 1,
-   "versionNonce": 1838238661,
+   "versionNonce": 287222683,
    "isDeleted": false,
    "boundElements": [
     {
@@ -594,10 +594,10 @@
     },
     {
      "type": "arrow",
-     "id": "arr-036"
+     "id": "arr-039"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -619,12 +619,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1966808229,
+   "seed": 1283236917,
    "version": 1,
-   "versionNonce": 113955983,
+   "versionNonce": 1772286690,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "\u25b6  Game Developer",
@@ -656,9 +656,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1729526405,
+   "seed": 659106038,
    "version": 1,
-   "versionNonce": 1830483678,
+   "versionNonce": 1246688120,
    "isDeleted": false,
    "boundElements": [
     {
@@ -667,14 +667,14 @@
     },
     {
      "type": "arrow",
-     "id": "arr-036"
+     "id": "arr-039"
     },
     {
      "type": "arrow",
-     "id": "arr-037"
+     "id": "arr-040"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -696,12 +696,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 442865762,
+   "seed": 1108596270,
    "version": 1,
-   "versionNonce": 1599242941,
+   "versionNonce": 540183203,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Partner Center:\nEnable Cloud Streaming  (toggle \u00b7 planned)",
@@ -733,9 +733,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1007557512,
+   "seed": 584468761,
    "version": 1,
-   "versionNonce": 830682427,
+   "versionNonce": 511646718,
    "isDeleted": false,
    "boundElements": [
     {
@@ -744,14 +744,14 @@
     },
     {
      "type": "arrow",
-     "id": "arr-037"
+     "id": "arr-040"
     },
     {
      "type": "arrow",
-     "id": "arr-038"
+     "id": "arr-041"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -773,12 +773,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 696724164,
+   "seed": 254367922,
    "version": 1,
-   "versionNonce": 433889688,
+   "versionNonce": 273836587,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Publish Playtest WF",
@@ -810,9 +810,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 562382781,
+   "seed": 1915468439,
    "version": 1,
-   "versionNonce": 1739591159,
+   "versionNonce": 529780124,
    "isDeleted": false,
    "boundElements": [
     {
@@ -821,14 +821,14 @@
     },
     {
      "type": "arrow",
-     "id": "arr-038"
+     "id": "arr-041"
     },
     {
      "type": "arrow",
-     "id": "arr-039"
+     "id": "arr-042"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -850,12 +850,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 822831292,
+   "seed": 1597290953,
    "version": 1,
-   "versionNonce": 319494902,
+   "versionNonce": 1302814571,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Build StoreAsset + JobParameters",
@@ -887,9 +887,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 299170184,
+   "seed": 1039826847,
    "version": 1,
-   "versionNonce": 915887678,
+   "versionNonce": 1378441516,
    "isDeleted": false,
    "boundElements": [
     {
@@ -898,18 +898,18 @@
     },
     {
      "type": "arrow",
-     "id": "arr-039"
+     "id": "arr-042"
     },
     {
      "type": "arrow",
-     "id": "arr-040"
+     "id": "arr-043"
     },
     {
      "type": "arrow",
-     "id": "arr-059"
+     "id": "arr-070"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -931,12 +931,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 307696843,
+   "seed": 1612388902,
    "version": 1,
-   "versionNonce": 870902343,
+   "versionNonce": 1256945968,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "StoreAsset\nPackageId(s) \u00b7 XboxTitleId (XORc)\nPlatform \u00b7 AumId",
@@ -954,7 +954,7 @@
    "x": 95.0,
    "y": 676,
    "width": 300,
-   "height": 128,
+   "height": 110,
    "angle": 0,
    "strokeColor": "#1971c2",
    "backgroundColor": "#a5d8ff",
@@ -968,9 +968,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1919980297,
+   "seed": 263850456,
    "version": 1,
-   "versionNonce": 838639288,
+   "versionNonce": 314414544,
    "isDeleted": false,
    "boundElements": [
     {
@@ -979,18 +979,18 @@
     },
     {
      "type": "arrow",
-     "id": "arr-040"
+     "id": "arr-043"
     },
     {
      "type": "arrow",
-     "id": "arr-042"
+     "id": "arr-045"
     },
     {
      "type": "arrow",
-     "id": "arr-061"
+     "id": "arr-072"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -998,7 +998,7 @@
    "id": "text-023",
    "type": "text",
    "x": 103.0,
-   "y": 710.0,
+   "y": 701.0,
    "width": 284,
    "height": 60.0,
    "angle": 0,
@@ -1012,28 +1012,28 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1396491777,
+   "seed": 1902784309,
    "version": 1,
-   "versionNonce": 668054227,
+   "versionNonce": 1821003058,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "PlaytestIngestionJobParameters\nAllowedDnaGroups  (audience)\nAllowedSandboxId \u00b7 Expiration \u2264 30d\nStoreAsset",
+   "text": "PlaytestIngestionJobParameters\nAllowedDnaGroups  (audience)\nExpiration \u2264 30d\nStoreAsset",
    "fontSize": 12,
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
    "containerId": "jobp",
-   "originalText": "PlaytestIngestionJobParameters\nAllowedDnaGroups  (audience)\nAllowedSandboxId \u00b7 Expiration \u2264 30d\nStoreAsset",
+   "originalText": "PlaytestIngestionJobParameters\nAllowedDnaGroups  (audience)\nExpiration \u2264 30d\nStoreAsset",
    "lineHeight": 1.25
   },
   {
    "id": "sage",
    "type": "rectangle",
    "x": 505.0,
-   "y": 580,
+   "y": 560,
    "width": 300,
    "height": 150,
    "angle": 0,
@@ -1049,9 +1049,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1833294783,
+   "seed": 1619119664,
    "version": 1,
-   "versionNonce": 193309105,
+   "versionNonce": 1688490675,
    "isDeleted": false,
    "boundElements": [
     {
@@ -1060,14 +1060,14 @@
     },
     {
      "type": "arrow",
-     "id": "arr-042"
+     "id": "arr-045"
     },
     {
      "type": "arrow",
-     "id": "arr-044"
+     "id": "arr-047"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -1075,7 +1075,7 @@
    "id": "text-024",
    "type": "text",
    "x": 513.0,
-   "y": 614.375,
+   "y": 594.375,
    "width": 284,
    "height": 81.25,
    "angle": 0,
@@ -1089,12 +1089,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1667087080,
+   "seed": 555345905,
    "version": 1,
-   "versionNonce": 1086607411,
+   "versionNonce": 1695867262,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "SAGE Gateway\nPOST /v3/playtest/\nplaytestingestion\ncross-tenant S2S\n(token pass-through)",
@@ -1110,9 +1110,9 @@
    "id": "workflow",
    "type": "rectangle",
    "x": 915.0,
-   "y": 360,
+   "y": 350,
    "width": 300,
-   "height": 150,
+   "height": 132,
    "angle": 0,
    "strokeColor": "#2f9e44",
    "backgroundColor": "#b2f2bb",
@@ -1126,9 +1126,9 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1251541058,
+   "seed": 806256157,
    "version": 1,
-   "versionNonce": 368062140,
+   "versionNonce": 1924812003,
    "isDeleted": false,
    "boundElements": [
     {
@@ -1137,18 +1137,18 @@
     },
     {
      "type": "arrow",
-     "id": "arr-044"
+     "id": "arr-047"
     },
     {
      "type": "arrow",
-     "id": "arr-046"
+     "id": "arr-049"
     },
     {
      "type": "arrow",
-     "id": "arr-048"
+     "id": "arr-051"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -1156,7 +1156,7 @@
    "id": "text-025",
    "type": "text",
    "x": 923.0,
-   "y": 402.5,
+   "y": 383.5,
    "width": 284,
    "height": 65.0,
    "angle": 0,
@@ -1170,30 +1170,107 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 912896393,
+   "seed": 288475390,
    "version": 1,
-   "versionNonce": 269222132,
+   "versionNonce": 303848013,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "PlaytestTitleIngestionWorkflow\nValidate \u2192 CreateOffering \u2192\nConfigurePackage \u2192\nPollFirstInstall \u2192 NotifyReady",
+   "text": "PlaytestTitleIngestionWorkflow\nValidate \u2192 CreateOffering \u2192\nConfigurePackage \u2192 PollFirstInstall\n\u2192 NotifyReady",
    "fontSize": 13,
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
    "containerId": "workflow",
-   "originalText": "PlaytestTitleIngestionWorkflow\nValidate \u2192 CreateOffering \u2192\nConfigurePackage \u2192\nPollFirstInstall \u2192 NotifyReady",
+   "originalText": "PlaytestTitleIngestionWorkflow\nValidate \u2192 CreateOffering \u2192\nConfigurePackage \u2192 PollFirstInstall\n\u2192 NotifyReady",
+   "lineHeight": 1.25
+  },
+  {
+   "id": "configpkg",
+   "type": "rectangle",
+   "x": 915.0,
+   "y": 500,
+   "width": 300,
+   "height": 70,
+   "angle": 0,
+   "strokeColor": "#2f9e44",
+   "backgroundColor": "#b2f2bb",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 3
+   },
+   "seed": 1338860345,
+   "version": 1,
+   "versionNonce": 1090501984,
+   "isDeleted": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "text-026"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-051"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-053"
+    }
+   ],
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false
+  },
+  {
+   "id": "text-026",
+   "type": "text",
+   "x": 923.0,
+   "y": 520.0,
+   "width": 284,
+   "height": 30.0,
+   "angle": 0,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 1876745851,
+   "version": 1,
+   "versionNonce": 270362293,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "text": "ConfigurePackage \u2192 StartAssetIngestion\nESRP-sign + stage the build",
+   "fontSize": 12,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "configpkg",
+   "originalText": "ConfigurePackage \u2192 StartAssetIngestion\nESRP-sign + stage the build",
    "lineHeight": 1.25
   },
   {
    "id": "sucu",
    "type": "rectangle",
    "x": 915.0,
-   "y": 556,
+   "y": 596,
    "width": 300,
-   "height": 78,
+   "height": 70,
    "angle": 0,
    "strokeColor": "#e8590c",
    "backgroundColor": "#ffd8a8",
@@ -1207,39 +1284,39 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1285498232,
+   "seed": 1778405068,
    "version": 1,
-   "versionNonce": 729595552,
+   "versionNonce": 1784029630,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-026"
+     "id": "text-027"
     },
     {
      "type": "arrow",
-     "id": "arr-048"
+     "id": "arr-053"
     },
     {
      "type": "arrow",
-     "id": "arr-050"
+     "id": "arr-055"
     },
     {
      "type": "arrow",
-     "id": "arr-059"
+     "id": "arr-070"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-026",
+   "id": "text-027",
    "type": "text",
    "x": 923.0,
-   "y": 577.5,
+   "y": 614.75,
    "width": 284,
-   "height": 35.0,
+   "height": 32.5,
    "angle": 0,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "transparent",
@@ -1251,30 +1328,30 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1881132953,
+   "seed": 1255289936,
    "version": 1,
-   "versionNonce": 1449993687,
+   "versionNonce": 328656700,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "SUCU build\nshared streaming package",
-   "fontSize": 14,
+   "text": "SUCU build  (aka XUS)\nshared streaming package",
+   "fontSize": 13,
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
    "containerId": "sucu",
-   "originalText": "SUCU build\nshared streaming package",
+   "originalText": "SUCU build  (aka XUS)\nshared streaming package",
    "lineHeight": 1.25
   },
   {
-   "id": "rect-027",
+   "id": "rect-028",
    "type": "rectangle",
    "x": 903.0,
-   "y": 664,
+   "y": 684,
    "width": 324,
-   "height": 176,
+   "height": 174,
    "angle": 0,
    "strokeColor": "transparent",
    "backgroundColor": "#ffd8a8",
@@ -1288,12 +1365,12 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1428261053,
+   "seed": 683951809,
    "version": 1,
-   "versionNonce": 1950501472,
+   "versionNonce": 1055111125,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
@@ -1301,9 +1378,9 @@
    "id": "pcpoll",
    "type": "rectangle",
    "x": 915.0,
-   "y": 676,
+   "y": 696,
    "width": 300,
-   "height": 152,
+   "height": 150,
    "angle": 0,
    "strokeColor": "#e8590c",
    "backgroundColor": "#fff3bf",
@@ -1317,29 +1394,29 @@
    "roundness": {
     "type": 3
    },
-   "seed": 876605304,
+   "seed": 1446620682,
    "version": 1,
-   "versionNonce": 1339854303,
+   "versionNonce": 1768255019,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-028"
+     "id": "text-029"
     },
     {
      "type": "arrow",
-     "id": "arr-050"
+     "id": "arr-055"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-028",
+   "id": "text-029",
    "type": "text",
    "x": 923.0,
-   "y": 714.5,
+   "y": 733.5,
    "width": 284,
    "height": 75.0,
    "angle": 0,
@@ -1353,12 +1430,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 512936598,
+   "seed": 1285526950,
    "version": 1,
-   "versionNonce": 1613056504,
+   "versionNonce": 360876396,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "\u2605 PC install-readiness poll\n\u2192 PC Orchestrator: QueryServersPaged\ncontent filter = install id + hash\nretry until a PC server reports it\n\u2192 NotifyReady",
@@ -1371,10 +1448,10 @@
    "lineHeight": 1.25
   },
   {
-   "id": "text-029",
+   "id": "text-030",
    "type": "text",
    "x": 915.0,
-   "y": 846,
+   "y": 862,
    "width": 300,
    "height": 13.75,
    "angle": 0,
@@ -1388,12 +1465,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 249368553,
+   "seed": 854654655,
    "version": 1,
-   "versionNonce": 198407116,
+   "versionNonce": 1237570931,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Xbox titles use the Allocator QueryServers fork instead.",
@@ -1406,10 +1483,164 @@
    "lineHeight": 1.25
   },
   {
+   "id": "audgrp",
+   "type": "rectangle",
+   "x": 1325.0,
+   "y": 250,
+   "width": 300,
+   "height": 90,
+   "angle": 0,
+   "strokeColor": "#ae3ec9",
+   "backgroundColor": "#eebefa",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 3
+   },
+   "seed": 221104612,
+   "version": 1,
+   "versionNonce": 1878518984,
+   "isDeleted": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "text-031"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-059"
+    }
+   ],
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false
+  },
+  {
+   "id": "text-031",
+   "type": "text",
+   "x": 1333.0,
+   "y": 272.5,
+   "width": 284,
+   "height": 45.0,
+   "angle": 0,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 1910555476,
+   "version": 1,
+   "versionNonce": 1757366499,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "text": "Create Audience Group\nCreator defines the allowed\nDNA groups",
+   "fontSize": 12,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "audgrp",
+   "originalText": "Create Audience Group\nCreator defines the allowed\nDNA groups",
+   "lineHeight": 1.25
+  },
+  {
+   "id": "gms",
+   "type": "rectangle",
+   "x": 1325.0,
+   "y": 380,
+   "width": 300,
+   "height": 110,
+   "angle": 0,
+   "strokeColor": "#ae3ec9",
+   "backgroundColor": "#eebefa",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 3
+   },
+   "seed": 967738024,
+   "version": 1,
+   "versionNonce": 1712885175,
+   "isDeleted": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "text-032"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-059"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-061"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-063"
+    }
+   ],
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false
+  },
+  {
+   "id": "text-032",
+   "type": "text",
+   "x": 1333.0,
+   "y": 407.5,
+   "width": 284,
+   "height": 55.0,
+   "angle": 0,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 1350945614,
+   "version": 1,
+   "versionNonce": 1400499066,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "text": "Group Management Service (GMS)\nsystem of record for DNA /\naudience groups\n(Asimov \u00b7 XPC Groups \u00b7 DNAGroup)",
+   "fontSize": 11,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "gms",
+   "originalText": "Group Management Service (GMS)\nsystem of record for DNA /\naudience groups\n(Asimov \u00b7 XPC Groups \u00b7 DNAGroup)",
+   "lineHeight": 1.25
+  },
+  {
    "id": "offering",
    "type": "rectangle",
    "x": 1325.0,
-   "y": 560,
+   "y": 540,
    "width": 300,
    "height": 150,
    "angle": 0,
@@ -1425,37 +1656,41 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1520052172,
+   "seed": 1240246017,
    "version": 1,
-   "versionNonce": 589407815,
+   "versionNonce": 632157759,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-030"
+     "id": "text-033"
     },
     {
      "type": "arrow",
-     "id": "arr-046"
+     "id": "arr-049"
     },
     {
      "type": "arrow",
-     "id": "arr-052"
+     "id": "arr-057"
     },
     {
      "type": "arrow",
      "id": "arr-061"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-072"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-030",
+   "id": "text-033",
    "type": "text",
    "x": 1333.0,
-   "y": 602.5,
+   "y": 582.5,
    "width": 284,
    "height": 65.0,
    "angle": 0,
@@ -1469,12 +1704,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1760151621,
+   "seed": 570640784,
    "version": 1,
-   "versionNonce": 721455910,
+   "versionNonce": 1329785202,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Offering  (playtestingestion)\nAllowedDnaGroups \u2192 audience gate\nAuthorizationType = Xbox\none StoreAsset \u2192 one build",
@@ -1506,26 +1741,26 @@
    "roundness": {
     "type": 3
    },
-   "seed": 271351960,
+   "seed": 1114232646,
    "version": 1,
-   "versionNonce": 1936780819,
+   "versionNonce": 964671276,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-031"
+     "id": "text-034"
     },
     {
      "type": "arrow",
-     "id": "arr-054"
+     "id": "arr-065"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-031",
+   "id": "text-034",
    "type": "text",
    "x": 1803.0,
    "y": 209.25,
@@ -1542,12 +1777,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 599914620,
+   "seed": 1685163944,
    "version": 1,
-   "versionNonce": 1960759513,
+   "versionNonce": 397089161,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "\u25a0  Playtester",
@@ -1579,30 +1814,30 @@
    "roundness": {
     "type": 3
    },
-   "seed": 316898920,
+   "seed": 1750364352,
    "version": 1,
-   "versionNonce": 916314859,
+   "versionNonce": 1826268339,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-032"
+     "id": "text-035"
     },
     {
      "type": "arrow",
-     "id": "arr-054"
+     "id": "arr-065"
     },
     {
      "type": "arrow",
-     "id": "arr-055"
+     "id": "arr-066"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-032",
+   "id": "text-035",
    "type": "text",
    "x": 1743.0,
    "y": 285.0,
@@ -1619,12 +1854,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 696943772,
+   "seed": 925338077,
    "version": 1,
-   "versionNonce": 1073691209,
+   "versionNonce": 127471601,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Launch deeplink (msxbox://\u2026)\nplanned",
@@ -1656,30 +1891,30 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1465121943,
+   "seed": 175370203,
    "version": 1,
-   "versionNonce": 1891238511,
+   "versionNonce": 212168513,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-033"
+     "id": "text-036"
     },
     {
      "type": "arrow",
-     "id": "arr-055"
+     "id": "arr-066"
     },
     {
      "type": "arrow",
-     "id": "arr-056"
+     "id": "arr-067"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-033",
+   "id": "text-036",
    "type": "text",
    "x": 1743.0,
    "y": 375.0,
@@ -1696,12 +1931,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 883471136,
+   "seed": 1164748859,
    "version": 1,
-   "versionNonce": 449297012,
+   "versionNonce": 1458221106,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Bayside \u2014 playtest launch path\n(not started)",
@@ -1733,34 +1968,38 @@
    "roundness": {
     "type": 3
    },
-   "seed": 894957572,
+   "seed": 184733782,
    "version": 1,
-   "versionNonce": 862938025,
+   "versionNonce": 1701672306,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-034"
-    },
-    {
-     "type": "arrow",
-     "id": "arr-052"
-    },
-    {
-     "type": "arrow",
-     "id": "arr-056"
+     "id": "text-037"
     },
     {
      "type": "arrow",
      "id": "arr-057"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-063"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-067"
+    },
+    {
+     "type": "arrow",
+     "id": "arr-068"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-034",
+   "id": "text-037",
    "type": "text",
    "x": 1743.0,
    "y": 512.5,
@@ -1777,21 +2016,21 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 549912919,
+   "seed": 868910149,
    "version": 1,
-   "versionNonce": 1539190226,
+   "versionNonce": 1732425543,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "services.auth\nresolve playtester DNA-group\nmembership vs offering\nAllowedDnaGroups \u2192 grant / deny",
+   "text": "services.auth\nresolve playtester membership\nin GMS vs offering\nAllowedDnaGroups \u2192 grant / deny",
    "fontSize": 13,
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
    "containerId": "authsvc",
-   "originalText": "services.auth\nresolve playtester DNA-group\nmembership vs offering\nAllowedDnaGroups \u2192 grant / deny",
+   "originalText": "services.auth\nresolve playtester membership\nin GMS vs offering\nAllowedDnaGroups \u2192 grant / deny",
    "lineHeight": 1.25
   },
   {
@@ -1814,26 +2053,26 @@
    "roundness": {
     "type": 3
    },
-   "seed": 673330498,
+   "seed": 1029443419,
    "version": 1,
-   "versionNonce": 1607147647,
+   "versionNonce": 353183373,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-035"
+     "id": "text-038"
     },
     {
      "type": "arrow",
-     "id": "arr-057"
+     "id": "arr-068"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-035",
+   "id": "text-038",
    "type": "text",
    "x": 1743.0,
    "y": 685.5,
@@ -1850,12 +2089,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1567907436,
+   "seed": 649840470,
    "version": 1,
-   "versionNonce": 1491645397,
+   "versionNonce": 1182362867,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Authorized tester streams\nthe playtest build (xCloud)",
@@ -1868,7 +2107,7 @@
    "lineHeight": 1.25
   },
   {
-   "id": "arr-036",
+   "id": "arr-039",
    "type": "arrow",
    "x": 245.0,
    "y": 246,
@@ -1887,12 +2126,12 @@
    "roundness": {
     "type": 2
    },
-   "seed": 253335723,
+   "seed": 1308645751,
    "version": 1,
-   "versionNonce": 1408098873,
+   "versionNonce": 1578056176,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -1920,7 +2159,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "arr-037",
+   "id": "arr-040",
    "type": "arrow",
    "x": 245.0,
    "y": 340,
@@ -1939,12 +2178,12 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1463605489,
+   "seed": 1149850177,
    "version": 1,
-   "versionNonce": 467517440,
+   "versionNonce": 220164804,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -1972,7 +2211,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "arr-038",
+   "id": "arr-041",
    "type": "arrow",
    "x": 245.0,
    "y": 420,
@@ -1991,12 +2230,12 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1247056643,
+   "seed": 1497264258,
    "version": 1,
-   "versionNonce": 1665787882,
+   "versionNonce": 1112574926,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2024,7 +2263,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "arr-039",
+   "id": "arr-042",
    "type": "arrow",
    "x": 245.0,
    "y": 502,
@@ -2043,12 +2282,12 @@
    "roundness": {
     "type": 2
    },
-   "seed": 625727461,
+   "seed": 1866512436,
    "version": 1,
-   "versionNonce": 450904183,
+   "versionNonce": 1585962777,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2076,7 +2315,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "arr-040",
+   "id": "arr-043",
    "type": "arrow",
    "x": 245.0,
    "y": 650,
@@ -2095,17 +2334,17 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1092696249,
+   "seed": 1505568046,
    "version": 1,
-   "versionNonce": 914874363,
+   "versionNonce": 304422287,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-041"
+     "id": "text-044"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2133,7 +2372,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-041",
+   "id": "text-044",
    "type": "text",
    "x": 215.0,
    "y": 651.875,
@@ -2150,12 +2389,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 679708537,
+   "seed": 416560107,
    "version": 1,
-   "versionNonce": 1474389012,
+   "versionNonce": 740454916,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "embeds",
@@ -2163,17 +2402,17 @@
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
-   "containerId": "arr-040",
+   "containerId": "arr-043",
    "originalText": "embeds",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-042",
+   "id": "arr-045",
    "type": "arrow",
    "x": 401.0,
-   "y": 740.0,
+   "y": 731.0,
    "width": 98.0,
-   "height": 85.0,
+   "height": 96.0,
    "angle": 0,
    "strokeColor": "#1971c2",
    "backgroundColor": "transparent",
@@ -2187,17 +2426,17 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1577816546,
+   "seed": 1240690202,
    "version": 1,
-   "versionNonce": 1296040476,
+   "versionNonce": 297192614,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-043"
+     "id": "text-046"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2207,7 +2446,7 @@
     ],
     [
      98.0,
-     -85.0
+     -96.0
     ]
    ],
    "lastCommittedPoint": null,
@@ -2225,10 +2464,10 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-043",
+   "id": "text-046",
    "type": "text",
    "x": 381.5,
-   "y": 681.25,
+   "y": 666.75,
    "width": 137,
    "height": 32.5,
    "angle": 0,
@@ -2242,12 +2481,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 571619987,
+   "seed": 136871772,
    "version": 1,
-   "versionNonce": 1570197911,
+   "versionNonce": 1911414991,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "1 \u00b7 POST\nplaytestingestion",
@@ -2255,17 +2494,17 @@
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
-   "containerId": "arr-042",
+   "containerId": "arr-045",
    "originalText": "1 \u00b7 POST\nplaytestingestion",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-044",
+   "id": "arr-047",
    "type": "arrow",
    "x": 811.0,
-   "y": 655.0,
+   "y": 635.0,
    "width": 98.0,
-   "height": 220.0,
+   "height": 219.0,
    "angle": 0,
    "strokeColor": "#1971c2",
    "backgroundColor": "transparent",
@@ -2279,17 +2518,17 @@
    "roundness": {
     "type": 2
    },
-   "seed": 796391871,
+   "seed": 1142648577,
    "version": 1,
-   "versionNonce": 1910010706,
+   "versionNonce": 857953235,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-045"
+     "id": "text-048"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2299,7 +2538,7 @@
     ],
     [
      98.0,
-     -220.0
+     -219.0
     ]
    ],
    "lastCommittedPoint": null,
@@ -2317,10 +2556,10 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-045",
+   "id": "text-048",
    "type": "text",
    "x": 779.5,
-   "y": 528.75,
+   "y": 509.25,
    "width": 161,
    "height": 32.5,
    "angle": 0,
@@ -2334,12 +2573,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1749940838,
+   "seed": 1850839285,
    "version": 1,
-   "versionNonce": 1766447132,
+   "versionNonce": 1712245277,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "2 \u00b7 forward\n(token pass-through)",
@@ -2347,17 +2586,17 @@
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
-   "containerId": "arr-044",
+   "containerId": "arr-047",
    "originalText": "2 \u00b7 forward\n(token pass-through)",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-046",
+   "id": "arr-049",
    "type": "arrow",
    "x": 1221.0,
-   "y": 435.0,
+   "y": 416.0,
    "width": 98.0,
-   "height": 200.0,
+   "height": 199.0,
    "angle": 0,
    "strokeColor": "#2f9e44",
    "backgroundColor": "transparent",
@@ -2371,17 +2610,17 @@
    "roundness": {
     "type": 2
    },
-   "seed": 220125830,
+   "seed": 992232741,
    "version": 1,
-   "versionNonce": 591876988,
+   "versionNonce": 1336055890,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-047"
+     "id": "text-050"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2391,7 +2630,7 @@
     ],
     [
      98.0,
-     200.0
+     199.0
     ]
    ],
    "lastCommittedPoint": null,
@@ -2409,10 +2648,10 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-047",
+   "id": "text-050",
    "type": "text",
    "x": 1197.5,
-   "y": 518.75,
+   "y": 499.25,
    "width": 145,
    "height": 32.5,
    "angle": 0,
@@ -2426,12 +2665,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1864807637,
+   "seed": 101526661,
    "version": 1,
-   "versionNonce": 168934737,
+   "versionNonce": 233569720,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "3 \u00b7 CreateOffering\n(DNA audience)",
@@ -2439,17 +2678,17 @@
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
-   "containerId": "arr-046",
+   "containerId": "arr-049",
    "originalText": "3 \u00b7 CreateOffering\n(DNA audience)",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-048",
+   "id": "arr-051",
    "type": "arrow",
    "x": 1065.0,
-   "y": 516,
+   "y": 488,
    "width": 1,
-   "height": 34,
+   "height": 6,
    "angle": 0,
    "strokeColor": "#2f9e44",
    "backgroundColor": "transparent",
@@ -2463,17 +2702,17 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1828822695,
+   "seed": 1805349533,
    "version": 1,
-   "versionNonce": 777430270,
+   "versionNonce": 1133848620,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-049"
+     "id": "text-052"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2483,7 +2722,7 @@
     ],
     [
      0.0,
-     34
+     6
     ]
    ],
    "lastCommittedPoint": null,
@@ -2493,7 +2732,7 @@
     "gap": 6
    },
    "endBinding": {
-    "elementId": "sucu",
+    "elementId": "configpkg",
     "focus": 0,
     "gap": 6
    },
@@ -2501,10 +2740,10 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-049",
+   "id": "text-052",
    "type": "text",
    "x": 972.5,
-   "y": 524.875,
+   "y": 482.875,
    "width": 185,
    "height": 16.25,
    "angle": 0,
@@ -2518,12 +2757,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 961494829,
+   "seed": 414466866,
    "version": 1,
-   "versionNonce": 674969167,
+   "versionNonce": 1733437389,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "4 \u00b7 StartAssetIngestion",
@@ -2531,17 +2770,109 @@
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
-   "containerId": "arr-048",
+   "containerId": "arr-051",
    "originalText": "4 \u00b7 StartAssetIngestion",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-050",
+   "id": "arr-053",
    "type": "arrow",
    "x": 1065.0,
-   "y": 640,
+   "y": 576,
    "width": 1,
-   "height": 30,
+   "height": 14,
+   "angle": 0,
+   "strokeColor": "#e8590c",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 2
+   },
+   "seed": 1879587606,
+   "version": 1,
+   "versionNonce": 1723439755,
+   "isDeleted": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "text-054"
+    }
+   ],
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "points": [
+    [
+     0.0,
+     0
+    ],
+    [
+     0.0,
+     14
+    ]
+   ],
+   "lastCommittedPoint": null,
+   "startBinding": {
+    "elementId": "configpkg",
+    "focus": 0,
+    "gap": 6
+   },
+   "endBinding": {
+    "elementId": "sucu",
+    "focus": 0,
+    "gap": 6
+   },
+   "startArrowhead": null,
+   "endArrowhead": "arrow"
+  },
+  {
+   "id": "text-054",
+   "type": "text",
+   "x": 1013.0,
+   "y": 574.875,
+   "width": 104,
+   "height": 16.25,
+   "angle": 0,
+   "strokeColor": "#e8590c",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 157396115,
+   "version": 1,
+   "versionNonce": 1605385462,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "text": "ingest \u2192 SUCU",
+   "fontSize": 13,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "arr-053",
+   "originalText": "ingest \u2192 SUCU",
+   "lineHeight": 1.25
+  },
+  {
+   "id": "arr-055",
+   "type": "arrow",
+   "x": 1065.0,
+   "y": 672,
+   "width": 1,
+   "height": 18,
    "angle": 0,
    "strokeColor": "#e8590c",
    "backgroundColor": "transparent",
@@ -2555,17 +2886,17 @@
    "roundness": {
     "type": 2
    },
-   "seed": 242138944,
+   "seed": 117626403,
    "version": 1,
-   "versionNonce": 553082198,
+   "versionNonce": 615193964,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-051"
+     "id": "text-056"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2575,7 +2906,7 @@
     ],
     [
      0.0,
-     30
+     18
     ]
    ],
    "lastCommittedPoint": null,
@@ -2593,10 +2924,10 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-051",
+   "id": "text-056",
    "type": "text",
    "x": 964.5,
-   "y": 646.875,
+   "y": 672.875,
    "width": 201,
    "height": 16.25,
    "angle": 0,
@@ -2610,12 +2941,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1318009887,
+   "seed": 289336409,
    "version": 1,
-   "versionNonce": 1981985143,
+   "versionNonce": 1531420637,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "5 \u00b7 PollFirstInstall (PC)",
@@ -2623,17 +2954,17 @@
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
-   "containerId": "arr-050",
+   "containerId": "arr-055",
    "originalText": "5 \u00b7 PollFirstInstall (PC)",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-052",
+   "id": "arr-057",
    "type": "arrow",
    "x": 1631.0,
-   "y": 635.0,
+   "y": 615.0,
    "width": 98.0,
-   "height": 90.0,
+   "height": 70.0,
    "angle": 0,
    "strokeColor": "#ae3ec9",
    "backgroundColor": "transparent",
@@ -2647,17 +2978,17 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1641709159,
+   "seed": 1101296217,
    "version": 1,
-   "versionNonce": 775765611,
+   "versionNonce": 343644086,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-053"
+     "id": "text-058"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2667,7 +2998,7 @@
     ],
     [
      98.0,
-     -90.0
+     -70.0
     ]
    ],
    "lastCommittedPoint": null,
@@ -2685,10 +3016,10 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-053",
+   "id": "text-058",
    "type": "text",
    "x": 1616.0,
-   "y": 573.75,
+   "y": 563.75,
    "width": 128,
    "height": 32.5,
    "angle": 0,
@@ -2702,12 +3033,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 556612023,
+   "seed": 1955547378,
    "version": 1,
-   "versionNonce": 1507543818,
+   "versionNonce": 938073974,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "6 \u00b7 reads\nAllowedDnaGroups",
@@ -2715,12 +3046,296 @@
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
-   "containerId": "arr-052",
+   "containerId": "arr-057",
    "originalText": "6 \u00b7 reads\nAllowedDnaGroups",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-054",
+   "id": "arr-059",
+   "type": "arrow",
+   "x": 1475.0,
+   "y": 346,
+   "width": 1,
+   "height": 28,
+   "angle": 0,
+   "strokeColor": "#ae3ec9",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 2
+   },
+   "seed": 1121989978,
+   "version": 1,
+   "versionNonce": 321430809,
+   "isDeleted": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "text-060"
+    }
+   ],
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "points": [
+    [
+     0.0,
+     0
+    ],
+    [
+     0.0,
+     28
+    ]
+   ],
+   "lastCommittedPoint": null,
+   "startBinding": {
+    "elementId": "audgrp",
+    "focus": 0,
+    "gap": 6
+   },
+   "endBinding": {
+    "elementId": "gms",
+    "focus": 0,
+    "gap": 6
+   },
+   "startArrowhead": null,
+   "endArrowhead": "arrow"
+  },
+  {
+   "id": "text-060",
+   "type": "text",
+   "x": 1415.0,
+   "y": 351.875,
+   "width": 120,
+   "height": 16.25,
+   "angle": 0,
+   "strokeColor": "#ae3ec9",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 1997856003,
+   "version": 1,
+   "versionNonce": 1936557802,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "text": "register groups",
+   "fontSize": 13,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "arr-059",
+   "originalText": "register groups",
+   "lineHeight": 1.25
+  },
+  {
+   "id": "arr-061",
+   "type": "arrow",
+   "x": 1475.0,
+   "y": 496,
+   "width": 1,
+   "height": 38,
+   "angle": 0,
+   "strokeColor": "#ae3ec9",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 2
+   },
+   "seed": 391251984,
+   "version": 1,
+   "versionNonce": 614059626,
+   "isDeleted": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "text-062"
+    }
+   ],
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "points": [
+    [
+     0.0,
+     0
+    ],
+    [
+     0.0,
+     38
+    ]
+   ],
+   "lastCommittedPoint": null,
+   "startBinding": {
+    "elementId": "gms",
+    "focus": 0,
+    "gap": 6
+   },
+   "endBinding": {
+    "elementId": "offering",
+    "focus": 0,
+    "gap": 6
+   },
+   "startArrowhead": null,
+   "endArrowhead": "arrow"
+  },
+  {
+   "id": "text-062",
+   "type": "text",
+   "x": 1415.0,
+   "y": 506.875,
+   "width": 120,
+   "height": 16.25,
+   "angle": 0,
+   "strokeColor": "#ae3ec9",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 661626597,
+   "version": 1,
+   "versionNonce": 550826628,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "text": "audience groups",
+   "fontSize": 13,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "arr-061",
+   "originalText": "audience groups",
+   "lineHeight": 1.25
+  },
+  {
+   "id": "arr-063",
+   "type": "arrow",
+   "x": 1885.0,
+   "y": 464,
+   "width": 254.0,
+   "height": 39.0,
+   "angle": 0,
+   "strokeColor": "#2f9e44",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 2
+   },
+   "seed": 1757703547,
+   "version": 1,
+   "versionNonce": 1898777525,
+   "isDeleted": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "text-064"
+    }
+   ],
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "points": [
+    [
+     0.0,
+     0
+    ],
+    [
+     0.0,
+     -39.0
+    ],
+    [
+     -230.0,
+     -39.0
+    ],
+    [
+     -254.0,
+     -29.0
+    ]
+   ],
+   "lastCommittedPoint": null,
+   "startBinding": {
+    "elementId": "authsvc",
+    "focus": 0,
+    "gap": 6
+   },
+   "endBinding": {
+    "elementId": "gms",
+    "focus": 0,
+    "gap": 6
+   },
+   "startArrowhead": null,
+   "endArrowhead": "arrow"
+  },
+  {
+   "id": "text-064",
+   "type": "text",
+   "x": 1685.5,
+   "y": 428.25,
+   "width": 145,
+   "height": 32.5,
+   "angle": 0,
+   "strokeColor": "#2f9e44",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 284595715,
+   "version": 1,
+   "versionNonce": 446869953,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "text": "resolve membership\n(at launch)",
+   "fontSize": 13,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "arr-063",
+   "originalText": "resolve membership\n(at launch)",
+   "lineHeight": 1.25
+  },
+  {
+   "id": "arr-065",
    "type": "arrow",
    "x": 1885.0,
    "y": 246,
@@ -2739,12 +3354,12 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1172090968,
+   "seed": 452721495,
    "version": 1,
-   "versionNonce": 949613032,
+   "versionNonce": 420312780,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2772,7 +3387,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "arr-055",
+   "id": "arr-066",
    "type": "arrow",
    "x": 1885.0,
    "y": 336,
@@ -2791,12 +3406,12 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1999842598,
+   "seed": 153889988,
    "version": 1,
-   "versionNonce": 1480513881,
+   "versionNonce": 208492708,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2824,7 +3439,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "arr-056",
+   "id": "arr-067",
    "type": "arrow",
    "x": 1885.0,
    "y": 426,
@@ -2843,12 +3458,12 @@
    "roundness": {
     "type": 2
    },
-   "seed": 1085376852,
+   "seed": 1962407213,
    "version": 1,
-   "versionNonce": 406814401,
+   "versionNonce": 601110045,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2876,7 +3491,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "arr-057",
+   "id": "arr-068",
    "type": "arrow",
    "x": 1885.0,
    "y": 626,
@@ -2895,17 +3510,17 @@
    "roundness": {
     "type": 2
    },
-   "seed": 668825839,
+   "seed": 1539712670,
    "version": 1,
-   "versionNonce": 399853838,
+   "versionNonce": 1176988059,
    "isDeleted": false,
    "boundElements": [
     {
      "type": "text",
-     "id": "text-058"
+     "id": "text-069"
     }
    ],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -2933,7 +3548,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-058",
+   "id": "text-069",
    "type": "text",
    "x": 1825.0,
    "y": 631.875,
@@ -2950,12 +3565,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 629628540,
+   "seed": 1752744030,
    "version": 1,
-   "versionNonce": 1699851660,
+   "versionNonce": 914249730,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "grant if member",
@@ -2963,17 +3578,17 @@
    "fontFamily": 5,
    "textAlign": "center",
    "verticalAlign": "middle",
-   "containerId": "arr-057",
+   "containerId": "arr-068",
    "originalText": "grant if member",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-059",
+   "id": "arr-070",
    "type": "arrow",
    "x": 245.0,
    "y": 534,
    "width": 664.0,
-   "height": 71.0,
+   "height": 111.0,
    "angle": 0,
    "strokeColor": "#e8590c",
    "backgroundColor": "transparent",
@@ -2985,12 +3600,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1305528893,
+   "seed": 1338147909,
    "version": 1,
-   "versionNonce": 1257444916,
+   "versionNonce": 1629119090,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -3000,19 +3615,19 @@
     ],
     [
      0.0,
-     -10.0
+     -14.0
     ],
     [
      655.0,
-     -10.0
+     -14.0
     ],
     [
      655.0,
-     61.0
+     97.0
     ],
     [
      664.0,
-     61.0
+     97.0
     ]
    ],
    "lastCommittedPoint": null,
@@ -3030,11 +3645,11 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-060",
+   "id": "text-071",
    "type": "text",
    "x": 470,
-   "y": 500,
-   "width": 444,
+   "y": 498,
+   "width": 392,
    "height": 16.25,
    "angle": 0,
    "strokeColor": "#e8590c",
@@ -3047,30 +3662,30 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 664233310,
+   "seed": 1672455259,
    "version": 1,
-   "versionNonce": 1704199939,
+   "versionNonce": 1390869727,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "\u2460  shared build \u2014 ingestion Sourceid = StoreAsset.ContentId",
+   "text": "\u2460  shared build \u2014 same ContentId + PackageFamilyName",
    "fontSize": 13,
    "fontFamily": 5,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "\u2460  shared build \u2014 ingestion Sourceid = StoreAsset.ContentId",
+   "originalText": "\u2460  shared build \u2014 same ContentId + PackageFamilyName",
    "lineHeight": 1.25
   },
   {
-   "id": "arr-061",
+   "id": "arr-072",
    "type": "arrow",
    "x": 245.0,
-   "y": 810,
+   "y": 792,
    "width": 1230.0,
-   "height": 168.0,
+   "height": 188.0,
    "angle": 0,
    "strokeColor": "#ae3ec9",
    "backgroundColor": "transparent",
@@ -3082,12 +3697,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1355388860,
+   "seed": 996181107,
    "version": 1,
-   "versionNonce": 1020054627,
+   "versionNonce": 1151237025,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "points": [
@@ -3097,15 +3712,15 @@
     ],
     [
      0.0,
-     74.0
+     92.0
     ],
     [
      1230.0,
-     74.0
+     92.0
     ],
     [
      1230.0,
-     -94
+     -96
     ]
    ],
    "lastCommittedPoint": null,
@@ -3123,7 +3738,7 @@
    "endArrowhead": "arrow"
   },
   {
-   "id": "text-062",
+   "id": "text-073",
    "type": "text",
    "x": 640,
    "y": 888,
@@ -3140,12 +3755,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1353127416,
+   "seed": 1187465086,
    "version": 1,
-   "versionNonce": 957706059,
+   "versionNonce": 675108024,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "\u2461  audience \u2014 AllowedDnaGroups \u2192 offering gate",
@@ -3158,7 +3773,7 @@
    "lineHeight": 1.25
   },
   {
-   "id": "text-063",
+   "id": "text-074",
    "type": "text",
    "x": 60,
    "y": 955,
@@ -3175,12 +3790,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 877381451,
+   "seed": 1384763233,
    "version": 1,
-   "versionNonce": 570987740,
+   "versionNonce": 1902188573,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Legend",
@@ -3193,7 +3808,7 @@
    "lineHeight": 1.25
   },
   {
-   "id": "box-064",
+   "id": "box-075",
    "type": "rectangle",
    "x": 60,
    "y": 985,
@@ -3212,17 +3827,17 @@
    "roundness": {
     "type": 3
    },
-   "seed": 397065154,
+   "seed": 321310440,
    "version": 1,
-   "versionNonce": 1194199380,
+   "versionNonce": 1112449411,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-065",
+   "id": "text-076",
    "type": "text",
    "x": 94,
    "y": 986,
@@ -3239,12 +3854,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1159817199,
+   "seed": 1435274619,
    "version": 1,
-   "versionNonce": 295226476,
+   "versionNonce": 991238587,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Built",
@@ -3257,7 +3872,7 @@
    "lineHeight": 1.25
   },
   {
-   "id": "box-066",
+   "id": "box-077",
    "type": "rectangle",
    "x": 188,
    "y": 985,
@@ -3276,17 +3891,17 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1723029829,
+   "seed": 733599526,
    "version": 1,
-   "versionNonce": 201181642,
+   "versionNonce": 1261691053,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-067",
+   "id": "text-078",
    "type": "text",
    "x": 222,
    "y": 986,
@@ -3303,12 +3918,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1949204427,
+   "seed": 693257272,
    "version": 1,
-   "versionNonce": 335469722,
+   "versionNonce": 717689414,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "In progress",
@@ -3321,7 +3936,7 @@
    "lineHeight": 1.25
   },
   {
-   "id": "box-068",
+   "id": "box-079",
    "type": "rectangle",
    "x": 323,
    "y": 985,
@@ -3340,17 +3955,17 @@
    "roundness": {
     "type": 3
    },
-   "seed": 428224239,
+   "seed": 1074394222,
    "version": 1,
-   "versionNonce": 1447430114,
+   "versionNonce": 1976676833,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-069",
+   "id": "text-080",
    "type": "text",
    "x": 357,
    "y": 986,
@@ -3367,12 +3982,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 443558720,
+   "seed": 506122262,
    "version": 1,
-   "versionNonce": 1800977478,
+   "versionNonce": 139302229,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Planned / not built",
@@ -3385,7 +4000,7 @@
    "lineHeight": 1.25
   },
   {
-   "id": "box-070",
+   "id": "box-081",
    "type": "rectangle",
    "x": 514,
    "y": 985,
@@ -3404,17 +4019,17 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1561322282,
+   "seed": 1370958487,
    "version": 1,
-   "versionNonce": 1006581620,
+   "versionNonce": 1144774145,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-071",
+   "id": "text-082",
    "type": "text",
    "x": 548,
    "y": 986,
@@ -3431,12 +4046,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1380778650,
+   "seed": 251934781,
    "version": 1,
-   "versionNonce": 236424712,
+   "versionNonce": 176561584,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "Data / contract",
@@ -3449,7 +4064,7 @@
    "lineHeight": 1.25
   },
   {
-   "id": "box-072",
+   "id": "box-083",
    "type": "rectangle",
    "x": 677,
    "y": 985,
@@ -3468,17 +4083,17 @@
    "roundness": {
     "type": 3
    },
-   "seed": 926281506,
+   "seed": 140397897,
    "version": 1,
-   "versionNonce": 919521169,
+   "versionNonce": 1678658661,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-073",
+   "id": "text-084",
    "type": "text",
    "x": 711,
    "y": 986,
@@ -3495,12 +4110,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1379660644,
+   "seed": 403496591,
    "version": 1,
-   "versionNonce": 1105129473,
+   "versionNonce": 118944881,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "SUCU build (shared package)",
@@ -3513,7 +4128,7 @@
    "lineHeight": 1.25
   },
   {
-   "id": "box-074",
+   "id": "box-085",
    "type": "rectangle",
    "x": 924,
    "y": 985,
@@ -3532,21 +4147,21 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1236264404,
+   "seed": 293146451,
    "version": 1,
-   "versionNonce": 639907702,
+   "versionNonce": 1514412654,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-075",
+   "id": "text-086",
    "type": "text",
    "x": 958,
    "y": 986,
-   "width": 132,
+   "width": 174,
    "height": 15.0,
    "angle": 0,
    "strokeColor": "#343a40",
@@ -3559,27 +4174,27 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1288043565,
+   "seed": 1986016341,
    "version": 1,
-   "versionNonce": 1948510326,
+   "versionNonce": 334696816,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "Offering / audience",
+   "text": "Offering / audience / GMS",
    "fontSize": 12,
    "fontFamily": 5,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "Offering / audience",
+   "originalText": "Offering / audience / GMS",
    "lineHeight": 1.25
   },
   {
-   "id": "box-076",
+   "id": "box-087",
    "type": "rectangle",
-   "x": 1115,
+   "x": 1157,
    "y": 985,
    "width": 26,
    "height": 20,
@@ -3596,19 +4211,19 @@
    "roundness": {
     "type": 3
    },
-   "seed": 124655304,
+   "seed": 1196064619,
    "version": 1,
-   "versionNonce": 1560897491,
+   "versionNonce": 538147682,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-077",
+   "id": "text-088",
    "type": "text",
-   "x": 1149,
+   "x": 1191,
    "y": 986,
    "width": 250,
    "height": 15.0,
@@ -3623,12 +4238,12 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1647738332,
+   "seed": 1557572739,
    "version": 1,
-   "versionNonce": 345997989,
+   "versionNonce": 278423059,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
    "text": "This feature: PC streaming-readiness",
@@ -3641,12 +4256,12 @@
    "lineHeight": 1.25
   },
   {
-   "id": "box-078",
+   "id": "box-089",
    "type": "rectangle",
    "x": 60,
    "y": 1060,
-   "width": 760,
-   "height": 120,
+   "width": 500,
+   "height": 132,
    "angle": 0,
    "strokeColor": "#f59f00",
    "backgroundColor": "#fff9db",
@@ -3660,22 +4275,22 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1563961867,
+   "seed": 1773001941,
    "version": 1,
-   "versionNonce": 1253135002,
+   "versionNonce": 1013034270,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-079",
+   "id": "text-090",
    "type": "text",
    "x": 78,
    "y": 1074,
-   "width": 724,
-   "height": 65.0,
+   "width": 470,
+   "height": 75.0,
    "angle": 0,
    "strokeColor": "#664d00",
    "backgroundColor": "transparent",
@@ -3687,30 +4302,30 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 1712497800,
+   "seed": 455082820,
    "version": 1,
-   "versionNonce": 673002724,
+   "versionNonce": 332973656,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "\u2460  SHARED BUILD\nPassing the StoreAsset gives xCloud the same XPackageContentId as the\ndownload / publish path: ingestion Sourceid = StoreAsset.ContentId (contract-\nenforced equal). One ingested SUCU build is the shared streaming package.",
-   "fontSize": 13,
+   "text": "\u2460  SHARED BUILD\nPassing the StoreAsset gives xCloud the same ContentId +\nPackageFamilyName as the download / publish path: ingestion\nSourceid = StoreAsset.ContentId (contract-enforced equal). One\ningested SUCU (XUS) build is the shared streaming package.",
+   "fontSize": 12,
    "fontFamily": 5,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "\u2460  SHARED BUILD\nPassing the StoreAsset gives xCloud the same XPackageContentId as the\ndownload / publish path: ingestion Sourceid = StoreAsset.ContentId (contract-\nenforced equal). One ingested SUCU build is the shared streaming package.",
+   "originalText": "\u2460  SHARED BUILD\nPassing the StoreAsset gives xCloud the same ContentId +\nPackageFamilyName as the download / publish path: ingestion\nSourceid = StoreAsset.ContentId (contract-enforced equal). One\ningested SUCU (XUS) build is the shared streaming package.",
    "lineHeight": 1.25
   },
   {
-   "id": "box-080",
+   "id": "box-091",
    "type": "rectangle",
-   "x": 860,
+   "x": 590,
    "y": 1060,
-   "width": 760,
-   "height": 120,
+   "width": 500,
+   "height": 132,
    "angle": 0,
    "strokeColor": "#f59f00",
    "backgroundColor": "#fff9db",
@@ -3724,22 +4339,22 @@
    "roundness": {
     "type": 3
    },
-   "seed": 1750553201,
+   "seed": 1526225544,
    "version": 1,
-   "versionNonce": 1476454985,
+   "versionNonce": 925283502,
    "isDeleted": false,
    "boundElements": [],
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false
   },
   {
-   "id": "text-081",
+   "id": "text-092",
    "type": "text",
-   "x": 878,
+   "x": 608,
    "y": 1074,
-   "width": 724,
-   "height": 65.0,
+   "width": 470,
+   "height": 75.0,
    "angle": 0,
    "strokeColor": "#664d00",
    "backgroundColor": "transparent",
@@ -3751,21 +4366,85 @@
    "groupIds": [],
    "frameId": null,
    "roundness": null,
-   "seed": 830521271,
+   "seed": 709454320,
    "version": 1,
-   "versionNonce": 339556468,
+   "versionNonce": 1088378944,
    "isDeleted": false,
    "boundElements": null,
-   "updated": 1781801800000,
+   "updated": 1781801900000,
    "link": null,
    "locked": false,
-   "text": "\u2461  DNA GROUPS / AUDIENCE\nAllowedDnaGroups on the JobParameters becomes the offering's AllowedDna-\nGroups. At launch, services.auth checks the playtester's DNA-group membership\nagainst the offering audience \u2014 grant the stream if a member, else deny.",
-   "fontSize": 13,
+   "text": "\u2461  DNA GROUPS / AUDIENCE\nThe Creator defines an Audience Group of DNA groups,\nregistered in the Group Management Service (GMS).\nAllowedDnaGroups becomes the offering's audience gate; at\nlaunch services.auth checks GMS membership \u2014 grant / deny.",
+   "fontSize": 12,
    "fontFamily": 5,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "\u2461  DNA GROUPS / AUDIENCE\nAllowedDnaGroups on the JobParameters becomes the offering's AllowedDna-\nGroups. At launch, services.auth checks the playtester's DNA-group membership\nagainst the offering audience \u2014 grant the stream if a member, else deny.",
+   "originalText": "\u2461  DNA GROUPS / AUDIENCE\nThe Creator defines an Audience Group of DNA groups,\nregistered in the Group Management Service (GMS).\nAllowedDnaGroups becomes the offering's audience gate; at\nlaunch services.auth checks GMS membership \u2014 grant / deny.",
+   "lineHeight": 1.25
+  },
+  {
+   "id": "box-093",
+   "type": "rectangle",
+   "x": 1120,
+   "y": 1060,
+   "width": 500,
+   "height": 132,
+   "angle": 0,
+   "strokeColor": "#f59f00",
+   "backgroundColor": "#fff9db",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 3
+   },
+   "seed": 1983851363,
+   "version": 1,
+   "versionNonce": 1148658611,
+   "isDeleted": false,
+   "boundElements": [],
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false
+  },
+  {
+   "id": "text-094",
+   "type": "text",
+   "x": 1138,
+   "y": 1074,
+   "width": 470,
+   "height": 75.0,
+   "angle": 0,
+   "strokeColor": "#664d00",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 1243597535,
+   "version": 1,
+   "versionNonce": 1593088525,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1781801900000,
+   "link": null,
+   "locked": false,
+   "text": "\u2462  PACKAGE INGESTION\nConfigurePackage \u2192 StartAssetIngestion ESRP-signs and\nstages the build into SUCU (aka XUS) as the streaming\npackage. The same ContentId + PackageFamilyName flow to\nboth endpoints, so xCloud streams the build as published.",
+   "fontSize": 12,
+   "fontFamily": 5,
+   "textAlign": "left",
+   "verticalAlign": "top",
+   "containerId": null,
+   "originalText": "\u2462  PACKAGE INGESTION\nConfigurePackage \u2192 StartAssetIngestion ESRP-signs and\nstages the build into SUCU (aka XUS) as the streaming\npackage. The same ContentId + PackageFamilyName flow to\nboth endpoints, so xCloud streams the build as published.",
    "lineHeight": 1.25
   }
  ],

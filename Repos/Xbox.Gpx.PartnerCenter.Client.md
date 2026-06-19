@@ -52,4 +52,5 @@ From `.github/agents/playtest-streaming.md` Partner Center UI plan and `FuturePl
 - Git commands used: `git -C "<repo>" --no-pager log --oneline origin/main..t-melanichen/playtest-streaming-enable-flag`; `git -C "<repo>" merge-base origin/main t-melanichen/playtest-streaming-enable-flag`; `git -C "<repo>" --no-pager diff --stat <mergebase>..t-melanichen/playtest-streaming-enable-flag`; `git -C "<repo>" --no-pager diff --name-only <mergebase>..t-melanichen/playtest-streaming-enable-flag`.
 - Spec: `.github/agents/playtest-streaming.md`, section `Partner Center UI changes (planned, Xbox.Gpx.PartnerCenter.Client)`.
 - Future plan: `FuturePlans/ecs-feature-flag.md`.
+- PR template / branch policy: `FuturePlans/ui-pr-templates.md` — `apps/packages/` PRs require a `[type] subject` title, a `Design Doc:` link/`N/A`, and CODEOWNERS approval; includes the filled PR description for `t-melanichen/playtest-streaming-enable-flag`.
 - PRProgress: no `Xbox.Gpx.PartnerCenter.Client` PRProgress file found under `cloud-playtest-implementation\PRProgress`; current PRProgress entries cover PTNR, AUTH, DEVAPI, PTNR-DATA, CTIN, SAGE, XBET, and PTNR follow-ups.
