@@ -36,10 +36,25 @@ The chain that turns "title attached to a playtest offering" into "≥1 PC serve
 - SKU + region match the offering created by partner registry `PlaytestProcessor`
   (`PcServerSku = STANDARD_NC64AS_T4_V3`; non-prod regions WestUS2/WestEurope).
 
+## Verification (2026-06-19) — content-targets mechanism proven
+Added live tests through the real `ResolutionProcessor` (services.contenttargets, `ResolutionProcessorTests`):
+- With the `IncludePredictions` override **on** for `PC_PLAYTEST`, a PC_PLAYTEST server set resolves to
+  `ConcurrenciesByInstallId = 1` (the first install). With it **off**, it resolves to no target.
+- Quota=1 → server set creation is covered by the existing `ServerSetsProcessorTests`, and the PC Orchestrator
+  calls `TargetsQuery.Create()` → `DistributionTargets` (includes the `Predictions` flag). **Suite 24/24.**
+
+So Timi's two knobs (per-SUG enable + quota=1) are **mechanically proven** to produce the install. The scenario still
+won't fire end-to-end until the preconditions below hold.
+
 ## Remaining work
-- [ ] **BLOCKING — Partner Registry must set the SUG on the playtest offering.** `PlaytestProcessor` sets Regions +
-  `TargetServerSkus` but **not** `SystemUpdateGroupWeights`/`SelectableSystemUpdateGroups`, so the offering carries no
-  SUG and the title maps to **no** PC_PLAYTEST server set. Separate partner-registry PR to add `PC_PLAYTEST` (no GA fallback).
+- [ ] **BLOCKING — the `PC_PLAYTEST` SUG must be registered at the platform level (Timi).** Both ends require it:
+  partner-registry validation rejects an unknown SUG (`ValidationProcessorUtilities.ValidateSystemUpdateGroupsAsync`
+  errors when `SystemUpdateGroup.GetId(sug, env) == null`), and content-targets `UpdatePCServerSetsAsync` only creates
+  a server set for SUGs present in the **OS Targets** manifest. Timi owns this (*"we will have a distinct PC_playtest
+  SUG"*, *"I have things set up that way already"*). Confirm the **exact** SUG string before wiring the rest.
+- [ ] **BLOCKING — Partner Registry must set that SUG on the playtest offering.** Once the SUG is registered,
+  `PlaytestProcessor` (which today sets Regions + `TargetServerSkus` but **no** SUG) must add it to
+  `SelectableSystemUpdateGroups`/`SystemUpdateGroupWeights`. Separate partner-registry PR; deferred until the SUG name is confirmed.
 - [ ] **OS Targets** must provision `PC_PLAYTEST` under `STANDARD_NC64AS_T4_V3` in WESTUS2, or `UpdatePCServerSetsAsync` skips it.
 - [ ] **Confirm the SKU + SUG name with Timi.** `PlaytestProcessor.PcServerSku` is a documented temporary stand-in;
   the SKU must stay identical across partner registry, this config, OS Targets, and CTIN. `PC_PLAYTEST` is the proposed SUG name.
@@ -51,6 +66,20 @@ The chain that turns "title attached to a playtest offering" into "≥1 PC serve
 - [ ] **Prod** deferred: `IncludePredictions` allows a single `Override`, already used by `ServerType=XBOX`. Needs the
   config model extended to support **multiple overrides**; prod region is `NorthCentralUs`.
 - [ ] Deploy via **CI/CICD** (not the PR pipeline), then validate end-to-end (attach title → server provisioned → CTIN poll → ready).
+
+## Questions to confirm with Timi (before the offering + CTIN wiring)
+1. **Exact SUG string** for the PC playtest SUG (we've assumed `PC_PLAYTEST`) — it must match across OS Targets,
+   `SystemUpdateGroup` Ids (partner-registry validation), content-targets quota/override, the offering, and CTIN.
+2. **Is the SUG already registered/provisioned** in OS Targets (and `SystemUpdateGroup` Ids) for `STANDARD_NC64AS_T4_V3`
+   in `WESTUS2` (int), or is that still pending?
+3. **Who flips the enable + quota** — does Timi do it via dynamic config (as he described), or should the checked-in
+   content-targets PR (15946980) be the source? If dynamic, the keys are
+   `ServerSetsConfiguration:SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1` and
+   `ResolutionConfiguration:IncludePredictions:Override = { Value:true, ServerType:PC, Sugs:[PC_PLAYTEST] }`.
+4. **SKU**: `PlaytestProcessor.PcServerSku = STANDARD_NC64AS_T4_V3` is a documented stand-in — is that the right T4 SKU,
+   or will it be resolved differently? (Everything downstream must use the same SKU.)
+5. **Environment mapping** for CTIN: content-targets has `Int`; the CTIN worker has only `Test/Prod` — which CTIN env
+   pairs with the content-targets `Int` deployment?
 
 ## Owners
 Melanie Chen (CTGT config + CTIN config) · Timi Bolaji (OS Targets SUG/quota, SKU confirmation) · Partner Registry owner (offering SUG).
