@@ -31,7 +31,10 @@ confirming with him.
 1. **Exact SUG name** — `PC_PLAYTEST`, or something else? (Will be matched across all three PRs.)
 2. **OS Targets** — is `PC_PLAYTEST` already provisioned for `STANDARD_NC64AS_T4_V3` in `WESTUS2` (Int), or still pending?
 3. **Recognition** — does `PC_PLAYTEST` need adding to `Services.Common.Ids` `SystemUpdateGroup`, or is there a dynamic path?
-4. **Enable + quota** — flip via dynamic config, or land the content-targets PR as the checked-in source? Dynamic keys:
+4. **Enable + quota — dynamic config or my PR?** Originally you suggested doing this yourself via dynamic config
+   ("we'll just enable it for the PC play test SUG… it's a dynamic config, so we can just set it to one… it doesn't
+   need to be done programmatically"). I've also prepared the content-targets PR (15946980) that checks in the same
+   settings. Which do you prefer — you flip it live, or I land the PR as the checked-in source? Dynamic keys:
    `ServerSetsConfiguration:SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1` and
    `ResolutionConfiguration:IncludePredictions:Override = { Value:true, ServerType:PC, Sugs:[PC_PLAYTEST] }`.
 5. **SKU** — `STANDARD_NC64AS_T4_V3` is a hardcoded stand-in on the offering; is that the right T4 SKU?
