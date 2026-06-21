@@ -158,7 +158,8 @@ This is the **readiness poll** (step 5). The method `PollPcFirstInstallAsync`:
 3. **No server yet → wait and try again** (retry). **A server has it → mark ready.**
 
 It also adds a small config block, `PlaytestPcReadinessQuery` (lane / regions / server types), so the poll looks at the
-right place, and fills in the non‑prod (Test) values: `PC_PLAYTEST` / `WESTUS2` / `STANDARD_NC64AS_T4_V3`.
+right place. The values are set for both non‑prod environments (**Int** and **Test**): `PC_PLAYTEST` / `WESTUS2` /
+`STANDARD_NC64AS_T4_V3`. Prod is intentionally left unset for now.
 
 **Tests:** the CTIN test passes **11/11** (including that the configured lane/region/server‑type are sent in the query).
 
@@ -255,8 +256,9 @@ A review of all three PRs raised these; each is resolved or flagged:
 - **Timeout vs approval — flag.** CTIN starts polling right after creating the offering, but the offering can require a
   human approval that may take up to ~48h, while the poll currently gives up after **6h**. Raise that timeout (or wait
   for the offering to be live) before relying on it. *(Tracked with [`../Blockers/manual-pr-polling.md`](../Blockers/manual-pr-polling.md).)*
-- **CTIN environment — flag.** The poll values are set in the Test config; confirm the environment that pairs with
-  content-targets `Int` actually loads that file (open question 5), else the poll looks in the wrong place and times out.
+- **CTIN environment — resolved.** The CTIN worker **does** have an `Int` environment (helm `values.en-int.yaml`,
+  `aspNetEnv: Int`); it just had no `appsettings.Int.json` file before. The poll config is now set in **both**
+  `appsettings.Int.json` and `appsettings.Test.json`, matching the content-targets Int+Test enablement.
 - **Republish version pick — known item 62521491** (see PR‑C limitation).
 - **Lane set for all PC playtests — note.** Fine because this code path only creates PC streaming playtests; if
   non‑streaming PC playtests ever share it, gate it on a streaming flag.
@@ -267,8 +269,11 @@ A review of all three PRs raised these; each is resolved or flagged:
 1. **Exact lane name** — we assumed `PC_PLAYTEST`; must match OS Targets, the Ids list, content-targets, the offering, and CTIN.
 2. **Is the lane already created** (OS Targets + Ids) for `STANDARD_NC64AS_T4_V3` in `WESTUS2`?
 3. **Who turns on enable + quota** — Timi via live "dynamic config," or by merging PR‑A?
-4. **Server type** — `STANDARD_NC64AS_T4_V3` is currently a placeholder; is that the right T4 SKU?
-5. **CTIN environment mapping** — content-targets has an `Int` environment; the CTIN worker has only `Test/Prod` — which CTIN env pairs with content-targets `Int`?
+4. **Server type** — `STANDARD_NC64AS_T4_V3` is a hardcoded placeholder (a `const` with a "resolve dynamically" TODO,
+   and validation only checks it is non‑empty). The existing non‑prod content-targets fleet uses a *different* T4 SKU
+   (`STANDARD_NC8AS_T4_V3`), so this needs confirming. Is `STANDARD_NC64AS_T4_V3` the right SKU, and should we config‑drive it?
+5. **Test provisioning** — does Test OS Targets actually have `STANDARD_NC64AS_T4_V3` in `WESTUS2`? If not the Test
+   config is a harmless no‑op until that infra exists. (Both Int and Test now carry the config.)
 6. **Production** — the enable mechanism currently allows only one override, already used by Xbox; production needs that
    extended (and a different region, `NorthCentralUs`).
 
