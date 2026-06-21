@@ -1,0 +1,288 @@
+openapi: 3.0.3
+
+# ---------------------------------------------------------------------------
+# Standalone OpenAPI spec for the Instantly Shareable Playtest streaming
+# ingestion API (the SAGE-fronted, caller-facing surface).
+#
+# This is a HAND-AUTHORED spec for review/design. The source of truth for
+# exact field names/types is the auto-generated Swagger from the backend
+# service (services.contentingestion / CTIN), produced by Swashbuckle in
+# ContentCatalog.Ingestion.Service/Startup.cs -> ConfigureSwagger() over
+# WorkflowsControllerV3. Reconcile against /swagger/v1/swagger.json there.
+#
+# Path mapping: SAGE proxies the public route to the CTIN backend route:
+#   POST /v3/playtest/playtesttitleingestion        -> POST /v3/workflows/playtesttitleingestion
+#   GET  /v3/playtest/playtesttitleingestion/{jobId} -> GET  /v3/workflows/playtesttitleingestion/{jobId}
+# ---------------------------------------------------------------------------
+
+info:
+  title: Playtest Title Ingestion API
+  version: "3.0"
+  description: >-
+    Schedules and polls an Instantly Shareable Playtest streaming-ingestion job.
+    Called by xPlaytest (Xbox.Xbet.Service) during publish, cross-tenant
+    (MSFTGreen) via the SAGE gateway, which forwards to xCloud Content Ingestion
+    (services.contentingestion). The job ingests the already-published build as a
+    streaming title and gates the offering on the playtest's DNA groups.
+  contact:
+    name: Instantly Shareable Playtest
+  license:
+    name: Microsoft internal
+
+servers:
+  - url: https://gssv-sage.xboxlive.com
+    description: SAGE gateway (prod)
+  - url: https://gssv-sage-test.xboxlive.com
+    description: SAGE gateway (test / staging)
+
+security:
+  - s2sBearer: []
+
+tags:
+  - name: PlaytestTitleIngestion
+    description: Schedule and poll playtest streaming-ingestion jobs.
+
+paths:
+  /v3/playtest/playtesttitleingestion:
+    post:
+      tags: [PlaytestTitleIngestion]
+      operationId: schedulePlaytestTitleIngestion
+      summary: Schedule a playtest title ingestion job
+      description: >-
+        Schedules ingestion of a streaming-enabled playtest title. Best-effort
+        from the caller's side: a streaming failure must never block the standard
+        download publish. Returns an OperationStatus whose `id` is then polled.
+        Authorization is enforced at the backend (CTIN); SAGE forwards the caller
+        token unchanged (auth pass-through).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaytestTitleIngestionJobParameters'
+      responses:
+        '200':
+          description: Job scheduled; returns the operation status (with the job id).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationStatus'
+        '400':
+          description: Invalid payload (e.g. missing ContentId, no DNA groups, expiration in the past, zero XboxTitleId).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Missing or invalid bearer token.
+        '403':
+          description: Caller app id is not authorized for playtest ingestion.
+
+  /v3/playtest/playtesttitleingestion/{jobId}:
+    get:
+      tags: [PlaytestTitleIngestion]
+      operationId: getPlaytestTitleIngestionJobStatus
+      summary: Get a playtest title ingestion job status
+      description: >-
+        Returns the current status of a previously scheduled ingestion job.
+        Callers poll this until `isComplete` is true.
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          description: The operation/job id returned by the schedule call.
+          schema:
+            type: string
+          example: "a1b2c3d4-0000-0000-0000-000000000000"
+      responses:
+        '200':
+          description: Current job status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationStatus'
+        '404':
+          description: No job found for the given id.
+
+components:
+  securitySchemes:
+    s2sBearer:
+      type: oauth2
+      description: >-
+        Service-to-service (cross-tenant / MSFTGreen) AAD token. The audience is
+        the contentingestion app registration; authorized xPackage client ids:
+        prod d60e3360-..., staging bf3fb5e5-.... SAGE forwards the token unchanged.
+      flows:
+        clientCredentials:
+          tokenUrl: https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token
+          scopes: {}
+
+  schemas:
+    PlaytestTitleIngestionJobParameters:
+      type: object
+      description: >-
+        Built by xPlaytest's XCloudPlaytestTitleIngestionBuilder. GSSV `Id` fields
+        are string-backed identifiers.
+      required:
+        - playtestId
+        - partnerId
+        - playtestProductId
+        - allowedDnaGroups
+        - expirationTime
+        - allowedSandboxId
+        - storeAsset
+      properties:
+        playtestId:
+          type: string
+          description: The xPlaytest GUID (string-backed Id); forms the workflow lock/partition key.
+          example: "3f2504e0-4f89-41d3-9a0c-0305e82c3301"
+        partnerId:
+          type: string
+          description: Always "MICROSOFT" for playtest offerings.
+          example: "MICROSOFT"
+        playtestProductId:
+          type: string
+          description: The generated Playtest XProduct BigId.
+          example: "9NBB1WVX4HJ7"
+        allowedDnaGroups:
+          type: array
+          description: Audience gate — the playtest's DNA-group / flight ids. Must be non-empty.
+          items:
+            type: string
+          example: ["3f2504e0-4f89-41d3-9a0c-0305e82c3301"]
+        expirationTime:
+          type: string
+          format: date-time
+          description: >-
+            UTC instant after which the streaming offering expires. Policy max is
+            30 days (decided); note the builder currently clamps to now + 7 days.
+          example: "2026-07-18T00:00:00Z"
+        allowedSandboxId:
+          type: string
+          description: Streaming playtests are retail-only; always "RETAIL".
+          example: "RETAIL"
+        storeAsset:
+          $ref: '#/components/schemas/StoreAsset'
+
+    StoreAsset:
+      type: object
+      required:
+        - storeEntry
+        - markets
+        - platform
+        - contentId
+        - packageFamilyName
+      properties:
+        storeEntry:
+          $ref: '#/components/schemas/StoreEntry'
+        markets:
+          type: array
+          items:
+            type: string
+          description: Market ids (string-backed Ids).
+          example: ["NEUTRAL"]
+        platform:
+          type: string
+          description: Game-streaming ServerPlatform id. Today playtests are PC.
+          enum: [PC, Xbox]
+          example: PC
+        contentId:
+          type: string
+          description: >-
+            The already-published package's content id. Used as the ingestion
+            SourceId — this is what makes the streaming build the SAME build the
+            developer published (shared build).
+          example: "00000000-0000-0000-0000-000000000000"
+        xboxTitleId:
+          type: integer
+          format: int64
+          nullable: true
+          description: >-
+            Resolved Xbox Live title id (32-bit unsigned, carried as a number).
+            Must be present and non-zero for streaming to be scheduled.
+          example: 1234567890
+        packageFamilyName:
+          type: string
+          description: Package Family Name (PFN) of the published package; required for PC.
+          example: "Publisher.Game_8wekyb3d8bbwe"
+        aumID:
+          type: string
+          nullable: true
+          description: Application User Model Id; defaults to "{packageFamilyName}!App".
+          example: "Publisher.Game_8wekyb3d8bbwe!App"
+
+    StoreEntry:
+      type: object
+      required:
+        - productId
+        - flags
+        - name
+        - publisherId
+        - isPrivateAudience
+      properties:
+        productId:
+          type: string
+          example: "9NBB1WVX4HJ7"
+        flags:
+          type: string
+          description: Store product flags.
+          enum: [GAME]
+          example: GAME
+        name:
+          type: string
+          example: "My Game (Playtest)"
+        description:
+          type: string
+          example: "Cloud-streamable playtest build."
+        publisherId:
+          type: string
+        parentProductIds:
+          type: array
+          items:
+            type: string
+          description: Source/parent product the streaming title is derived from.
+        isPrivateAudience:
+          type: boolean
+          description: Always true — playtest offerings are private and DNA-group gated.
+          example: true
+
+    OperationStatus:
+      type: object
+      description: Standard GSSV async-operation status.
+      required:
+        - id
+        - isComplete
+      properties:
+        id:
+          type: string
+          description: The job/operation id (poll the GET endpoint with this).
+          example: "a1b2c3d4-0000-0000-0000-000000000000"
+        isComplete:
+          type: boolean
+          description: True once the job has reached a terminal state.
+          example: false
+        isSuccess:
+          type: boolean
+          nullable: true
+          description: On a terminal job, whether it succeeded. Null while in progress.
+          example: null
+        startTime:
+          type: string
+          format: date-time
+          nullable: true
+        completionTime:
+          type: string
+          format: date-time
+          nullable: true
+
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string

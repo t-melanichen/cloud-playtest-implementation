@@ -32,8 +32,9 @@ so the on-disk file numbers are not strictly ascending in the table. Click a tit
 | 16 | 15896502 | CTIN | services.contentingestion | Draft | [Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow](./17-CTIN-15896502-pc-install-readiness-polling.md) |
 | 17 | 15905881 | CTIN | services.contentingestion | Merged | [Gate playtest title ingestion endpoints with CrossTenantS2S policy](./12-CTIN-15905881-gate-playtest-ingestion-crosstenant-s2s.md) |
 | 18 | 15946980 | CTGT | services.contenttargets | Draft | [Enable PC playtest install-on-attach + quota (PC_PLAYTEST SUG, Int)](./18-CTGT-15946980-pc-playtest-install-on-attach.md) |
+| 19 | 15949594 | PTNR | services.partnerregistry | Draft | [Set PC_PLAYTEST SUG on the playtest offering](./19-PTNR-15949594-playtest-offering-sug.md) |
 
-**Totals:** 18 tracked PRs — **13 merged**, **1 active**, **4 draft**.
+**Totals:** 19 tracked PRs — **13 merged**, **1 active**, **5 draft**.
 
 **Status legend:** Merged = completed/merged · Active = open and in review · Draft = open draft.
 
