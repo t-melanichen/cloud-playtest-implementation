@@ -272,8 +272,10 @@ A review of all three PRs raised these; each is resolved or flagged:
 4. **Server type** — `STANDARD_NC64AS_T4_V3` is a hardcoded placeholder (a `const` with a "resolve dynamically" TODO,
    and validation only checks it is non‑empty). The existing non‑prod content-targets fleet uses a *different* T4 SKU
    (`STANDARD_NC8AS_T4_V3`), so this needs confirming. Is `STANDARD_NC64AS_T4_V3` the right SKU, and should we config‑drive it?
-5. **Test provisioning** — does Test OS Targets actually have `STANDARD_NC64AS_T4_V3` in `WESTUS2`? If not the Test
-   config is a harmless no‑op until that infra exists. (Both Int and Test now carry the config.)
+5. **Test provisioning** — the offering targets `WestUS2`/`WestEurope` in **both** Int and Test (the existing `WESTUS3`/`GA`
+   entry in the Test fleet is a *separate, unrelated* fleet), and the playtest config matches it on `WESTUS2`. The only
+   remaining unknown is infra: does Test OS Targets actually have `STANDARD_NC64AS_T4_V3` provisioned in `WESTUS2` for the
+   `PC_PLAYTEST` lane? If not, the Test config is a harmless no‑op until that infra exists.
 6. **Production** — the enable mechanism currently allows only one override, already used by Xbox; production needs that
    extended (and a different region, `NorthCentralUs`).
 
