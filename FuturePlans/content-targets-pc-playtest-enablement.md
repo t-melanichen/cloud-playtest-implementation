@@ -1,184 +1,278 @@
-# PC playtest streaming readiness — install-on-attach, quota, offering SUG, and the readiness poll
+# PC playtest streaming readiness — a complete, plain‑English guide
 
-**Status (2026-06-20):** All three code/config changes are made, built, and tested, and are open as **draft PRs**.
-The only remaining step is **registering the distinct `PC_PLAYTEST` SUG** at the platform level (Timi). Everything is
-pinned to **`PC_PLAYTEST`** / **`STANDARD_NC64AS_T4_V3`** / **`WESTUS2`**; if the real SUG string differs, it's a single
-literal to update in the three PRs.
+> **If you're new to this, start at sections 0–4.** They explain the whole thing with no assumed knowledge.
+> Sections 5+ are the detailed engineering record (the three PRs, the test plan, and what's left).
+
+**Status (2026-06-21):** All three code/config changes are done, built, and tested, and are open as **draft PRs**.
+The only remaining step is **registering the `PC_PLAYTEST` SUG** (a server "lane" — explained below) at the platform
+level, which is owned by Timi. Everything is pinned to three values: **`PC_PLAYTEST`** (the lane), **`STANDARD_NC64AS_T4_V3`**
+(the server type), and **`WESTUS2`** (the datacenter region).
 
 ---
 
-## 1. Why this is needed (high level)
+## 0. The 60‑second version (no jargon)
 
-Instantly Shareable Playtest lets testers **stream** a playtest from the cloud instead of downloading it. For that to
-work, the game build must be **physically installed on a cloud GPU server**, and we must **know it's ready** before we
-hand the tester a launch link (else they click and get a broken/404 experience).
+A "playtest" is when a game creator shares an early build so testers can try it. We want testers to **stream** it from
+the cloud (play it instantly over the internet, like Netflix) instead of downloading it.
 
-Xbox vs PC: Xbox servers pre‑pull content and self‑report. **PC servers do not** — content lands **on demand** only when
-something tells the system to install it. So for PC we must (a) **trigger** the server‑side install and (b) **confirm**
-it landed, for the **exact version** just published (a PC version = the content **hash**).
+For streaming to work, the game has to be **installed on a real machine in a datacenter** before the tester clicks play.
+On Xbox that happens automatically; on **PC it does not** — we have to (1) tell the system to install it, and (2) check
+that it finished, before we say "ready."
 
-## 2. The two "installs" and the end‑to‑end order
+This work does exactly that, across three services:
+1. **Tell the system to set aside one PC machine and install the build** (the `content-targets` service).
+2. **Label the playtest so the install goes to the right group of machines** (the `partner-registry` service).
+3. **Keep checking until the machine actually has the build, then mark it ready** (the `content-ingestion` service).
 
-There are two different things called "install"; the order matters (verified in `PlaytestTitleIngestionWorkflow`):
+The only thing left is for the platform team (Timi) to **create the dedicated group of machines** ("the `PC_PLAYTEST`
+lane") that all three pieces point at.
 
-- **Install #1 — content ingestion** (build → xCloud's content catalog/SUCU). Happens **first**.
-- **Install #2 — PC‑server install** (build → an actual GPU server, for streaming). Happens **later, triggered by
-  attaching the title to the offering**.
+---
 
-CTIN `PlaytestTitleIngestionWorkflow` stage order:
-1. `ValidateParameters`
-2. `TriggerAssetIngestionAsync` → `PollAssetIngestionAsync` — **Install #1** (ingest the build, wait for it)
-3. `CreatePackageAsync` — create the streaming package + version 1.0
-4. `ConfigureOfferingAsync` — create the offering + **attach the title** (`ConfigurePlaytestAsync`)
-5. `PollFirstInstallAsync` — **Install #2 happens here**: the attach triggers the PC‑server staging; this stage polls for it
-6. `NotifyReadyAsync` → ready
+## 1. Plain‑English glossary (read this — the rest uses these words)
 
-So: **ingest the build → package it → attach the title to the offering → that attach triggers the PC‑server staging →
-poll by exact version‑hash until a server reports it → ready.**
-
-## 3. The three PRs — what each does, in depth
-
-### PR-A · services.contenttargets · #15946980 · draft · `t-melanichen/pc-playtest-install-on-attach`
-**Title:** [CTGT] Enable PC playtest install-on-attach + quota (PC_PLAYTEST SUG, Int)
-
-**What it does:** turns on the **PC‑server install (Install #2)** for the playtest lane. Content Targets tells the PC
-Orchestrator how many servers to provision per *server set* (region × SUG × SKU) and which installs map to them. Two
-config edits in `appsettings.ContentTargets.Int.json`:
-- **Quota (Timi's C2):** a `STANDARD_NC64AS_T4_V3` SkuConfig with `QuotasBySugByRegion.WESTUS2.PC_PLAYTEST = 1` — so
-  `ServerSetsProcessor.UpdatePCServerSetsAsync` **creates the server set** with `ServerQuota = 1` (one T4).
-- **Enable install-on-attach (Timi's C1):** a `ResolutionConfiguration.IncludePredictions.Override`
-  (`ServerType=PC`, `Sugs=[PC_PLAYTEST]`, `Value=true`).
-
-**Why that enables the install:** PC has **no BaseTargets** path; PC concurrency comes from `PredictionsProcessor`
-which synthesizes **1 per install id**, and that's only included when `IncludePredictions.GetValue(serverSet)` is true
-(off by default; only XBOX is overridden on). The PC Orchestrator calls `ResolveTargetsAsync` with
-`TargetsQuery.Create()` → `DistributionTargets` (includes the `Predictions` flag), so the override is honored → the
-server set gets a concurrency target of **1** → it provisions one T4 and installs the title's build.
-
-**Files:** `appsettings.ContentTargets.Int.json`; tests `Configuration/ResolutionConfigurationBindingTests.cs`,
-`Processors/ResolutionProcessorTests.cs`.
-**Tests:** Core.UnitTests **24/24**. `ResolutionProcessorTests` proves: override **on** → `ConcurrenciesByInstallId = 1`;
-**off** → no target.
-
-### PR-B · services.partnerregistry · #15949594 · draft · `t-melanichen/playtest-offering-sug`
-**Title:** [PTNR] Set PC_PLAYTEST SUG on the playtest offering
-
-**What it does:** names the `PC_PLAYTEST` lane **on the offering** so Content Targets maps the title's installs to it.
-`PlaytestProcessor` now sets `OfferingV2.SelectableSystemUpdateGroups = [PC_PLAYTEST]` for PC playtest titles (alongside
-the existing `TargetServerSkus = [STANDARD_NC64AS_T4_V3]`).
-
-**Why it's needed:** Content Targets' `UpdateInstallIdsByServerSetAsync` reads `offering.GetSystemUpdateGroups()` and
-maps the title's installs to `ServerSetId.CreatePC(region, sug, sku)`. Before this, the offering set Regions + SKU but
-**no SUG**, so the title mapped to **no** server set and Install #2 never had anywhere to land.
-
-**Files:** `Processors/PlaytestProcessor.cs`; test `Processors/PlaytestProcessorTests.cs`.
-**Tests:** PlaytestProcessorTests **12/12** (asserts the offering carries `SelectableSystemUpdateGroups = [PC_PLAYTEST]`).
-
-### PR-C · services.contentingestion · #15896502 · draft · `t-melanichen/playtest-pc-install-polling`
-**Title:** Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow
-
-**What it does:** the **readiness poll (step 5)** — how CTIN *knows* Install #2 finished, pinned to the exact version.
-`PollPcFirstInstallAsync`:
-1. **Resolve** the just‑ingested content → `install id` + `hash` (`ResolveContentInstallMetadataAsync`).
-2. Build `GameStreamingServerFilter.Content = [ ContentFileFilter { Id = installId, Version = hash } ]` (plus the
-   configurable SUG / Regions / SKUs).
-3. Query **PC Orchestrator** `QueryServersPagedAsync`. Empty → **retry**; a server reporting that exact install id +
-   hash → `NotifyReadyAsync`.
-
-It also adds `IngestionWorkflowSettings.PlaytestPcReadinessQuery` (SystemUpdateGroup / Regions / Skus) so the poll is
-pinned to the same lane, and sets the **Test (non‑prod)** values to `PC_PLAYTEST` / `WESTUS2` / `STANDARD_NC64AS_T4_V3`.
-
-**Files:** `Configuration/IngestionWorkflowSettings.cs`, `Workflows/PlaytestTitleIngestionWorkflow.cs`,
-`Worker/appsettings.json`, `Worker/appsettings.Test.json`; test `PlaytestTitleIngestionWorkflowTests.cs`.
-**Tests:** PlaytestTitleIngestionWorkflowTests **11/11** (incl. configured‑SUG/region/SKU flows into the filter).
-
-**Known caveat:** version selection uses `OrderByDescending(v => v.IsCurrent)`, where `IsCurrent` = "available now," not
-strictly "just‑ingested," so a republish/version‑bump could select a stale hash (TODO 62521491). First‑publish is correct.
-
-## 4. Verified against what Timi said (XCloudIngestion mtg)
-
-| Timi (verbatim) | Maps to |
+| Term | What it actually means |
 |---|---|
-| "we should have one SKU … one SUG and we use that for every play test" / "a distinct PC underscore play test SUG" | the `PC_PLAYTEST` SUG + single `STANDARD_NC64AS_T4_V3` SKU used by all three PRs |
-| "content targets will notice that the title is in this offering … if it's in this offering, then I should install at least one … we already have that implemented today. I just have it disabled … for playtest we can conditionally enable it" | **PR‑A** (IncludePredictions override = conditionally enable) + **PR‑B** (title in the offering, with the SUG) |
-| "we now have a quota configuration that defines … the max number of servers a sug can have … we can just set that to one. It's one T4 … it's a dynamic config" | **PR‑A** `QuotasBySugByRegion.WESTUS2.PC_PLAYTEST = 1` |
-| "once you merge … the offering config, distribution service should start doing one installation … once that installation is done … the PC orchestrator manifests saying … this content is now available on this server. So then, while you're doing your polling, eventually should magically just show up … ready to play" | the attach→install→poll sequence; **PR‑C** poll → `NotifyReady` |
-| "the version for a content file on a PC server is actually the hash … the install ID is install ID and the version is the hash … put that in the content file filter … query for servers and wait until something shows up" | **PR‑C** `ContentFileFilter { Id = installId, Version = hash }` → `QueryServersPagedAsync` |
-| "the offering stuff that's already been done by Melanie" | the offering creation in CTIN `ConfigureOfferingAsync` + **PR‑B** (the SUG on it) |
+| **Streaming / xCloud / cloud gaming** | The game runs on a server in a datacenter; the tester's device just shows the video and sends button presses. No download. |
+| **Build** | One specific compiled version of the game (the actual files). |
+| **Server / GPU server / "T4"** | A physical machine in a datacenter with a graphics card that runs the game. "T4" is the type of machine (an NVIDIA T4 GPU). Its exact name here is the **SKU** `STANDARD_NC64AS_T4_V3`. These are expensive, so we only want one. |
+| **SKU** | The *type/size* of the server machine (e.g. `STANDARD_NC64AS_T4_V3` = a T4‑GPU VM). |
+| **Region** | The datacenter location, e.g. `WESTUS2` (West US 2), `WestEurope`, `NorthCentralUs`. |
+| **SUG (System Update Group)** | A **named group ("lane") of servers** that share the same OS/update settings. Think of it as a labeled shelf of machines. Examples that already exist: `GA` (the big public one), `Canary`. We want a brand‑new, dedicated lane called **`PC_PLAYTEST`** just for playtests, so they're isolated and easy to control. |
+| **Server set** | One specific bucket of servers, identified by **region × SUG × SKU**. Example: `WESTUS2 / PC_PLAYTEST / STANDARD_NC64AS_T4_V3` is one server set. This is the unit everything is counted/configured in. |
+| **Offering** | The "listing" that makes a game streamable — it says *this game is available to stream, to these testers, in these regions, on these kinds of servers/lanes*. Stored in Partner Registry. |
+| **Title** | The game record itself, which gets **attached** to an offering. |
+| **Install id** | A unique id for a specific installable chunk of content. |
+| **Hash (content hash)** | A **fingerprint** (a long unique string) of the **exact** game+DLC version. Different build → different hash. On a PC server, "what version is installed?" is answered by the hash. |
+| **content-targets** (service) | The xCloud service that decides **how many** servers to keep for each server set and **which** content to install on them. Think "warehouse stock manager." |
+| **PC Orchestrator** (service) | The xCloud service that actually runs/tracks the PC servers and knows what's installed on each. The source of truth for PC server state. |
+| **OS Targets** | The platform list that says **which SUGs (lanes) exist** and which servers belong to them. To create the `PC_PLAYTEST` lane, it has to be added here. |
+| **content-ingestion / CTIN** (service) | The xCloud service that runs the **publish workflow**: takes a build, gets it into the system, creates the offering, and waits for the server to be ready. |
+| **Partner Registry** | The service that stores offerings and titles (the catalog/listings database). |
+| **Install‑on‑attach** | The behavior where simply **adding the title to the offering** causes the system to install it on a server. It exists already but is **turned off by default**; we turn it on just for the playtest lane. |
+| **Quota** | The **max number of servers** allowed in a server set. We set it to **1**. |
+| **Predictions** | content-targets' way of estimating how many servers a piece of content needs. For PC it's just hard‑coded to **1 per install** — we only want one server. |
+| **Readiness poll** | CTIN **repeatedly checking** ("polling") whether the server has the build yet, before declaring the playtest "ready." |
 
-**One nuance vs Timi:** he framed the enable + quota as a **dynamic‑config flip he'd do**, "not … done programmatically."
-PR‑A is the **checked‑in** equivalent (same keys); content‑targets loads config via `CreateGameStreamingBuilder` →
-`SetupDefaultConfigSources`, so the dynamic layer can override the same keys at runtime. Confirm with Timi whether he
-flips dynamic config or merges PR‑A (see open questions).
+---
 
-## 5. The one remaining step — register the `PC_PLAYTEST` SUG
+## 2. The big picture, with an analogy
 
-The lane must **exist** before any of the above fires. Two places, both platform/infra (Timi):
+Imagine a **warehouse of game‑server machines**:
+- The machines are organized into labeled **shelves** = **SUGs** (lanes). `GA` is the giant public shelf. We want a small
+  new shelf labeled **`PC_PLAYTEST`** just for playtests.
+- A **server set** is "this many machines of this type, on this shelf, in this warehouse (region)."
+- The **offering** is the game's storefront listing. It says which shelf the game should live on.
+- **content-targets** is the stock manager: it reads the listings, and for anything that should be on the `PC_PLAYTEST`
+  shelf, it says "put one machine on that shelf and install this game on it."
+- **PC Orchestrator** is the floor that actually has the machines and knows what's installed where.
+- **CTIN** is the clerk who placed the order and now keeps walking to the shelf to check "is the game installed yet?"
+  before telling the tester "you can play."
 
-1. **SUG Ids registry** — `PC_PLAYTEST` must resolve via `SystemUpdateGroup.GetId("PC_PLAYTEST", env)` (where `GA`,
-   `CANARY` live). Partner‑registry validation rejects unknown SUGs (`ValidationProcessorUtilities.cs:421`), so the
-   offering PR (PR‑B) won't validate until this exists.
-2. **OS Targets manifest** — add `PC_PLAYTEST` for `STANDARD_NC64AS_T4_V3` in `WESTUS2`, so PC servers run in that SUG.
-   Content Targets `UpdatePCServerSetsAsync` only builds the server set for SUGs present in the OS Targets manifest.
+The work in this doc: put the game's listing on the `PC_PLAYTEST` shelf, turn on "auto‑stock one machine," and have the
+clerk check until it's done. The platform team still has to **physically create the `PC_PLAYTEST` shelf** (register the SUG).
 
-(The Partner Registry `SystemUpdateGroupConfigV2` pools at `/SystemUpdateGroups/Pools` are for Xbox pool→SUG quota
-mappings; the PC quota is handled in PR‑A, so you don't need that for PC.)
+---
 
-## 6. How to test that this works
+## 3. Why PC is special (Xbox vs PC)
 
-### A. Unit level — already green (run locally)
-- content-targets: `dotnet test src/Tests/Unit/ContentTargets.Core.UnitTests -p:StaticWebAssetsEnabled=false` → **24/24** (`ResolutionProcessorTests`: enable→1, off→0).
-- partner-registry: `dotnet test …/PartnerRegistryService.UnitTests --filter PlaytestProcessorTests -p:StaticWebAssetsEnabled=false` → **12/12** (offering carries the SUG).
-- CTIN: `dotnet test …/ContentCatalog.Ingestion.Core.UnitTests --filter PlaytestTitleIngestionWorkflowTests` → **11/11** (SUG/region/SKU + hash flow into the PC Orchestrator filter).
+- **Xbox** servers **pre‑pull** content (they download games ahead of time on their own) and report what they have. So
+  "is it installed?" is already answered.
+- **PC** servers **don't** pre‑pull. Content only lands **on demand**, and only when something explicitly triggers an
+  install. And because each playtest publish can be a **new build**, "is this game installed somewhere?" isn't enough —
+  we must confirm **the exact version** (the hash) is installed.
 
-### B. After the SUG is registered + the 3 changes deploy (CI/CICD, Int/Test) — verify each layer
-1. **SUG registered?** Partner Registry `GET /v1/systemupdategroup/configs` (or confirm `SystemUpdateGroup.GetId("PC_PLAYTEST", int)` ≠ null). OS Targets manifest lists `PC_PLAYTEST` for the SKU/region.
-2. **Offering carries the SUG?** Publish a PC playtest, then GET the offering and confirm `SelectableSystemUpdateGroups = ["PC_PLAYTEST"]`.
-3. **Content Targets built the lane + target?** Use the content-targets **Savant** console (the dashboard Timi used), server‑set id format `WESTUS2/PC_PLAYTEST/STANDARD_NC64AS_T4_V3`:
-   - `sst sugs=PC_PLAYTEST` (GetServerSets) → the PC_PLAYTEST server set exists ⇒ quota config + OS Targets worked.
-   - `sstm WESTUS2/PC_PLAYTEST/STANDARD_NC64AS_T4_V3` (GetServerSetMetadata) → `ServerQuota = 1`.
-   - `ssti …` (GetServerSetInstallIds) → the playtest's install id is mapped ⇒ offering SUG (PR‑B) worked.
-   - `sstt …` (GetServerSetTargets / ResolveTargets) → `ConcurrenciesByInstallId` has the install at **1** ⇒ enable (PR‑A) worked.
-4. **Server provisioned + installed?** Query **PC Orchestrator** for a server matching the content file (install id + hash) — it should appear once distribution finishes.
-5. **CTIN poll reaches ready?** `GET /v3/workflows/playtesttitleingestion/{jobId}` → `OperationStatus` flips terminal/success; worker logs show "PC install successful" → `NotifyReadyAsync`.
+That's why PC needs this extra work and Xbox doesn't.
 
-### C. End-to-end (the real proof)
-Publish a PC playtest for the pilot seller → walk steps B2–B5 → get the launch link
-(`https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}`) and confirm it streams. Then
-**republish a new build** and confirm the poll waits for the **new** hash (covers the version caveat in PR‑C).
+---
 
-## 7. Rubber-duck review (2026-06-20) — findings + resolutions
-- **PR-B field (`SelectableSystemUpdateGroups` vs `SystemUpdateGroupWeights`) — resolved, no change.** `services.auth`
-  `UserLoginProcessor.cs:739` builds each `OfferingRegion` with `SystemUpdateGroups = offering.SelectableSystemUpdateGroups`,
-  so auth exposes the offering's `SelectableSystemUpdateGroups` to the client as the available SUGs, and content-targets
-  unions both fields. `SelectableSystemUpdateGroups = [PC_PLAYTEST]` is correct for both install-mapping and allocation.
-  (If end-to-end allocation testing ever shows the server isn't picked, also set `SystemUpdateGroupWeights = { PC_PLAYTEST: 100 }`.)
-- **PR-A override scope — intentional, no change.** The `IncludePredictions` override is keyed on `Sugs=[PC_PLAYTEST]` only
-  (no Regions/Skus). Deliberate: enable install-on-attach wherever the dedicated PC_PLAYTEST lane exists. Constraining to
-  WESTUS2/NC64AS would silently break if PC_PLAYTEST capacity is later added in another region/SKU.
-- **Region casing — OK.** Content-targets uses `WESTUS2`, the offering uses `WestUS2`; `Id` comparison is case-insensitive
-  (per `PlaytestProcessorTests`: "Offering.Id is an Id (case-insensitive)"), so they match.
-- **Timing / first-install timeout — flag.** CTIN starts `PollFirstInstallAsync` right after `ConfigureOfferingAsync`. The
-  offering is a Partner Registry ADO PR that can need human approval (up to ~48h, per `Blockers/manual-pr-polling.md`), but
-  `FirstInstallPollingPolicy` times out at **6h**. If approval/provisioning exceeds the window, the poll routes to
-  `NotifyInstallNotFound`. Raise the timeout (or gate the poll on the offering being live) before relying on it.
-- **CTIN env config — flag.** The poll values live in the Worker `appsettings.Test.json`. Confirm the CTIN env that pairs
-  with content-targets `Int` loads that file; otherwise the poll falls back to `WestEurope`/unconstrained and times out (open question 5).
-- **Version republish — known TODO 62521491.** On republish the `IsCurrent` selection can false-ready against a stale hash. First publish is correct.
-- **SUG gating — note.** The SUG is set for all PC playtest titles in `PlaytestProcessor`; correct since that path only
-  creates PC streaming playtests. If non-streaming PC playtests ever share it, gate on the streaming/instant-playtest flag.
+## 4. The end‑to‑end flow, step by step
 
-## 8. Open questions for Timi
-1. **Exact SUG string** (assumed `PC_PLAYTEST`) — must match OS Targets, the SUG Ids registry, content-targets, the offering, and CTIN.
-2. **Is the SUG already registered/provisioned** (OS Targets + Ids) for `STANDARD_NC64AS_T4_V3` in `WESTUS2`?
-3. **Who flips enable + quota** — Timi via dynamic config, or merge PR‑A? Dynamic keys:
-   `ServerSetsConfiguration:SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1` and
-   `ResolutionConfiguration:IncludePredictions:Override = { Value:true, ServerType:PC, Sugs:[PC_PLAYTEST] }`.
-4. **SKU** — `PcServerSku = STANDARD_NC64AS_T4_V3` is a documented stand-in; right T4 SKU?
-5. **CTIN env mapping** — content-targets has `Int`; the CTIN worker has only `Test/Prod` — which CTIN env pairs with content-targets `Int`?
-6. **Prod** — `IncludePredictions` allows a single `Override`, already used by `ServerType=XBOX`; needs multi-override support; prod region `NorthCentralUs`.
+Heads‑up: the word "install" is used for **two different things**, and the order matters:
+- **Install #1 — content ingestion:** getting the build *into xCloud's content system* (so it's a known, resolvable
+  package). This happens **first**.
+- **Install #2 — PC‑server install:** putting that build *onto an actual GPU server* so it can be streamed. This happens
+  **later, and is triggered by attaching the title to the offering**.
 
-### Ready-to-send message to Timi
+The publish workflow (`PlaytestTitleIngestionWorkflow` in CTIN) runs these stages in order:
+1. **Validate** the request.
+2. **Ingest the build** (Install #1) and wait for it to finish.
+3. **Create the package + version 1.0** (a tidy record of the build).
+4. **Create the offering and attach the title** — this is the step that says "this game is streamable, on the
+   `PC_PLAYTEST` lane."
+5. **That attach triggers Install #2** — content-targets notices the title is on the `PC_PLAYTEST` lane and tells PC
+   Orchestrator to set aside one machine and install the build. CTIN **polls** here until a server reports it.
+6. **Mark it ready** — the tester gets a working launch link.
+
+In one sentence: **ingest the build → package it → put it on the `PC_PLAYTEST` lane (attach to offering) → that triggers
+one PC server to install the exact build → keep checking until that server has it → ready.**
+
+---
+
+## 5. The three PRs — what each does and why (in depth)
+
+There are three small changes, one per service. Each is a **draft PR** (a proposed change not yet merged).
+
+### PR‑A · `services.contenttargets` · PR #15946980
+**Plain English:** "For the `PC_PLAYTEST` lane, automatically keep **one** machine and install the playtest build on it."
+
+This is the piece that makes the PC‑server install (Install #2) actually happen. It's two small config settings in
+`appsettings.ContentTargets.Int.json`:
+- **Quota = 1 (one machine):** under a `STANDARD_NC64AS_T4_V3` server type, `QuotasBySugByRegion.WESTUS2.PC_PLAYTEST = 1`.
+  This both **creates** the `PC_PLAYTEST` server set and caps it at one machine.
+- **Turn on install‑on‑attach for this lane:** a `ResolutionConfiguration.IncludePredictions` override
+  (`ServerType = PC`, `Sugs = [PC_PLAYTEST]`, `Value = true`).
+
+**Why both are needed (the mechanism):** on PC, the "how many servers should have this content" number comes only from
+**predictions**, which the system hard‑codes to **1 per install**. But predictions are **off by default** — they're only
+counted when `IncludePredictions` is turned **on** for that server set. So:
+- The **quota** creates the lane and gives it capacity (1 machine), but on its own the "needed count" is 0 → nothing installs.
+- The **override** turns the needed count into 1 → PC Orchestrator provisions one machine and installs the build.
+- You need **both**.
+
+**Tests:** the content-targets unit test suite passes **24/24**. The key test (`ResolutionProcessorTests`) proves that
+with the override **on**, the lane's target becomes **1** (install happens); with it **off**, the target is **0**
+(nothing installs). A second test proves the override only matches PC servers on the `PC_PLAYTEST` lane (not Xbox, not `GA`).
+
+### PR‑B · `services.partnerregistry` · PR #15949594
+**Plain English:** "Put the playtest game's listing **on the `PC_PLAYTEST` lane**, so content-targets knows where to send it."
+
+In `PlaytestProcessor.cs`, when a playtest is a PC title, the offering now records the lane:
+`OfferingV2.SelectableSystemUpdateGroups = [PC_PLAYTEST]` (it already recorded the server type
+`TargetServerSkus = [STANDARD_NC64AS_T4_V3]`).
+
+**Why it's needed:** content-targets looks at each offering and reads which lane(s) it targets, then maps the game's
+installs to `region / SUG / SKU`. Before this change the offering listed a region and a server type but **no lane**, so
+the game mapped to **no** server set and Install #2 had nowhere to go. This is the missing link between PR‑A and PR‑C.
+
+**Tests:** the partner-registry test passes **12/12** (it checks the offering now carries `PC_PLAYTEST`).
+
+### PR‑C · `services.contentingestion` (CTIN) · PR #15896502
+**Plain English:** "After we ask for the install, keep checking the servers until one actually has **this exact build**,
+then say ready."
+
+This is the **readiness poll** (step 5). The method `PollPcFirstInstallAsync`:
+1. **Resolves** the just‑ingested build to get its **install id** and its **hash** (the exact‑version fingerprint).
+2. Asks **PC Orchestrator**: "do you have any server reporting this exact `install id` + `hash`?" (plus the lane, region,
+   and server type, so it only looks at the right machines).
+3. **No server yet → wait and try again** (retry). **A server has it → mark ready.**
+
+It also adds a small config block, `PlaytestPcReadinessQuery` (lane / regions / server types), so the poll looks at the
+right place, and fills in the non‑prod (Test) values: `PC_PLAYTEST` / `WESTUS2` / `STANDARD_NC64AS_T4_V3`.
+
+**Tests:** the CTIN test passes **11/11** (including that the configured lane/region/server‑type are sent in the query).
+
+**One known limitation (already tracked):** when picking which version to wait for, the code currently picks the
+"currently available" version, which is *almost always* the just‑published one — but on a quick **republish** it could
+in theory pick the previous build's hash. First‑publish is correct; the fix (pin to the exact just‑ingested version) is
+tracked as work item 62521491.
+
+---
+
+## 6. Verified against what the platform owner (Timi) described
+
+This was designed in a meeting with Timi Bolaji (who owns the PC server side). His words map to the three PRs:
+
+| What Timi said (verbatim) | Which PR it became |
+|---|---|
+| "we should have one SKU … one SUG and we use that for every play test" / "a distinct PC underscore play test SUG" | the single `PC_PLAYTEST` lane + single `STANDARD_NC64AS_T4_V3` server type used by all three PRs |
+| "content targets will notice that the title is in this offering … if it's in this offering, then I should install at least one … we already have that implemented today. I just have it disabled … for playtest we can conditionally enable it" | **PR‑A** (turn the behavior on for this lane) + **PR‑B** (put the title on the lane) |
+| "we now have a quota configuration … the max number of servers a sug can have … set that to one. It's one T4 … it's a dynamic config" | **PR‑A** quota = 1 |
+| "once you merge … the offering config, distribution service should start doing one installation … once that installation is done … this content is now available on this server. So then, while you're doing your polling, eventually should magically just show up … ready to play" | the attach→install→poll sequence; **PR‑C** marks ready |
+| "the version … on a PC server is actually the hash … the install ID is install ID and the version is the hash … put that in the content file filter … query for servers and wait until something shows up" | **PR‑C** asks PC Orchestrator for the exact `install id` + `hash` |
+
+**One nuance:** Timi described turning the enable + quota on as a **runtime "dynamic config" flip he would do himself**,
+"not … done programmatically." PR‑A is the **checked‑in** version of the same settings. content-targets can read either
+the file or a runtime override, so both work — we just need to confirm with him whether he flips it live or merges PR‑A
+(see §10).
+
+---
+
+## 7. The one thing left — "registering the `PC_PLAYTEST` SUG" (what that even means)
+
+"Registering the SUG" means **actually creating the `PC_PLAYTEST` lane** so the platform knows it exists and real
+machines belong to it. Until that happens, all three PRs point at a lane that isn't there yet. It has to be done in two
+places, both owned by the platform team (Timi):
+
+1. **OS Targets (the required one):** add `PC_PLAYTEST` for the `STANDARD_NC64AS_T4_V3` server type in `WESTUS2`. This is
+   what makes real PC machines run in that lane. Without it, content-targets won't even create the server set, so nothing
+   can install.
+2. **The recognized‑lane list in code (`Services.Common.Ids`):** the set of valid SUG names is a fixed list in a shared
+   library (it currently has `GA`, `Canary`, etc., but **not** `PC_PLAYTEST`). The Partner Registry only *warns* (it
+   doesn't hard‑block) if an offering uses an unlisted lane, but `PC_PLAYTEST` should be added there for cleanliness — or
+   confirmed to have a dynamic path.
+
+Why this is someone else's job: creating a server lane + assigning machines is platform/infrastructure work. Timi said in
+the meeting "we **will have** a distinct PC_playtest SUG … I have things set up that way already," so he owns it — we just
+need the exact name and confirmation it's been done.
+
+This is also tracked as a blocker: [`../Blockers/pc-playtest-sug-registration.md`](../Blockers/pc-playtest-sug-registration.md).
+
+---
+
+## 8. How to test that this works
+
+### A. Right now — unit tests (already green)
+Each PR has automated tests proving its piece in isolation:
+- content-targets: `dotnet test src/Tests/Unit/ContentTargets.Core.UnitTests -p:StaticWebAssetsEnabled=false` → **24/24**.
+- partner-registry: `dotnet test …/PartnerRegistryService.UnitTests --filter PlaytestProcessorTests -p:StaticWebAssetsEnabled=false` → **12/12**.
+- CTIN: `dotnet test …/ContentCatalog.Ingestion.Core.UnitTests --filter PlaytestTitleIngestionWorkflowTests` → **11/11**.
+  *(The `-p:StaticWebAssetsEnabled=false` flag avoids a flaky OneDrive file‑lock during the web‑project build.)*
+
+### B. After the lane is registered + the 3 changes deploy — check each layer in order
+1. **Is the lane real?** Confirm `PC_PLAYTEST` is in OS Targets for the server type/region, and recognized in the Ids list.
+2. **Did the listing land on the lane?** Publish a PC playtest, then look at the offering and confirm it carries
+   `SelectableSystemUpdateGroups = ["PC_PLAYTEST"]`. *(Proves PR‑B.)*
+3. **Did content-targets stock the lane?** content-targets has a built‑in diagnostic console ("Savant" — the dashboard
+   Timi used in the demo). For the server set id `WESTUS2/PC_PLAYTEST/STANDARD_NC64AS_T4_V3`:
+   - `sst sugs=PC_PLAYTEST` → the `PC_PLAYTEST` server set exists *(quota + OS Targets worked)*.
+   - `sstm WESTUS2/PC_PLAYTEST/STANDARD_NC64AS_T4_V3` → `ServerQuota = 1`.
+   - `ssti …` → the playtest's install id is mapped to the lane *(PR‑B worked)*.
+   - `sstt …` → the lane's target is **1** *(PR‑A's enable worked)*.
+4. **Did a machine actually install it?** Ask PC Orchestrator for a server reporting the content (install id + hash) — it
+   appears once the install finishes.
+5. **Did the poll mark it ready?** Check the publish job status (`GET /v3/workflows/playtesttitleingestion/{jobId}`) — it
+   should flip to success, and the worker log shows "PC install successful." *(Proves PR‑C.)*
+
+### C. End‑to‑end (the real proof)
+Publish a PC playtest for the pilot creator → walk through B2–B5 → open the launch link
+(`https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}`) and confirm the game streams. Then
+**republish a new build** and confirm the poll waits for the **new** hash (exercises the limitation noted in PR‑C).
+
+---
+
+## 9. Code‑review (rubber‑duck) findings + resolutions (2026-06-20)
+A review of all three PRs raised these; each is resolved or flagged:
+- **PR‑B "which offering field" — resolved, no change.** `services.auth` (`UserLoginProcessor.cs:739`) reads
+  `offering.SelectableSystemUpdateGroups` to tell the client which lanes are available, and content-targets reads both
+  lane fields, so `SelectableSystemUpdateGroups = [PC_PLAYTEST]` is correct. (If live allocation testing ever shows the
+  tester's machine isn't picked from the lane, also set `SystemUpdateGroupWeights = { PC_PLAYTEST: 100 }`.)
+- **PR‑A override scope — intentional.** The enable is keyed on the lane only (`Sugs=[PC_PLAYTEST]`), not region/SKU, so it
+  works wherever the dedicated playtest lane exists. (Locking it to one region/SKU would silently break if capacity is
+  added elsewhere.)
+- **Region capitalization — fine.** content-targets uses `WESTUS2`, the offering uses `WestUS2`; the id type compares
+  case‑insensitively, so they match.
+- **Timeout vs approval — flag.** CTIN starts polling right after creating the offering, but the offering can require a
+  human approval that may take up to ~48h, while the poll currently gives up after **6h**. Raise that timeout (or wait
+  for the offering to be live) before relying on it. *(Tracked with [`../Blockers/manual-pr-polling.md`](../Blockers/manual-pr-polling.md).)*
+- **CTIN environment — flag.** The poll values are set in the Test config; confirm the environment that pairs with
+  content-targets `Int` actually loads that file (open question 5), else the poll looks in the wrong place and times out.
+- **Republish version pick — known item 62521491** (see PR‑C limitation).
+- **Lane set for all PC playtests — note.** Fine because this code path only creates PC streaming playtests; if
+  non‑streaming PC playtests ever share it, gate it on a streaming flag.
+
+---
+
+## 10. Open questions for the platform owner (Timi)
+1. **Exact lane name** — we assumed `PC_PLAYTEST`; must match OS Targets, the Ids list, content-targets, the offering, and CTIN.
+2. **Is the lane already created** (OS Targets + Ids) for `STANDARD_NC64AS_T4_V3` in `WESTUS2`?
+3. **Who turns on enable + quota** — Timi via live "dynamic config," or by merging PR‑A?
+4. **Server type** — `STANDARD_NC64AS_T4_V3` is currently a placeholder; is that the right T4 SKU?
+5. **CTIN environment mapping** — content-targets has an `Int` environment; the CTIN worker has only `Test/Prod` — which CTIN env pairs with content-targets `Int`?
+6. **Production** — the enable mechanism currently allows only one override, already used by Xbox; production needs that
+   extended (and a different region, `NorthCentralUs`).
+
+### Ready‑to‑send message to Timi
 
 > **Subject: PC playtest streaming — need the `PC_PLAYTEST` SUG registered/provisioned**
 >
@@ -206,15 +300,20 @@ Publish a PC playtest for the pilot seller → walk steps B2–B5 → get the la
 >
 > Once I have the exact name + confirmation the SUG is provisioned, everything else is already wired. Thanks!
 
-## 9. Owners
-Melanie Chen (CTGT/CTIN/PTNR changes) · Timi Bolaji (SUG registration in OS Targets + Ids, SKU confirmation, dynamic-config flip).
+---
 
-## 10. Sources
-- services.contentingestion: `Workflows/PlaytestTitleIngestionWorkflow.cs` (stage order; `PollPcFirstInstallAsync`).
+## 11. Owners
+Melanie Chen (the three code/config changes) · Timi Bolaji (creating the `PC_PLAYTEST` lane in OS Targets + Ids, SKU
+confirmation, and the dynamic-config flip).
+
+## 12. Sources (where to look in the code)
+- services.contentingestion: `Workflows/PlaytestTitleIngestionWorkflow.cs` (the stage order and `PollPcFirstInstallAsync`).
 - services.contenttargets: `Processors/Implementations/{ResolutionProcessor,ServerSetsProcessor,PredictionsProcessor}.cs`,
   `Configuration/{ConfigItem,ResolutionConfiguration,SkuConfiguration}.cs`, `Extensions/{OfferingExtensions,TitleExtensions}.cs`,
-  `Contracts/{TargetsQuery,TargetsCalculationMode}.cs`, `Savant/DefaultSavantProvider.cs`.
+  `Contracts/{TargetsQuery,TargetsCalculationMode}.cs`, `Savant/DefaultSavantProvider.cs` (the diagnostic console).
 - services.pcservices: `Orchestrator.Core/Manifests/ConfigManifestProvider.cs`.
-- services.partnerregistry: `Processors/PlaytestProcessor.cs`, `Processors/Validation/ValidationProcessorUtilities.cs`, `Controllers/SystemUpdateGroupConfigController.cs`.
-- `Transcripts/XCloudIngestion.docx` (Timi Bolaji).
-- [`./pc-install-readiness-polling-implementation.md`](./pc-install-readiness-polling-implementation.md) C1/C2.
+- services.partnerregistry: `Processors/PlaytestProcessor.cs`, `Processors/Validation/ValidationProcessorUtilities.cs`,
+  `Controllers/SystemUpdateGroupConfigController.cs`.
+- `Transcripts/XCloudIngestion.docx` (the design meeting with Timi Bolaji).
+- [`./pc-install-readiness-polling-implementation.md`](./pc-install-readiness-polling-implementation.md) and
+  [`../Blockers/pc-playtest-sug-registration.md`](../Blockers/pc-playtest-sug-registration.md).
