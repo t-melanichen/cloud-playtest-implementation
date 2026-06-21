@@ -147,7 +147,28 @@ Publish a PC playtest for the pilot seller → walk steps B2–B5 → get the la
 (`https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}`) and confirm it streams. Then
 **republish a new build** and confirm the poll waits for the **new** hash (covers the version caveat in PR‑C).
 
-## 7. Open questions for Timi
+## 7. Rubber-duck review (2026-06-20) — findings + resolutions
+- **PR-B field (`SelectableSystemUpdateGroups` vs `SystemUpdateGroupWeights`) — resolved, no change.** `services.auth`
+  `UserLoginProcessor.cs:739` builds each `OfferingRegion` with `SystemUpdateGroups = offering.SelectableSystemUpdateGroups`,
+  so auth exposes the offering's `SelectableSystemUpdateGroups` to the client as the available SUGs, and content-targets
+  unions both fields. `SelectableSystemUpdateGroups = [PC_PLAYTEST]` is correct for both install-mapping and allocation.
+  (If end-to-end allocation testing ever shows the server isn't picked, also set `SystemUpdateGroupWeights = { PC_PLAYTEST: 100 }`.)
+- **PR-A override scope — intentional, no change.** The `IncludePredictions` override is keyed on `Sugs=[PC_PLAYTEST]` only
+  (no Regions/Skus). Deliberate: enable install-on-attach wherever the dedicated PC_PLAYTEST lane exists. Constraining to
+  WESTUS2/NC64AS would silently break if PC_PLAYTEST capacity is later added in another region/SKU.
+- **Region casing — OK.** Content-targets uses `WESTUS2`, the offering uses `WestUS2`; `Id` comparison is case-insensitive
+  (per `PlaytestProcessorTests`: "Offering.Id is an Id (case-insensitive)"), so they match.
+- **Timing / first-install timeout — flag.** CTIN starts `PollFirstInstallAsync` right after `ConfigureOfferingAsync`. The
+  offering is a Partner Registry ADO PR that can need human approval (up to ~48h, per `Blockers/manual-pr-polling.md`), but
+  `FirstInstallPollingPolicy` times out at **6h**. If approval/provisioning exceeds the window, the poll routes to
+  `NotifyInstallNotFound`. Raise the timeout (or gate the poll on the offering being live) before relying on it.
+- **CTIN env config — flag.** The poll values live in the Worker `appsettings.Test.json`. Confirm the CTIN env that pairs
+  with content-targets `Int` loads that file; otherwise the poll falls back to `WestEurope`/unconstrained and times out (open question 5).
+- **Version republish — known TODO 62521491.** On republish the `IsCurrent` selection can false-ready against a stale hash. First publish is correct.
+- **SUG gating — note.** The SUG is set for all PC playtest titles in `PlaytestProcessor`; correct since that path only
+  creates PC streaming playtests. If non-streaming PC playtests ever share it, gate on the streaming/instant-playtest flag.
+
+## 8. Open questions for Timi
 1. **Exact SUG string** (assumed `PC_PLAYTEST`) — must match OS Targets, the SUG Ids registry, content-targets, the offering, and CTIN.
 2. **Is the SUG already registered/provisioned** (OS Targets + Ids) for `STANDARD_NC64AS_T4_V3` in `WESTUS2`?
 3. **Who flips enable + quota** — Timi via dynamic config, or merge PR‑A? Dynamic keys:
@@ -157,10 +178,38 @@ Publish a PC playtest for the pilot seller → walk steps B2–B5 → get the la
 5. **CTIN env mapping** — content-targets has `Int`; the CTIN worker has only `Test/Prod` — which CTIN env pairs with content-targets `Int`?
 6. **Prod** — `IncludePredictions` allows a single `Override`, already used by `ServerType=XBOX`; needs multi-override support; prod region `NorthCentralUs`.
 
-## 8. Owners
+### Ready-to-send message to Timi
+
+> **Subject: PC playtest streaming — need the `PC_PLAYTEST` SUG registered/provisioned**
+>
+> Hi Timi — following up on the PC playtest install-on-attach work from the xCloud ingestion sync. The three
+> code/config changes are done and tested, all pinned to **SUG `PC_PLAYTEST`**, **SKU `STANDARD_NC64AS_T4_V3`**,
+> **region `WESTUS2`** (Int):
+>
+> - Content Targets (enable install-on-attach + quota=1): PR 15946980
+> - Partner Registry (sets the SUG on the playtest offering): PR 15949594
+> - Content Ingestion (readiness poll by install-id + version hash): PR 15896502
+>
+> The only thing blocking end-to-end is the SUG itself. You mentioned you'd have a distinct PC_playtest SUG and
+> "have things set up that way already," so a few quick questions:
+>
+> 1. **Exact SUG name** — is it `PC_PLAYTEST`, or something else? (I'll match it across all three PRs.)
+> 2. **OS Targets** — is `PC_PLAYTEST` already provisioned for `STANDARD_NC64AS_T4_V3` in `WESTUS2` (Int), or does
+>    that still need doing? (Content Targets only builds the server set for SUGs in the OS Targets manifest.)
+> 3. **Recognition** — `PC_PLAYTEST` isn't in the `SystemUpdateGroup` list in `Services.Common.Ids` today, so the
+>    offering hits a (non-critical) validation warning. Does it need adding there, or is there a dynamic path?
+> 4. **Enable + quota** — flip via dynamic config (as you described), or land the Content Targets PR as the
+>    checked-in source? If dynamic, the keys are:
+>    `ServerSetsConfiguration:SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1` and
+>    `ResolutionConfiguration:IncludePredictions:Override = { Value: true, ServerType: PC, Sugs: [PC_PLAYTEST] }`.
+> 5. **SKU** — `STANDARD_NC64AS_T4_V3` is currently a hardcoded stand-in on the offering; is that the right T4 SKU?
+>
+> Once I have the exact name + confirmation the SUG is provisioned, everything else is already wired. Thanks!
+
+## 9. Owners
 Melanie Chen (CTGT/CTIN/PTNR changes) · Timi Bolaji (SUG registration in OS Targets + Ids, SKU confirmation, dynamic-config flip).
 
-## 9. Sources
+## 10. Sources
 - services.contentingestion: `Workflows/PlaytestTitleIngestionWorkflow.cs` (stage order; `PollPcFirstInstallAsync`).
 - services.contenttargets: `Processors/Implementations/{ResolutionProcessor,ServerSetsProcessor,PredictionsProcessor}.cs`,
   `Configuration/{ConfigItem,ResolutionConfiguration,SkuConfiguration}.cs`, `Extensions/{OfferingExtensions,TitleExtensions}.cs`,
