@@ -18,6 +18,15 @@ Also adds `IngestionWorkflowSettings.PlaytestPcReadinessQuery` (SystemUpdateGrou
 `PC_PLAYTEST` / `WESTUS2` / `STANDARD_NC64AS_T4_V3` to match the content-targets enablement and the offering.
 Full per-PR design + test plan: [`../FuturePlans/content-targets-pc-playtest-enablement.md`](../FuturePlans/content-targets-pc-playtest-enablement.md).
 
+## Review updates (PR feedback)
+- **Jack Heuberger** — split the PC readiness poll into its own stage: `ConfigureOfferingAsync` now transitions to
+  `PollFirstInstallAsync` (Xbox) or `PollPcFirstInstallAsync` (PC) by content type, and `PollPcFirstInstallAsync` is its
+  own `[WorkflowStage]` (with the same empty-package guard), so an inspected workflow shows a stage name that reflects
+  the install path being verified. Commit `47c4800a`.
+- **Version-pick hardening** — the poll now requires exactly one *current* PC version (zero/multiple → retry) so a
+  republish can't confirm readiness against a stale build; the full explicit-version pin stays tracked as **62521491**.
+- **Tests:** 20 Core + 38 Worker passing (added `ConfigureOfferingAsync` routing tests and per-stage guard tests).
+
 ## Context
 - Board deliverable **[XC3] Implement PlaytestTitleIngestionWorkflow** (62492680), task **62521491
   "Implement PC Polling"**.

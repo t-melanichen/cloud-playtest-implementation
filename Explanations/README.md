@@ -6,6 +6,8 @@ Conceptual companion docs for the Instantly Shareable Playtest project: how xPla
 
 | Doc | Description |
 |---|---|
+| **▶ [End-to-end flow & xCloud ingestion deep dive](./end-to-end-flow-and-xcloud-ingestion.md)** | **Start here.** Full creator→tester walkthrough, the role of every repo, and a stage-by-stage dissection of `PlaytestTitleIngestionWorkflow`. |
+| [Transcript decisions ledger](./transcript-decisions.md) | Key design decisions/considerations distilled from the 9 cross-team meeting transcripts, each linked to the doc that reflects it. |
 | [InternSync4 summary](./internsync4-summary.md) | Summarizes the 2026-06-18 meeting decisions on expiration, future dates, title-level configuration, and follow-ups. |
 | [xCloud vs xPlaytest vs xPackage](./xcloud-xplaytest-xpackage.md) | Defines the three layers, where each lives in code, and the end-to-end xPackage → xPlaytest → xCloud flow. |
 | [Ingestion creates new things](./ingestion-creates-new-things.md) | Explains how ingestion mints per-playtest title IDs, attaches content to offerings, triggers installs, and handles PC version hashes. |
