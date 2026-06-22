@@ -1,28 +1,28 @@
-# [CTGT] PR 15946980 — Enable PC playtest install-on-attach + quota (PC_PLAYTEST SUG)
+# [CTGT] PR 15946980 — Superseded: PC playtest enable + quota moves to dynamic config
 
 - **Pull Request:** 15946980
 - **Repo:** services.contenttargets (Xbox.Streaming)
 - **Source branch:** `t-melanichen/pc-playtest-install-on-attach` → `main`
-- **Status:** Draft
+- **Status:** Superseded — appsettings changes reverted; recommend abandon
 - **Opened:** 2026-06-19  |  **Closed:** —
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contenttargets/pullrequest/15946980
 
 ## Summary
-Config-only change that enables PC playtest **install-on-attach** and sets the **server quota** for the
-`PC_PLAYTEST` SUG, scoped to **Int**. This is the upstream prerequisite (Timi's C1 + C2) that lets CTIN's
-`PlaytestTitleIngestionWorkflow.PollPcFirstInstallAsync` actually observe a PC server staging the build.
+Per Timi's review feedback, the PC playtest **enable + quota** settings must be applied through Content Targets dynamic
+config, not checked into `appsettings`. The PR's `appsettings.ContentTargets.Int.json` and
+`appsettings.ContentTargets.Test.json` additions were reverted in commit `04ac32c`; the remaining branch diff is tests only.
 
-Two coupled config edits in `appsettings.ContentTargets.Int.json`:
-1. **Quota (C2):** add a `STANDARD_NC64AS_T4_V3` SkuConfig with `QuotasBySugByRegion.WESTUS2.PC_PLAYTEST = 1`
-   (one T4) so `UpdatePCServerSetsAsync` creates the server set.
-2. **Enable install-on-attach (C1):** add `ResolutionConfiguration.IncludePredictions.Override`
-   (`ServerType=PC`, `Sugs=[PC_PLAYTEST]`, `Value=true`) so PC predictions (1 per install id) are included for that
-   SUG — PC has no BaseTargets path, and predictions are disabled by default (only XBOX is on).
+Dynamic-config quota to apply instead:
+`CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` →
+`SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1`.
 
-SKU + region match the playtest offering created by partner registry `PlaytestProcessor`
-(`PcServerSku = STANDARD_NC64AS_T4_V3`; non-prod regions WestUS2/WestEurope); Int's WESTUS2 fleet matches.
-Adds `ResolutionConfigurationBindingTests` proving the override binds (`Sugs` HashSet<Id>) and matches only the
-PC_PLAYTEST PC server set. Full Core.UnitTests suite: **22/22 pass.**
+Do not restate/replace the existing live `STANDARD_NC64AS_T4_V3` SKU block: live config already has
+`GameplaySlotsPerServer = 4` and `DefaultMaxLocalSpaceInMB = 2000000`. The reverted appsettings attempted to check in
+`1` / `360445`, which would clobber those live values.
+
+Open question for Timi: if PC playtest still needs the install-on-attach enable override, should he add
+`CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION` `IncludePredictions.Override = { Value:true, ServerType:PC, Sugs:[PC_PLAYTEST] }`,
+or are predictions already enabled in non-prod for existing PC SUGs?
 
 ## Context
 - Tracks [`../FuturePlans/pc-install-readiness-polling-implementation.md`](../FuturePlans/pc-install-readiness-polling-implementation.md) **C1/C2** and [`../Blockers/pc-install-readiness-poll.md`](../Blockers/pc-install-readiness-poll.md).
@@ -34,10 +34,12 @@ PC_PLAYTEST PC server set. Full Core.UnitTests suite: **22/22 pass.**
   `SystemUpdateGroupWeights`/`SelectableSystemUpdateGroups`, so the offering carries no SUG and the title maps to no
   PC_PLAYTEST server set. Needs a separate partner-registry change to add `PC_PLAYTEST`.
 - **OS Targets** must provision the `PC_PLAYTEST` SUG under `STANDARD_NC64AS_T4_V3` in WESTUS2, or no server set is created.
+- **Dynamic config** must add the `PC_PLAYTEST` quota under the existing live `STANDARD_NC64AS_T4_V3`/WESTUS2 block.
 - **SKU coupling:** `PcServerSku = STANDARD_NC64AS_T4_V3` is a documented temporary stand-in in partner registry; this
   config, OS Targets, and CTIN must stay on the same SKU.
 - The SUG string + region must be identical across partner registry, OS Targets, this config, and CTIN
   `PlaytestPcReadinessQuery`. `PC_PLAYTEST` is proposed — confirm with Timi.
-- **Test** deferred (its WESTUS3 fleet doesn't match the offering's WestUS2/WestEurope). **Prod** deferred
-  (`IncludePredictions` allows one `Override`, taken by `ServerType=XBOX`; prod region NorthCentralUs).
+- **Test/Int IncludePredictions** is an open question for Timi: existing non-prod PC SUGs have quotas without an obvious
+  per-SUG override, so `PC_PLAYTEST` may not need one. **Prod** deferred (`IncludePredictions` allows one `Override`, taken
+  by `ServerType=XBOX`; prod region NorthCentralUs).
 - Deploy via CI/CICD, not the PR pipeline.

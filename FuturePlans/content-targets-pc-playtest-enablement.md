@@ -3,10 +3,10 @@
 > **If you're new to this, start at sections 0–4.** They explain the whole thing with no assumed knowledge.
 > Sections 5+ are the detailed engineering record (the three PRs, the test plan, and what's left).
 
-**Status (2026-06-21):** All three code/config changes are done, built, and tested, and are open as **draft PRs**.
-The only remaining step is **registering the `PC_PLAYTEST` SUG** (a server "lane" — explained below) at the platform
-level, which is owned by Timi. Everything is pinned to three values: **`PC_PLAYTEST`** (the lane), **`STANDARD_NC64AS_T4_V3`**
-(the server type), and **`WESTUS2`** (the datacenter region).
+**Status (2026-06-22):** The partner-registry and content-ingestion code changes remain draft PRs. Per Timi, the
+content-targets enable + quota change is **dynamic config**, not checked-in `appsettings`; PR 15946980 is superseded and
+should be abandoned once Timi applies the dynamic-config change. Everything is pinned to three values: **`PC_PLAYTEST`**
+(the lane), **`STANDARD_NC64AS_T4_V3`** (the server type), and **`WESTUS2`** (the datacenter region).
 
 ---
 
@@ -111,28 +111,46 @@ one PC server to install the exact build → keep checking until that server has
 
 ## 5. The three PRs — what each does and why (in depth)
 
-There are three small changes, one per service. Each is a **draft PR** (a proposed change not yet merged).
+There are three small changes, one per service. The partner-registry and content-ingestion changes are draft PRs; the
+content-targets PR is now superseded by dynamic config.
 
-### PR‑A · `services.contenttargets` · PR #15946980
+### PR‑A · `services.contenttargets` · PR #15946980 — superseded by dynamic config
 **Plain English:** "For the `PC_PLAYTEST` lane, automatically keep **one** machine and install the playtest build on it."
 
-This is the piece that makes the PC‑server install (Install #2) actually happen. It's two small config settings in
-`appsettings.ContentTargets.Int.json`:
-- **Quota = 1 (one machine):** under a `STANDARD_NC64AS_T4_V3` server type, `QuotasBySugByRegion.WESTUS2.PC_PLAYTEST = 1`.
-  This both **creates** the `PC_PLAYTEST` server set and caps it at one machine.
-- **Turn on install‑on‑attach for this lane:** a `ResolutionConfiguration.IncludePredictions` override
-  (`ServerType = PC`, `Sugs = [PC_PLAYTEST]`, `Value = true`).
+Per Timi's review, this must be done with **dynamic config**, not checked into `appsettings`. PR 15946980's `appsettings`
+changes have been reverted and the PR should be abandoned once the dynamic-config change is live.
 
-**Why both are needed (the mechanism):** on PC, the "how many servers should have this content" number comes only from
-**predictions**, which the system hard‑codes to **1 per install**. But predictions are **off by default** — they're only
-counted when `IncludePredictions` is turned **on** for that server set. So:
-- The **quota** creates the lane and gives it capacity (1 machine), but on its own the "needed count" is 0 → nothing installs.
-- The **override** turns the needed count into 1 → PC Orchestrator provisions one machine and installs the build.
-- You need **both**.
+**Dynamic-config payload (quota):** in ConfigSection `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION`
+(portal path `DynamicConfigPartnerRegistry/ConfigSections/CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION`), update the
+existing `SkuConfigs -> STANDARD_NC64AS_T4_V3 -> QuotasBySugByRegion -> WESTUS2` block by adding only this SUG entry:
 
-**Tests:** the content-targets unit test suite passes **24/24**. The key test (`ResolutionProcessorTests`) proves that
-with the override **on**, the lane's target becomes **1** (install happens); with it **off**, the target is **0**
-(nothing installs). A second test proves the override only matches PC servers on the `PC_PLAYTEST` lane (not Xbox, not `GA`).
+```json
+"PC_PLAYTEST": 1
+```
+
+The `STANDARD_NC64AS_T4_V3` SKU block already exists in live dynamic config with `GameplaySlotsPerServer = 4` and
+`DefaultMaxLocalSpaceInMB = 2000000`; do **not** restate or replace those values. The checked-in PR attempted to add a new
+SKU block with `GameplaySlotsPerServer = 1` and `DefaultMaxLocalSpaceInMB = 360445`, which disagrees with live config and
+would clobber the real SKU settings. That value discrepancy is the concrete reason the appsettings approach was wrong.
+
+**Dynamic-config payload (enable / open question):** if PC playtest still needs the install-on-attach enable override, it
+belongs in ConfigSection `CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION`, as:
+
+```json
+{
+  "IncludePredictions": {
+    "Override": {
+      "Value": true,
+      "ServerType": "PC",
+      "Sugs": [ "PC_PLAYTEST" ]
+    }
+  }
+}
+```
+
+**Open question for Timi:** confirm whether this `IncludePredictions` override is needed at all in Int/Test. Existing PC
+test SUGs such as `PC_TAKEHOME` already have working quotas in dynamic config without an obvious per-SUG
+`IncludePredictions` override, so non-prod may already have predictions enabled through another path.
 
 ### PR‑B · `services.partnerregistry` · PR #15949594
 **Plain English:** "Put the playtest game's listing **on the `PC_PLAYTEST` lane**, so content-targets knows where to send it."
@@ -177,15 +195,14 @@ This was designed in a meeting with Timi Bolaji (who owns the PC server side). H
 | What Timi said (verbatim) | Which PR it became |
 |---|---|
 | "we should have one SKU … one SUG and we use that for every play test" / "a distinct PC underscore play test SUG" | the single `PC_PLAYTEST` lane + single `STANDARD_NC64AS_T4_V3` server type used by all three PRs |
-| "content targets will notice that the title is in this offering … if it's in this offering, then I should install at least one … we already have that implemented today. I just have it disabled … for playtest we can conditionally enable it" | **PR‑A** (turn the behavior on for this lane) + **PR‑B** (put the title on the lane) |
-| "we now have a quota configuration … the max number of servers a sug can have … set that to one. It's one T4 … it's a dynamic config" | **PR‑A** quota = 1 |
+| "content targets will notice that the title is in this offering … if it's in this offering, then I should install at least one … we already have that implemented today. I just have it disabled … for playtest we can conditionally enable it" | dynamic config (turn the behavior on for this lane, if needed) + **PR‑B** (put the title on the lane) |
+| "we now have a quota configuration … the max number of servers a sug can have … set that to one. It's one T4 … it's a dynamic config" | `SERVERSETSCONFIGURATION` dynamic-config quota = 1 |
 | "once you merge … the offering config, distribution service should start doing one installation … once that installation is done … this content is now available on this server. So then, while you're doing your polling, eventually should magically just show up … ready to play" | the attach→install→poll sequence; **PR‑C** marks ready |
 | "the version … on a PC server is actually the hash … the install ID is install ID and the version is the hash … put that in the content file filter … query for servers and wait until something shows up" | **PR‑C** asks PC Orchestrator for the exact `install id` + `hash` |
 
-**One nuance:** Timi described turning the enable + quota on as a **runtime "dynamic config" flip he would do himself**,
-"not … done programmatically." PR‑A is the **checked‑in** version of the same settings. content-targets can read either
-the file or a runtime override, so both work — we just need to confirm with him whether he flips it live or merges PR‑A
-(see §10).
+**Dynamic-config pivot (2026-06-22):** Timi confirmed the enable + quota settings should live in dynamic config, not
+checked-in `appsettings`. PR‑A is now superseded: its `appsettings` additions were reverted, and it should be abandoned
+once Timi applies the dynamic config described in §5.
 
 ---
 
@@ -214,8 +231,8 @@ This is also tracked as a blocker: [`../Blockers/pc-playtest-sug-registration.md
 ## 8. How to test that this works
 
 ### A. Right now — unit tests (already green)
-Each PR has automated tests proving its piece in isolation:
-- content-targets: `dotnet test src/Tests/Unit/ContentTargets.Core.UnitTests -p:StaticWebAssetsEnabled=false` → **24/24**.
+Each code PR has automated tests proving its piece in isolation; content-targets dynamic config must be verified live:
+- content-targets: `dotnet build src/Product/ContentTargets.Core/ContentTargets.Core.csproj -v minimal` after reverting appsettings; live validation through Savant after Timi's dynamic-config flip.
 - partner-registry: `dotnet test …/PartnerRegistryService.UnitTests --filter PlaytestProcessorTests -p:StaticWebAssetsEnabled=false` → **12/12**.
 - CTIN: `dotnet test …/ContentCatalog.Ingestion.Core.UnitTests --filter PlaytestTitleIngestionWorkflowTests` → **11/11**.
   *(The `-p:StaticWebAssetsEnabled=false` flag avoids a flaky OneDrive file‑lock during the web‑project build.)*
@@ -229,7 +246,7 @@ Each PR has automated tests proving its piece in isolation:
    - `sst sugs=PC_PLAYTEST` → the `PC_PLAYTEST` server set exists *(quota + OS Targets worked)*.
    - `sstm WESTUS2/PC_PLAYTEST/STANDARD_NC64AS_T4_V3` → `ServerQuota = 1`.
    - `ssti …` → the playtest's install id is mapped to the lane *(PR‑B worked)*.
-   - `sstt …` → the lane's target is **1** *(PR‑A's enable worked)*.
+   - `sstt …` → the lane's target is **1** *(dynamic-config enable worked, if an explicit override is needed)*.
 4. **Did a machine actually install it?** Ask PC Orchestrator for a server reporting the content (install id + hash) — it
    appears once the install finishes.
 5. **Did the poll mark it ready?** Check the publish job status (`GET /v3/workflows/playtesttitleingestion/{jobId}`) — it
@@ -248,9 +265,9 @@ A review of all three PRs raised these; each is resolved or flagged:
   `offering.SelectableSystemUpdateGroups` to tell the client which lanes are available, and content-targets reads both
   lane fields, so `SelectableSystemUpdateGroups = [PC_PLAYTEST]` is correct. (If live allocation testing ever shows the
   tester's machine isn't picked from the lane, also set `SystemUpdateGroupWeights = { PC_PLAYTEST: 100 }`.)
-- **PR‑A override scope — intentional.** The enable is keyed on the lane only (`Sugs=[PC_PLAYTEST]`), not region/SKU, so it
-  works wherever the dedicated playtest lane exists. (Locking it to one region/SKU would silently break if capacity is
-  added elsewhere.)
+- **IncludePredictions override scope — if needed, keep it lane-scoped.** The enable is keyed on the lane only
+  (`Sugs=[PC_PLAYTEST]`), not region/SKU, so it works wherever the dedicated playtest lane exists. (Locking it to one
+  region/SKU would silently break if capacity is added elsewhere.)
 - **Region capitalization — fine.** content-targets uses `WESTUS2`, the offering uses `WestUS2`; the id type compares
   case‑insensitively, so they match.
 - **Timeout vs approval — flag.** CTIN starts polling right after creating the offering, but the offering can require a
@@ -258,7 +275,7 @@ A review of all three PRs raised these; each is resolved or flagged:
   for the offering to be live) before relying on it. *(Tracked with [`../Blockers/manual-pr-polling.md`](../Blockers/manual-pr-polling.md).)*
 - **CTIN environment — resolved.** The CTIN worker **does** have an `Int` environment (helm `values.en-int.yaml`,
   `aspNetEnv: Int`); it just had no `appsettings.Int.json` file before. The poll config is now set in **both**
-  `appsettings.Int.json` and `appsettings.Test.json`, matching the content-targets Int+Test enablement.
+  `appsettings.Int.json` and `appsettings.Test.json`, matching the intended non-prod content-targets dynamic config.
 - **Republish version pick — interim hardening landed; full fix tracked as 62521491.** The poll picks the just‑ingested
   build by its content hash. It now filters to the *current* PC version and requires **exactly one** — zero or multiple
   current versions route to retry rather than risk confirming readiness against a stale/wrong build (commit `3ae1dccc`,
@@ -275,7 +292,10 @@ A review of all three PRs raised these; each is resolved or flagged:
 ## 10. Open questions for the platform owner (Timi)
 1. **Exact lane name** — we assumed `PC_PLAYTEST`; must match OS Targets, the Ids list, content-targets, the offering, and CTIN.
 2. **Is the lane already created** (OS Targets + Ids) for `STANDARD_NC64AS_T4_V3` in `WESTUS2`?
-3. **Who turns on enable + quota** — Timi via live "dynamic config," or by merging PR‑A?
+3. **Enable + quota** — Timi owns the live dynamic-config change: add `PC_PLAYTEST = 1` under
+   `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` for `STANDARD_NC64AS_T4_V3` / `WESTUS2`. Open: does Int/Test also need
+   `CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION` `IncludePredictions.Override` for `PC_PLAYTEST`, or are PC predictions
+   already enabled for existing non-prod PC SUGs?
 4. **Server type** — `STANDARD_NC64AS_T4_V3` is a hardcoded placeholder (a `const` with a "resolve dynamically" TODO,
    and validation only checks it is non‑empty). The existing non‑prod content-targets fleet uses a *different* T4 SKU
    (`STANDARD_NC8AS_T4_V3`), so this needs confirming. Is `STANDARD_NC64AS_T4_V3` the right SKU, and should we config‑drive it?
@@ -294,7 +314,7 @@ A review of all three PRs raised these; each is resolved or flagged:
 > code/config changes are done and tested, all pinned to **SUG `PC_PLAYTEST`**, **SKU `STANDARD_NC64AS_T4_V3`**,
 > **region `WESTUS2`** (Int):
 >
-> - Content Targets (enable install-on-attach + quota=1): PR 15946980
+> - Content Targets (quota=1 via dynamic config; PR 15946980 is superseded): `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION`
 > - Partner Registry (sets the SUG on the playtest offering): PR 15949594
 > - Content Ingestion (readiness poll by install-id + version hash): PR 15896502
 >
@@ -306,10 +326,13 @@ A review of all three PRs raised these; each is resolved or flagged:
 >    that still need doing? (Content Targets only builds the server set for SUGs in the OS Targets manifest.)
 > 3. **Recognition** — `PC_PLAYTEST` isn't in the `SystemUpdateGroup` list in `Services.Common.Ids` today, so the
 >    offering hits a (non-critical) validation warning. Does it need adding there, or is there a dynamic path?
-> 4. **Enable + quota** — flip via dynamic config (as you described), or land the Content Targets PR as the
->    checked-in source? If dynamic, the keys are:
->    `ServerSetsConfiguration:SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1` and
->    `ResolutionConfiguration:IncludePredictions:Override = { Value: true, ServerType: PC, Sugs: [PC_PLAYTEST] }`.
+> 4. **Enable + quota** — per your review, I'll abandon the checked-in Content Targets PR after you apply dynamic config.
+>    For `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION`, please add only
+>    `SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1`; the live SKU block already has
+>    `GameplaySlotsPerServer = 4` and `DefaultMaxLocalSpaceInMB = 2000000`, so we should not replace it with the stale
+>    checked-in values (`1` / `360445`). Open question: does Int/Test also need
+>    `CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION` `IncludePredictions.Override = { Value: true, ServerType: PC, Sugs: [PC_PLAYTEST] }`,
+>    or are predictions already enabled for the existing non-prod PC SUGs?
 > 5. **SKU** — `STANDARD_NC64AS_T4_V3` is currently a hardcoded stand-in on the offering; is that the right T4 SKU?
 >
 > Once I have the exact name + confirmation the SUG is provisioned, everything else is already wired. Thanks!
@@ -317,8 +340,8 @@ A review of all three PRs raised these; each is resolved or flagged:
 ---
 
 ## 11. Owners
-Melanie Chen (the three code/config changes) · Timi Bolaji (creating the `PC_PLAYTEST` lane in OS Targets + Ids, SKU
-confirmation, and the dynamic-config flip).
+Melanie Chen (partner-registry + CTIN code changes) · Timi Bolaji (creating the `PC_PLAYTEST` lane in OS Targets + Ids,
+SKU confirmation, and the content-targets dynamic-config flip).
 
 ## 12. Sources (where to look in the code)
 - services.contentingestion: `Workflows/PlaytestTitleIngestionWorkflow.cs` (the stage order and `PollPcFirstInstallAsync`).

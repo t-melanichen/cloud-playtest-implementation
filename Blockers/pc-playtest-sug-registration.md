@@ -22,8 +22,8 @@ Timi described enabling this as a **dynamic-config flip he'd do** ("we will have
 I have things set up that way already"), which doesn't match the hardcoded Ids list — so the exact mechanism + name need
 confirming with him.
 
-## What's already done (the 3 PRs, all draft, all pinned to `PC_PLAYTEST`)
-- **services.contenttargets** [PR 15946980](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contenttargets/pullrequest/15946980) — enable install-on-attach + quota=1 for the SUG (Int).
+## What's already done (all pinned to `PC_PLAYTEST`)
+- **services.contenttargets** [PR 15946980](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contenttargets/pullrequest/15946980) — superseded by dynamic config; appsettings changes reverted, recommend abandon after Timi applies the quota.
 - **services.partnerregistry** [PR 15949594](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.partnerregistry/pullrequest/15949594) — set the SUG on the playtest offering.
 - **services.contentingestion** [PR 15896502](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contentingestion/pullrequest/15896502) — the readiness poll + pin it to the SUG/region/SKU.
 
@@ -31,16 +31,22 @@ confirming with him.
 1. **Exact SUG name** — `PC_PLAYTEST`, or something else? (Will be matched across all three PRs.)
 2. **OS Targets** — is `PC_PLAYTEST` already provisioned for `STANDARD_NC64AS_T4_V3` in `WESTUS2` (Int), or still pending?
 3. **Recognition** — does `PC_PLAYTEST` need adding to `Services.Common.Ids` `SystemUpdateGroup`, or is there a dynamic path?
-4. **Enable + quota — dynamic config or my PR?** Originally you suggested doing this yourself via dynamic config
-   ("we'll just enable it for the PC play test SUG… it's a dynamic config, so we can just set it to one… it doesn't
-   need to be done programmatically"). I've also prepared the content-targets PR (15946980) that checks in the same
-   settings. Which do you prefer — you flip it live, or I land the PR as the checked-in source? Dynamic keys:
-   `ServerSetsConfiguration:SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1` and
-   `ResolutionConfiguration:IncludePredictions:Override = { Value:true, ServerType:PC, Sugs:[PC_PLAYTEST] }`.
-5. **SKU** — `STANDARD_NC64AS_T4_V3` is a hardcoded stand-in on the offering; is that the right T4 SKU?
+4. **Enable + quota — dynamic config.** Timi decided the Content Targets enable + quota settings should live in dynamic
+   config, not checked-in `appsettings`. In ConfigSection `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` (portal path
+   `DynamicConfigPartnerRegistry/ConfigSections/CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION`), add only
+   `SkuConfigs:STANDARD_NC64AS_T4_V3:QuotasBySugByRegion:WESTUS2:PC_PLAYTEST = 1`. The live SKU block already exists
+   (`GameplaySlotsPerServer = 4`, `DefaultMaxLocalSpaceInMB = 2000000`); do not replace it with the reverted PR values
+   (`1` / `360445`).
+5. **IncludePredictions open question** — if PC playtest still needs an enable override, it belongs in
+   `CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION` as
+   `IncludePredictions:Override = { Value:true, ServerType:PC, Sugs:[PC_PLAYTEST] }`. Ask Timi to confirm whether this is
+   required in Int/Test, since existing non-prod PC SUGs such as `PC_TAKEHOME` already have working quotas without an
+   obvious per-SUG override.
+6. **SKU** — `STANDARD_NC64AS_T4_V3` is a hardcoded stand-in on the offering; is that the right T4 SKU?
 
 ## Next actions
-- Send Timi the questions above; get the exact SUG name + confirmation it's provisioned in OS Targets (+ recognized in Ids).
+- Send Timi the questions above; get the exact SUG name + confirmation it's provisioned in OS Targets (+ recognized in Ids),
+  and ask him to apply the `SERVERSETSCONFIGURATION` dynamic-config quota.
 - Update the SUG literal in all three PRs if the name differs; then deploy via CI/CICD and validate (see the test plan in
   [`../FuturePlans/content-targets-pc-playtest-enablement.md`](../FuturePlans/content-targets-pc-playtest-enablement.md)).
 
