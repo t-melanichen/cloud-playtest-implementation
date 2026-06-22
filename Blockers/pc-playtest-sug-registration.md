@@ -22,6 +22,20 @@ Timi described enabling this as a **dynamic-config flip he'd do** ("we will have
 I have things set up that way already"), which doesn't match the hardcoded Ids list — so the exact mechanism + name need
 confirming with him.
 
+## SUG setup — the two parts (per Timi)
+Setting up `PC_PLAYTEST` is **two** steps:
+
+1. **Quota** — the dynamic-config line in `SERVERSETSCONFIGURATION` (see question 4). This says "the PC_PLAYTEST lane is
+   *allowed* N servers."
+2. **SUG definition** — register the SUG itself on the **PC SUG Definitions** page
+   (`https://americas.gssv-dev-prod.xboxlive.com/PcSugDefinitions`). A SUG definition (`PCSystemUpdateGroup` in OS Targets)
+   assigns the **OS image versions** (the Windows/OS build the GPU servers run) per SKU via *flighting configs*.
+   **Timi's recommendation: create `PC_PLAYTEST` to *inherit from* a stable release SUG — `PC_TAKEHOME` (currently the most
+   solid).** On the page: New SUG → `Id = PC_PLAYTEST`, `InheritsFrom = PC_TAKEHOME`, inherit configs + dev options — so it
+   automatically picks up PC_TAKEHOME's known-good OS images for `STANDARD_NC64AS_T4_V3` instead of hand-picking image
+   definitions. This page writes the OS Targets SUG entry (satisfying the OS-Targets requirement above). Owner: Timi (or
+   whoever has edit access to the page).
+
 ## What's already done (all pinned to `PC_PLAYTEST`)
 - **services.contenttargets** [PR 15946980](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contenttargets/pullrequest/15946980) — superseded by dynamic config; appsettings changes reverted, recommend abandon after Timi applies the quota.
 - **services.partnerregistry** [PR 15949594](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.partnerregistry/pullrequest/15949594) — set the SUG on the playtest offering.
@@ -51,6 +65,9 @@ confirming with him.
   [`../FuturePlans/content-targets-pc-playtest-enablement.md`](../FuturePlans/content-targets-pc-playtest-enablement.md)).
 
 ## References
+- **PC SUG Definitions page:** `https://americas.gssv-dev-prod.xboxlive.com/PcSugDefinitions` — register `PC_PLAYTEST`
+  inheriting from `PC_TAKEHOME`. Backed by `services.devapi` `DevApiGateway/Pages/PcSugDefinitions/`
+  (`PcSugDefinitionInfo.cs`: `InheritsFrom` / `InheritsConfigs`; `PcSugFlightingConfigInfo.cs`: per-SKU OS image versions).
 - `Transcripts/XCloudIngestion.docx` (Timi on the PC_playtest SUG, quota, dynamic config).
 - [`../FuturePlans/content-targets-pc-playtest-enablement.md`](../FuturePlans/content-targets-pc-playtest-enablement.md) — full design + test plan.
 - [`./pc-install-readiness-poll.md`](./pc-install-readiness-poll.md) — the original readiness-poll blocker (now implemented).

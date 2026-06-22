@@ -28,6 +28,10 @@ so the title mapped to no server set and the PC‑server install had nowhere to 
 - **Id typing** — the PC SUG/SKU values set on the offering are now strongly-typed `Id` (`static readonly Id`) instead of
   `string`, matching the Id-typed offering fields they feed (`SelectableSystemUpdateGroups` / `TargetServerSkus`) and the
   CTIN readiness-settings change. Tests 12/12. Commit `18a0226e`.
+- **Timi (`SystemUpdateGroupWeights`)** — `SelectableSystemUpdateGroups` only lets a client *request* the SUG; default
+  session allocation is driven by `SystemUpdateGroupWeights` (SUG→weight). Added `SystemUpdateGroupWeights = { PC_PLAYTEST: 100 }`
+  so launched playtest sessions allocate to PC_PLAYTEST servers (Content Targets already unions both for install mapping;
+  this fixes runtime allocation). Tests 12/12. Commit `4f0d329a`.
 
 ## Context
 - The missing link between CTIN PR [17](./17-CTIN-15896502-pc-install-readiness-polling.md) (the readiness poll) and
