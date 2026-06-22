@@ -259,7 +259,14 @@ A review of all three PRs raised these; each is resolved or flagged:
 - **CTIN environment — resolved.** The CTIN worker **does** have an `Int` environment (helm `values.en-int.yaml`,
   `aspNetEnv: Int`); it just had no `appsettings.Int.json` file before. The poll config is now set in **both**
   `appsettings.Int.json` and `appsettings.Test.json`, matching the content-targets Int+Test enablement.
-- **Republish version pick — known item 62521491** (see PR‑C limitation).
+- **Republish version pick — interim hardening landed; full fix tracked as 62521491.** The poll picks the just‑ingested
+  build by its content hash. It now filters to the *current* PC version and requires **exactly one** — zero or multiple
+  current versions route to retry rather than risk confirming readiness against a stale/wrong build (commit `3ae1dccc`,
+  with a unit test for the multiple‑current case). The full fix (pin to the exact ingested version instead of inferring
+  via `IsCurrent`) still needs the resolver contract and stays tracked as **62521491**.
+- **Xbox readiness path still hardcoded — flag.** The non‑PC branch hardcodes region (`WestEurope` non‑prod), `SUG = GA`,
+  and `ServerType = XboxV3SeriesS`, unlike the now config‑driven PC path. Pre‑existing, but if Xbox playtests share this
+  workflow and their servers aren't in that region/SUG, that poll would false‑timeout. Decide whether to config‑drive it too.
 - **Lane set for all PC playtests — note.** Fine because this code path only creates PC streaming playtests; if
   non‑streaming PC playtests ever share it, gate it on a streaming flag.
 
