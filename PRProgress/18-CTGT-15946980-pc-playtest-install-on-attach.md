@@ -1,9 +1,9 @@
-# [CTGT] PR 15946980 — Superseded: PC playtest enable + quota moves to dynamic config
+# [CTGT] PR 15946980 — Tests-only: PC playtest enable + quota moved to dynamic config
 
 - **Pull Request:** 15946980
 - **Repo:** services.contenttargets (Xbox.Streaming)
 - **Source branch:** `t-melanichen/pc-playtest-install-on-attach` → `main`
-- **Status:** Superseded — appsettings changes reverted; recommend abandon
+- **Status:** Active — appsettings reverted (enable+quota now dynamic config); **retained as a tests-only PR** (retitled)
 - **Opened:** 2026-06-19  |  **Closed:** —
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contenttargets/pullrequest/15946980
 
@@ -11,6 +11,13 @@
 Per Timi's review feedback, the PC playtest **enable + quota** settings must be applied through Content Targets dynamic
 config, not checked into `appsettings`. The PR's `appsettings.ContentTargets.Int.json` and
 `appsettings.ContentTargets.Test.json` additions were reverted in commit `04ac32c`; the remaining branch diff is tests only.
+
+**Decision — not abandoned.** The PR is retained and retitled *"[CTGT] Add tests for PC_PLAYTEST SUG resolution/enablement"*
+because the 3 remaining tests are valuable regression coverage for the behavior the dynamic config produces:
+`IncludePredictions_WithPlaytestSugOverride_EnablesOnlyPlaytestPcServerSet` (override scoped to PC_PLAYTEST only),
+`ResolveTargets_WithPlaytestSugEnabled_ProducesConcurrencyOfOne` (enabled → exactly one server), and
+`ResolveTargets_WithPlaytestSugDisabled_ProducesNoTarget` (disabled → none). Tests 24/24. Confirm with Timi (his repo)
+whether to merge them or have him own that coverage.
 
 Dynamic-config quota to apply instead:
 `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` →
