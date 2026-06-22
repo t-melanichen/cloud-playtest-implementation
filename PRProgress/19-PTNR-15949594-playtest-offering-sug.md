@@ -25,6 +25,9 @@ so the title mapped to no server set and the PC‑server install had nowhere to 
 - **Brian Bowman** — the `PC_PLAYTEST` SUG (and the hardcoded `STANDARD_NC64AS_T4_V3` SKU) are temporary stand-ins, so
   added `// TODO (62812760)` on both consts linking to ADO Task **62812760** (assigned to **Timi**, under XC4) to remove/
   finalize them once long-term PC playtest provisioning lands — so the cleanup isn't lost.
+- **Id typing** — the PC SUG/SKU values set on the offering are now strongly-typed `Id` (`static readonly Id`) instead of
+  `string`, matching the Id-typed offering fields they feed (`SelectableSystemUpdateGroups` / `TargetServerSkus`) and the
+  CTIN readiness-settings change. Tests 12/12. Commit `18a0226e`.
 
 ## Context
 - The missing link between CTIN PR [17](./17-CTIN-15896502-pc-install-readiness-polling.md) (the readiness poll) and
