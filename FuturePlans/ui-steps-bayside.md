@@ -17,7 +17,7 @@ Service legend: **AUTH** = `services.auth` · **PTNR** = `services.partnerregist
 
 ## #0 (foundation, partially done) — stream-start against the playtest offering  ·  P0/P1
 
-C1 sets the **active** offering from `?offeringId`. The deeper wire — passing the offering id directly
+C1 sets the **active** offering from `?offering.id`. The deeper wire — passing the offering id directly
 into `gameStream.cloudConnect(...)` (`useSessionConnect.ts:466-485`) — is a **cross-team open
 question**: does the cloud session-allocation API accept an offering id today, or is a platform change
 needed? Resolve this with the game-stream/auth package owners before relying on allocation targeting.

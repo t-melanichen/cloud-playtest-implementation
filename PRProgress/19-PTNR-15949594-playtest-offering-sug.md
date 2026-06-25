@@ -3,7 +3,7 @@
 - **Pull Request:** 15949594
 - **Repo:** services.partnerregistry (Xbox.Streaming)
 - **Source branch:** `t-melanichen/playtest-offering-sug` → `main`
-- **Status:** Draft
+- **Status:** Active
 - **Opened:** 2026-06-19  |  **Closed:** —
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.partnerregistry/pullrequest/15949594
 
@@ -31,7 +31,10 @@ so the title mapped to no server set and the PC‑server install had nowhere to 
 - **Timi (`SystemUpdateGroupWeights`)** — `SelectableSystemUpdateGroups` only lets a client *request* the SUG; default
   session allocation is driven by `SystemUpdateGroupWeights` (SUG→weight). Added `SystemUpdateGroupWeights = { PC_PLAYTEST: 100 }`
   so launched playtest sessions allocate to PC_PLAYTEST servers (Content Targets already unions both for install mapping;
-  this fixes runtime allocation). Tests 12/12. Commit `4f0d329a`.
+  this fixes runtime allocation). **Why:** without the weight, the offering can advertise the SUG but launched sessions
+  do not actually land on it. Tests 12/12. Commit `4f0d329a`.
+- **All review threads resolved (status=fixed).** Timi's `SystemUpdateGroupWeights` comment (above, commit `4f0d329a`) is
+  resolved on ADO; no active review threads remain. Tests 12/12.
 
 ## Context
 - The missing link between CTIN PR [17](./17-CTIN-15896502-pc-install-readiness-polling.md) (the readiness poll) and
@@ -39,9 +42,12 @@ so the title mapped to no server set and the PC‑server install had nowhere to 
 - Full design + test plan: [`../FuturePlans/content-targets-pc-playtest-enablement.md`](../FuturePlans/content-targets-pc-playtest-enablement.md).
 
 ## Dependencies
-- **Requires the `PC_PLAYTEST` SUG to be registered** — partner-registry validation rejects an unknown SUG
-  (`ValidationProcessorUtilities.cs:421`, `SystemUpdateGroup.GetId(sug, env)` must be non-null) and OS Targets must
-  provision it. Draft until Timi confirms the exact SUG string + provisioning.
+- **`PC_PLAYTEST` SUG registration — now satisfied in non-prod (2026-06-22).** Partner-registry validation rejects an
+  unknown SUG (`ValidationProcessorUtilities.cs:421`, `SystemUpdateGroup.GetId(sug, env)` must be non-null) and OS Targets
+  must provision it. The SUG is now **registered** via the data-repo SUG-definition adds
+  [20](./20-PTNR-DATA-15965750-add-pc-playtest-sug-test.md) (Test) / [21](./21-PTNR-DATA-15965763-add-pc-playtest-sug-int.md)
+  (Int), and the Content Targets quota is applied in Int via [22](./22-DCFG-15966616-contenttargets-pc-playtest-quota.md).
+  PR now **Active** (out of draft); the SUG parent remains `PC_GA`, which is acceptable for Test/Int per user guidance.
 - Deploy via CI/CICD, not the PR pipeline.
 - **Follow-up (temporary hardcodes):** ADO Task **62812760** (assigned to Timi, under XC4) tracks replacing the
   hardcoded `PC_PLAYTEST` SUG and `STANDARD_NC64AS_T4_V3` SKU with config-driven / dynamically-resolved values.

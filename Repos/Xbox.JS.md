@@ -2,7 +2,7 @@
 
 **Role:** Player-side cloud-gaming web client (**Bayside** = `apps/play-xbox`, play.xbox.com). The
 surface a playtester lands on when they open the shared streaming link
-(`https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}`). Renders the
+(`https://play.xbox.com/play/launch/{productId}?offering.id=xpt{PlaytestProductId}`). Renders the
 pre-stream screen, runs the offering-scoped (DNA-gated) login, and starts the cloud stream.
 
 ## Changes made

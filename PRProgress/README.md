@@ -29,27 +29,31 @@ so the on-disk file numbers are not strictly ascending in the table. Click a tit
 | 13 | 15876080 | DEVAPI | services.devapi | Active | [Testing workflow ingestion (Playtest Title Ingestion UI/client)](./10-DEVAPI-15876080-testing-workflow-ingestion.md) |
 | 14 | 15892276 | PTNR | services.partnerregistry | Merged | [Set Xbox AuthenticationOptions on playtest offerings](./11-PTNR-15892276-playtest-offering-authentication-type.md) |
 | 15 | 15894506 | XORC | xorc | Merged | [Expose Xbox Live TitleId on the product Xbox Live config response](./16-XORC-15894506-expose-xbox-live-title-id.md) |
-| 16 | 15896502 | CTIN | services.contentingestion | Draft | [Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow](./17-CTIN-15896502-pc-install-readiness-polling.md) |
+| 16 | 15896502 | CTIN | services.contentingestion | Active | [Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow](./17-CTIN-15896502-pc-install-readiness-polling.md) |
 | 17 | 15905881 | CTIN | services.contentingestion | Merged | [Gate playtest title ingestion endpoints with CrossTenantS2S policy](./12-CTIN-15905881-gate-playtest-ingestion-crosstenant-s2s.md) |
-| 18 | 15946980 | CTGT | services.contenttargets | Draft | [Enable PC playtest install-on-attach + quota (PC_PLAYTEST SUG, Int)](./18-CTGT-15946980-pc-playtest-install-on-attach.md) |
-| 19 | 15949594 | PTNR | services.partnerregistry | Draft | [Set PC_PLAYTEST SUG on the playtest offering](./19-PTNR-15949594-playtest-offering-sug.md) |
+| 18 | 15949594 | PTNR | services.partnerregistry | Active | [Set PC_PLAYTEST SUG on the playtest offering](./19-PTNR-15949594-playtest-offering-sug.md) |
+| 19 | 15965750 | PTNR-DATA | services.data.partnerregistry | Merged | [Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Test)](./20-PTNR-DATA-15965750-add-pc-playtest-sug-test.md) |
+| 20 | 15965763 | PTNR-DATA | services.data.partnerregistry | Merged | [Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Int)](./21-PTNR-DATA-15965763-add-pc-playtest-sug-int.md) |
+| 21 | 15966616 | DCFG | services.data.partnerregistry | Merged | [Update CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION — PC_PLAYTEST quota (Int)](./22-DCFG-15966616-contenttargets-pc-playtest-quota.md) |
 
-**Totals:** 19 tracked PRs — **13 merged**, **1 active**, **5 draft**.
+**Totals:** 21 tracked PRs — **16 merged**, **3 active**, **2 draft**.
 
 **Status legend:** Merged = completed/merged · Active = open and in review · Draft = open draft.
 
-**Area legend:** PTNR = services.partnerregistry · PTNR-DATA = services.data.partnerregistry ·
+**Area legend:** PTNR = services.partnerregistry · PTNR-DATA = services.data.partnerregistry (offering / SUG-definition data) ·
 AUTH = services.auth · DEVAPI = services.devapi · CTIN = services.contentingestion ·
 SAGE = services.serviceapigateway · XBET = Xbox.Xbet.Service · XORC = xorc (Xbox.Services) ·
-CTGT = services.contenttargets.
+CTGT = services.contenttargets · DCFG = services.data.partnerregistry (dynamic config — CONTENTTARGETS ServerSetsConfiguration).
 
 ## Superseded / abandoned PRs
 
-Earlier exploratory PRs that were abandoned once a better approach landed. Kept here for a complete record;
-they have no individual file. (Trivial throwaway PRs — `g`, `Remove Hyphen`, `Unused PR` — are omitted.)
+Earlier exploratory PRs that were abandoned once a better approach landed, kept here for a complete record.
+Most have no individual file; where a PR carried substantial design/test context (e.g. 15946980) its file is
+retained and linked. (Trivial throwaway PRs — `g`, `Remove Hyphen`, `Unused PR` — are omitted.)
 
 | PR | Area | Repo | Closed | Title & why superseded |
 |----|------|------|--------|------------------------|
 | 15680234 | XBET | Xbox.Xbet.Service | 2026-05-31 | *feat(PlayTest): add Partner Registry offering publish (Path B / AllowedFlights)* — early in-PlayTest scaffold using **Path B** (`AuthorizationOptions.AllowedFlights`); superseded by the **AllowedDnaGroups (Path A)** audience model (PRs 15732852 / 15738761 / 15739964). |
 | 15733268 | XBET | Xbox.Xbet.Service | 2026-06-02 | *Add PlaytestIngestionJobParameters + StoreAsset contracts* — early hand-written local wire contracts; superseded by PR 15834601 (payload builder) and the move to consume the published GSSV contract (board task 62696974). |
 | 15737351 | SAGE | services.serviceapigateway | 2026-06-16 | *Register Playtest ingestion proxy routes* — first attempt at the SAGE proxy routes; superseded by PR 15829639 (the live routes PR, #09 above). |
+| 15946980 | CTGT | services.contenttargets | 2026-06-22 | *[Tests-only: PC playtest enable + quota moved to dynamic config](./18-CTGT-15946980-pc-playtest-install-on-attach.md)* — checked-in `appsettings` quota was reverted per Timi; superseded by the **dynamic-config** quota PR 15966616 (Int, #21 above). File retained for its 3 regression tests. |

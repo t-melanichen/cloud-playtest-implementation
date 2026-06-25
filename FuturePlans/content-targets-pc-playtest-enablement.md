@@ -171,20 +171,34 @@ then say ready."
 
 This is the **readiness poll** (step 5). The method `PollPcFirstInstallAsync`:
 1. **Resolves** the just‑ingested build to get its **install id** and its **hash** (the exact‑version fingerprint).
-2. Asks **PC Orchestrator**: "do you have any server reporting this exact `install id` + `hash`?" (plus the lane, region,
-   and server type, so it only looks at the right machines).
+2. Asks **PC Orchestrator**: "do you have any server reporting this exact `install id` + `hash`?" (plus the lane and
+   server type, so it only looks at the right machines).
 3. **No server yet → wait and try again** (retry). **A server has it → mark ready.**
 
-It also adds a small config block, `PlaytestPcReadinessQuery` (lane / regions / server types), so the poll looks at the
-right place. The values are set for both non‑prod environments (**Int** and **Test**): `PC_PLAYTEST` / `WESTUS2` /
-`STANDARD_NC64AS_T4_V3`. Prod is intentionally left unset for now.
+It also adds a small config block, `PlaytestPcReadinessQuery` (lane / server types), so the poll looks at the right
+place. The values are set for both non‑prod environments (**Int** and **Test**): `PC_PLAYTEST` / `STANDARD_NC64AS_T4_V3`.
+Prod is intentionally left unset for now.
 
-**Tests:** the CTIN test passes **11/11** (including that the configured lane/region/server‑type are sent in the query).
+**Region — not filtered (Timi review, commit `0fab4be6`).** Per platform guidance the poll uses a **"first region"
+assumption**: a server in *any* region reporting the exact ingested version is sufficient, so the query no longer sets
+`Regions` (the `PlaytestPcReadinessQuery.Regions` config + its appsettings entries + the env‑provider region fallback
+were removed). Region targeting is deferred until we steer developers to specific regions for performance.
 
-**One known limitation (already tracked):** when picking which version to wait for, the code currently picks the
-"currently available" version, which is *almost always* the just‑published one — but on a quick **republish** it could
-in theory pick the previous build's hash. First‑publish is correct; the fix (pin to the exact just‑ingested version) is
-tracked as work item 62521491.
+**Tests:** CTIN unit tests green (Core + Worker), including assertions that the configured lane/server‑type are sent in
+the query and the `ConfigureOfferingAsync` routing / per‑stage guards.
+
+**Open — resolution business logic for playtests (needs Jack walkthrough).** A PR‑C reviewer flagged: *"Resolution code needs some special business
+logic for playtests. Jack can probably walk you through it."* The poll selects the target build via `version.IsCurrent`
+(where `IsCurrent => AvailableFrom == null`), and the resolver marks a version "current" only once its asset versions
+satisfy `AvailableFrom <= now < AvailableUntil` (`CosmosDALManager`). For a freshly‑published playtest build that needs
+confirming — immediate availability for the playtest's flights + sandbox, exactly one current version, and republish
+ordering. **Needs a walkthrough with Jack before implementing** (do not speculatively change the shared resolver). See
+§10 Q7 and [PRProgress 17](../PRProgress/17-CTIN-15896502-pc-install-readiness-polling.md).
+
+**One known limitation (already tracked, related to the above):** when picking which version to wait for, the code
+filters to the *current* PC version and requires **exactly one** (zero/multiple → retry, so a republish can't confirm
+against a stale build). The full fix — pin to the exact just‑ingested version rather than inferring via `IsCurrent` — is
+tracked as work item 62521491 and is intertwined with the resolution business logic above.
 
 ---
 
@@ -206,23 +220,30 @@ once Timi applies the dynamic config described in §5.
 
 ---
 
-## 7. The one thing left — "registering the `PC_PLAYTEST` SUG" (what that even means)
+## 7. The one thing left — registering the `PC_PLAYTEST` SUG (you can self‑serve this)
 
 "Registering the SUG" means **actually creating the `PC_PLAYTEST` lane** so the platform knows it exists and real
-machines belong to it. Until that happens, all three PRs point at a lane that isn't there yet. It has to be done in two
-places, both owned by the platform team (Timi):
+machines run the right OS image in it. Until that happens, all three PRs point at a lane that isn't there yet.
 
-1. **OS Targets (the required one):** add `PC_PLAYTEST` for the `STANDARD_NC64AS_T4_V3` server type in `WESTUS2`. This is
-   what makes real PC machines run in that lane. Without it, content-targets won't even create the server set, so nothing
-   can install.
-2. **The recognized‑lane list in code (`Services.Common.Ids`):** the set of valid SUG names is a fixed list in a shared
-   library (it currently has `GA`, `Canary`, etc., but **not** `PC_PLAYTEST`). The Partner Registry only *warns* (it
-   doesn't hard‑block) if an offering uses an unlisted lane, but `PC_PLAYTEST` should be added there for cleanliness — or
-   confirmed to have a dynamic path.
+**Update (Jack, 2026‑06‑22): this is no longer blocked on Timi — you can set the SUG up yourself.** Jack: *"you need
+quota (covered in your first PR) then you need to go to the PC SUG configuration page and set up the SUG … I'll recommend
+inheriting from a 'production'/release SUG. PC_TAKEHOME is currently our most solid."* So it's two parts:
 
-Why this is someone else's job: creating a server lane + assigning machines is platform/infrastructure work. Timi said in
-the meeting "we **will have** a distinct PC_playtest SUG … I have things set up that way already," so he owns it — we just
-need the exact name and confirmation it's been done.
+1. **Quota (dynamic config):** add the `PC_PLAYTEST` quota under `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` (see §5
+   PR‑A and the copy/paste values in
+   [`./pc-playtest-dynamic-config-and-sug-setup.md`](./pc-playtest-dynamic-config-and-sug-setup.md)). This says the lane is
+   *allowed* a server.
+2. **SUG definition (PC SUG Definitions page):** at <https://americas.gssv-dev-prod.xboxlive.com/PcSugDefinitions> →
+   **Add PC Sug Definition** → `Sug Id = PC_PLAYTEST`, **`Inherits From = PC_GA`** (accepted for Test/Int per user
+   guidance), then **Link to Parent** for Developer Settings *and* Flighting Configs so it inherits the parent SUG's
+   known‑good OS images. ⚠️ If you *don't* link/inherit, the page demands a manual Flighting Config row with a non‑empty
+   **Version** ("At least one Flighting Config is required when configs are not inherited") — inheriting from PC_TAKEHOME is
+   exactly how you avoid hand‑picking image versions. Writing this entry satisfies the OS Targets requirement below.
+
+Still platform‑owned (confirm with Timi): the **recognized‑lane list in code (`Services.Common.Ids`)** is a fixed list
+(`GA`, `Canary`, … but **not** `PC_PLAYTEST`). Partner Registry only *warns* (it doesn't hard‑block) on an unlisted lane,
+but `PC_PLAYTEST` should be added for cleanliness — or confirmed to have a dynamic path. And confirm real GPU capacity for
+the chosen SKU exists in the target region (the NC64 vs NC8 decision in §10 Q4 / the setup doc).
 
 This is also tracked as a blocker: [`../Blockers/pc-playtest-sug-registration.md`](../Blockers/pc-playtest-sug-registration.md).
 
@@ -233,8 +254,8 @@ This is also tracked as a blocker: [`../Blockers/pc-playtest-sug-registration.md
 ### A. Right now — unit tests (already green)
 Each code PR has automated tests proving its piece in isolation; content-targets dynamic config must be verified live:
 - content-targets: `dotnet build src/Product/ContentTargets.Core/ContentTargets.Core.csproj -v minimal` after reverting appsettings; live validation through Savant after Timi's dynamic-config flip.
-- partner-registry: `dotnet test …/PartnerRegistryService.UnitTests --filter PlaytestProcessorTests -p:StaticWebAssetsEnabled=false` → **12/12**.
-- CTIN: `dotnet test …/ContentCatalog.Ingestion.Core.UnitTests --filter PlaytestTitleIngestionWorkflowTests` → **11/11**.
+- partner-registry: `dotnet test …/PartnerRegistryService.UnitTests --filter PlaytestProcessorTests -p:StaticWebAssetsEnabled=false` → **12/12** (verified 2026‑06‑22).
+- CTIN: `dotnet test …/ContentCatalog.Ingestion.Core.UnitTests --filter PlaytestTitleIngestionWorkflowTests -p:StaticWebAssetsEnabled=false` → **16/16** (verified 2026‑06‑22).
   *(The `-p:StaticWebAssetsEnabled=false` flag avoids a flaky OneDrive file‑lock during the web‑project build.)*
 
 ### B. After the lane is registered + the 3 changes deploy — check each layer in order
@@ -254,7 +275,7 @@ Each code PR has automated tests proving its piece in isolation; content-targets
 
 ### C. End‑to‑end (the real proof)
 Publish a PC playtest for the pilot creator → walk through B2–B5 → open the launch link
-(`https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}`) and confirm the game streams. Then
+(`https://play.xbox.com/play/launch/{productId}?offering.id=xpt{PlaytestProductId}`) and confirm the game streams. Then
 **republish a new build** and confirm the poll waits for the **new** hash (exercises the limitation noted in PR‑C).
 
 ---
@@ -263,8 +284,10 @@ Publish a PC playtest for the pilot creator → walk through B2–B5 → open th
 A review of all three PRs raised these; each is resolved or flagged:
 - **PR‑B "which offering field" — resolved, no change.** `services.auth` (`UserLoginProcessor.cs:739`) reads
   `offering.SelectableSystemUpdateGroups` to tell the client which lanes are available, and content-targets reads both
-  lane fields, so `SelectableSystemUpdateGroups = [PC_PLAYTEST]` is correct. (If live allocation testing ever shows the
-  tester's machine isn't picked from the lane, also set `SystemUpdateGroupWeights = { PC_PLAYTEST: 100 }`.)
+  lane fields, so `SelectableSystemUpdateGroups = [PC_PLAYTEST]` is correct. **Update (Timi review):** `SystemUpdateGroupWeights
+  = { PC_PLAYTEST: 100 }` is now also set on the offering (PTNR commit `4f0d329a`) — `SelectableSystemUpdateGroups` only
+  lets a client *request* a lane, but a tester just clicks a link, so default allocation needs the SUG **weighted** to land
+  launched sessions on PC_PLAYTEST servers.
 - **IncludePredictions override scope — if needed, keep it lane-scoped.** The enable is keyed on the lane only
   (`Sugs=[PC_PLAYTEST]`), not region/SKU, so it works wherever the dedicated playtest lane exists. (Locking it to one
   region/SKU would silently break if capacity is added elsewhere.)
@@ -281,6 +304,16 @@ A review of all three PRs raised these; each is resolved or flagged:
   current versions route to retry rather than risk confirming readiness against a stale/wrong build (commit `3ae1dccc`,
   with a unit test for the multiple‑current case). The full fix (pin to the exact ingested version instead of inferring
   via `IsCurrent`) still needs the resolver contract and stays tracked as **62521491**.
+- **Resolution business logic for playtests — OPEN (needs Jack walkthrough).** PR‑C review: *"Resolution code needs some
+  special business logic for playtests. Jack can probably walk you through it."* The poll keys on `version.IsCurrent`
+  (`IsCurrent => AvailableFrom == null`), and the resolver derives "current" purely from availability windows
+  (`CosmosDALManager`: current = `AvailableFrom < resolveTime`, ordered desc). For a freshly‑published *playtest* build,
+  unconfirmed: (a) is it marked current/resolvable immediately under the playtest's flights + sandbox, or does it need a
+  playtest‑specific availability rule; (b) can two versions be "current" at once (→ the exactly‑one guard retries
+  forever); (c) does the special logic live in the shared `ResolutionProcessor` (Common.Core) or the
+  `ContentCatalog.Resolution.Service` resolver. **Do not change the shared resolver speculatively** — sync with Jack
+  first. This is the last open code item on PR‑C; it overlaps with 62521491 (resolving by explicit install id would
+  sidestep the `IsCurrent` inference entirely).
 - **Xbox readiness path still hardcoded — flag.** The non‑PC branch hardcodes region (`WestEurope` non‑prod), `SUG = GA`,
   and `ServerType = XboxV3SeriesS`, unlike the now config‑driven PC path. Pre‑existing, but if Xbox playtests share this
   workflow and their servers aren't in that region/SUG, that poll would false‑timeout. Decide whether to config‑drive it too.
@@ -289,11 +322,13 @@ A review of all three PRs raised these; each is resolved or flagged:
 
 ---
 
-## 10. Open questions for the platform owner (Timi)
+## 10. Open questions for the platform owners (Timi / Jack)
 1. **Exact lane name** — we assumed `PC_PLAYTEST`; must match OS Targets, the Ids list, content-targets, the offering, and CTIN.
-2. **Is the lane already created** (OS Targets + Ids) for `STANDARD_NC64AS_T4_V3` in `WESTUS2`?
-3. **Enable + quota** — Timi owns the live dynamic-config change: add `PC_PLAYTEST = 1` under
-   `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` for `STANDARD_NC64AS_T4_V3` / `WESTUS2`. Open: does Int/Test also need
+2. **Lane creation** — the SUG definition is now **self‑serve** via the PC SUG Definitions page (§7: `PC_PLAYTEST` inheriting
+   `PC_GA`). Confirm with Timi only that (a) `PC_PLAYTEST` should be added to `Services.Common.Ids` (recognition), and
+   (b) GPU capacity exists for the chosen SKU/region.
+3. **Enable + quota** — Timi owns / grants the live dynamic-config change: add `PC_PLAYTEST = 1` under
+   `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` for the chosen SKU / `WESTUS2`. Open: does Int/Test also need
    `CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION` `IncludePredictions.Override` for `PC_PLAYTEST`, or are PC predictions
    already enabled for existing non-prod PC SUGs?
 4. **Server type** — `STANDARD_NC64AS_T4_V3` is a hardcoded placeholder (a `const` with a "resolve dynamically" TODO,
@@ -301,10 +336,15 @@ A review of all three PRs raised these; each is resolved or flagged:
    (`STANDARD_NC8AS_T4_V3`), so this needs confirming. Is `STANDARD_NC64AS_T4_V3` the right SKU, and should we config‑drive it?
 5. **Test provisioning** — the offering targets `WestUS2`/`WestEurope` in **both** Int and Test (the existing `WESTUS3`/`GA`
    entry in the Test fleet is a *separate, unrelated* fleet), and the playtest config matches it on `WESTUS2`. The only
-   remaining unknown is infra: does Test OS Targets actually have `STANDARD_NC64AS_T4_V3` provisioned in `WESTUS2` for the
+   remaining unknown is infra: does Test OS Targets actually have the SKU provisioned in `WESTUS2` for the
    `PC_PLAYTEST` lane? If not, the Test config is a harmless no‑op until that infra exists.
 6. **Production** — the enable mechanism currently allows only one override, already used by Xbox; production needs that
    extended (and a different region, `NorthCentralUs`).
+7. **Resolution business logic for playtests (needs Jack walkthrough).** PR‑C review: *"Resolution code needs some special business
+   logic for playtests."* Schedule the walkthrough. Concrete questions to bring: does the resolver mark a just‑ingested
+   playtest version `IsCurrent` (`AvailableFrom == null`) immediately under the playtest's flights + sandbox? Can multiple
+   versions be current at once? Should the poll resolve by explicit install id (ties to 62521491) instead of inferring via
+   `IsCurrent`? Which resolver owns the change — `ResolutionProcessor` (Common.Core) or `ContentCatalog.Resolution.Service`?
 
 ### Ready‑to‑send message to Timi
 

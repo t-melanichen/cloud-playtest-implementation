@@ -48,8 +48,12 @@ This table is a snapshot; [`PRProgress/README.md`](../../PRProgress/README.md) i
 | 15876080 | DEVAPI | services.devapi | Active | Testing workflow ingestion (Playtest Title Ingestion UI/client) |
 | 15892276 | PTNR | services.partnerregistry | Merged | Set Xbox AuthenticationOptions on playtest offerings |
 | 15894506 | XORC | xorc | Merged | Expose Xbox Live TitleId on the product Xbox Live config response |
-| 15896502 | CTIN | services.contentingestion | Draft | Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow |
+| 15896502 | CTIN | services.contentingestion | Active | Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow |
 | 15905881 | CTIN | services.contentingestion | Merged | Gate playtest title ingestion endpoints with CrossTenantS2S policy |
+| 15949594 | PTNR | services.partnerregistry | Active | Set PC_PLAYTEST SUG on the playtest offering |
+| 15965750 | PTNR-DATA | services.data.partnerregistry | Merged | Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Test) |
+| 15965763 | PTNR-DATA | services.data.partnerregistry | Merged | Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Int) |
+| 15966616 | DCFG | services.data.partnerregistry | Merged | Update CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION — PC_PLAYTEST quota (Int) |
 
 ## Repositories this project spans
 All paths are on the user's Desktop. **This agent's file does not by itself grant

@@ -21,9 +21,11 @@ Before a streaming playtest can be marked ready, we need to know that the stream
 
 ## Next actions
 1. ~~Identify the exact PC server-query API~~ **Done (2026-06-18):** `IPCOrchestratorClient.QueryServersPagedAsync` with `GameStreamingServerFilter.Content = [ContentFileFilter{Id, Version}]` (see Confirmed API above).
-2. ~~Swap the PC branch of `PollFirstInstallAsync` from `IServerAllocatorClient` to `IPCOrchestratorClient`~~ **Done (2026-06-18):** package refs added, `AddGSHttpClient<IPCOrchestratorClient, PCOrchestratorClient>()` registered in the Worker, `IPCOrchestratorClient` injected, PC branch rebuilt on `GameStreamingServerFilter.Content`. Solution builds clean; 14/14 workflow unit tests pass. Xbox branch unchanged.
+2. ~~Swap the PC branch of `PollFirstInstallAsync` from `IServerAllocatorClient` to `IPCOrchestratorClient`~~ **Done (2026-06-18):** package refs added, `AddGSHttpClient<IPCOrchestratorClient, PCOrchestratorClient>()` registered in the Worker, `IPCOrchestratorClient` injected, PC branch rebuilt on `GameStreamingServerFilter.Content`. Solution builds clean; workflow unit tests pass.
 3. ~~Pair the per-version `targetVersion.InstallId` with `targetVersion.Hash`~~ **Done (2026-06-18).**
-4. Validate that polling after title-attach correctly observes install completion (needs Timi's upstream install-on-attach + quota; see FuturePlans C1/C2).
+4. ~~Drop the region filter from the PC query~~ **Done (2026-06-22, commit `0fab4be6`):** per Timi's review the poll uses a **"first region" assumption** (any region reporting the exact version is sufficient); `PlaytestPcReadinessQuery.Regions` + appsettings + the env-provider fallback were removed.
+5. **OPEN — resolution business logic for playtests (needs Jack walkthrough).** PR‑C review: *"Resolution code needs some special business logic for playtests. Jack can probably walk you through it."* The poll keys on `version.IsCurrent` (`IsCurrent => AvailableFrom == null`); confirm with Jack whether a freshly-ingested playtest version is marked current/resolvable immediately under the playtest's flights + sandbox. Do not change the shared resolver speculatively. (See FuturePlans pc-install-readiness-polling-implementation **B5**.)
+6. Validate that polling after title-attach correctly observes install completion (needs the install-on-attach enable + quota via **dynamic config**, and the `PC_PLAYTEST` SUG definition — see FuturePlans C1/C2 and the dynamic-config + SUG setup doc).
 
 ## References
 - `Transcripts/Sync3.docx` — Timi on PC polling + install-on-attach ordering.

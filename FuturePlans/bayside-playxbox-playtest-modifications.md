@@ -18,7 +18,7 @@ explanation.
 From `FuturePlans/launch-link-and-status-accuracy.md` (Sync 3 — Anthony), the shareable link is:
 
 ```
-https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}
+https://play.xbox.com/play/launch/{productId}?offering.id=xpt{PlaytestProductId}
 ```
 
 So the **only** playtest-specific signal Bayside receives is the **`offeringId` query param**. Everything
@@ -30,7 +30,7 @@ auth/login. The offering id convention is literal `xpt` + `PlaytestProductId`, n
 - **Link transform preserves the query string.** `/play/launch/:productId` redirects to
   `/stream/:productId`, and the original `URLSearchParams` are carried through unchanged
   (`src/server/middleware/edgewaterLinkTransformation.ts:243-289`, final URL built as `path?search`
-  at `156-158`). ✅ Good news: `?offeringId=...` *survives* to the stream route.
+  at `156-158`). ✅ Good news: `?offering.id=...` *survives* to the stream route.
 - **But nothing reads it.** The stream route reads only the `productId` **path** param and never the
   query (`src/app/routes/CloudConsoleStreamRoute.tsx:18-36`). `GameStreamPage` takes only
   `productId`/`serverId` props — no `useSearchParams`
@@ -85,12 +85,12 @@ Mapped to the intern project doc (`Context/InternProjectDocument.pdf`) P0/P1 obj
 **Setup (before the click):** Creator checks "Enable Cloud Streaming" in xPlaytest → a private
 offering `xpt{PlaytestProductId}` is created, DNA-group gated, with one title bound to the latest
 build (intern-doc P0 #2–4). xPlaytest crafts the URL
-`https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}` (intern-doc P0:
+`https://play.xbox.com/play/launch/{productId}?offering.id=xpt{PlaytestProductId}` (intern-doc P0:
 "craft a URL usable for streaming").
 
 1. **Click → land in Bayside** (intern-doc P1: "takes the user to an Xbox Gaming Endpoint (Bayside)").
    `edgewaterLinkTransformation.ts:243-289` redirects `/play/launch/{productId}` → `/stream/{productId}`,
-   **preserving `?offeringId`**. ✅ Already works.
+   **preserving `?offering.id`**. ✅ Already works.
 2. **Log in FIRST, reveal nothing yet** (intern-doc P1: "player gets logged in first (before revealing
    any details)"; P0: "Members not part of the playtest do not see any information"). New playtest gate
    modeled on `InsiderPreviewGateLayout.tsx:23-90`. → W2/W4.
@@ -122,17 +122,17 @@ Bayside already has a full **offering** subsystem — the intern work is mostly 
 - **Offering-scoped login already wired:** `activeOfferingStreamUser` (`CloudStreamingClientSideContext.tsx:157-160`) logs the user into the *active* offering via `/v2/login/user[/delegated]` (`packages/@xbox-js/-game-stream/auth-service/src/AuthenticationService.ts:55-89`) — the DNA-gated playtest login.
 - **Private-offering no-leak already partially handled:** the stream loader fetches `activeOfferingInfo` and, when `isPrivate`, **returns early without hydrating retail product metadata** (`packages/@play-xbox/-route/game-stream/src/loader.server.ts` — "Avoid throwing hydration errors for private offerings").
 - **Denial UX already exists:** `OfferingErrorPage.tsx` (rendered on `OfferingAccessDeniedError`, `GameStreamPage.tsx:44`) shows "Cannot connect to the requested streaming offering. Please ensure you have access" with an enrollment CTA and **no title details** — satisfies the no-leak requirement.
-- **`offeringId` is already a known query string** in the older edgewater stack (`packages/xbox-web-partner-edgewater/src/routes/routes.ts:408`, cookie `gs_of_id` at `constants/cookies.ts:8`). The intern doc confirms: *"private offering support is possible today in the web cloud streaming endpoint."*
+- **The offering query param already exists platform-wide** as `offering.id` (`QueryStrings.Auth.Offering.id`; edgewater `routes.ts:408` aliases it, cookie `gs_of_id` at `constants/cookies.ts:8`). We **reuse this existing param** for the playtest link rather than inventing a new one. The intern doc confirms: *"private offering support is possible today in the web cloud streaming endpoint."*
 
-**=> The one missing wire:** nothing in the new play-xbox `/stream/:productId` flow reads `?offeringId=` and calls `setActiveOfferingId`. That is the core intern change.
+**=> The one missing wire:** nothing in the new play-xbox `/stream/:productId` flow reads `?offering.id=` and calls `setActiveOfferingId`. That is the core intern change.
 
 ## Concrete code changes (file-by-file)
 
-### C1 — Apply `offeringId` from the launch link (the core change)
-- **`apps/play-xbox/src/app/routes/CloudConsoleStreamRoute.tsx`** — read the query param and set the active offering before streaming:
-  - `const [searchParams] = useSearchParams(); const offeringId = searchParams.get('offeringId');`
+### C1 — Apply the launch link's `offering.id` to the active offering (the core change) — ✅ DONE (commit `6fc9740ef7f`)
+- **`apps/play-xbox/src/app/routes/CloudConsoleStreamRoute.tsx`** — read the **existing** `offering.id` query param and set the active offering before streaming:
+  - `const [searchParams] = useSearchParams(); const offeringId = searchParams.get('offering.id');` — the param matches `QueryStrings.Auth.Offering.id` (reuse, **not** a new `offeringId` param)
   - get `setActiveOfferingId` from `useSystems().services.gameStream.authentication.mutations`, and in an effect call `setActiveOfferingId({ offeringId, shouldPersist: true })` when `offeringId` is present and differs from the current `activeOfferingId` (mirror `OfferingInfo.tsx:388-396`). Optionally hold rendering of `<GameStreamPage>` until the active offering matches, so login/metadata run under the playtest offering.
-- **`packages/@play-xbox/-route/game-stream/src/loader.server.ts`** — parse `offeringId` from `request.url` and set it as the active offering (cookie, same key the offering subsystem reads) **before** `activeOfferingInfo`/product fetch, so SSR resolves the private offering and the existing `isPrivate` early-return (no-leak) path applies on the very first paint.
+- **`packages/@play-xbox/-route/game-stream/src/loader.server.ts`** — parse `offering.id` from `request.url` and set it as the active offering (cookie, same key the offering subsystem reads) **before** `activeOfferingInfo`/product fetch, so SSR resolves the private offering and the existing `isPrivate` early-return (no-leak) path applies on the very first paint.
 
 ### C2 — Login-first + no-leak (verify; likely minimal)
 - Ensure an unauthenticated tester is sent through auth before any render. The offering-scoped `activeOfferingStreamUser` + the loader's private-offering guard already cover most of this; confirm `ClientSideRenderGate.tsx` / the `/auth/*` flow blocks render until signed in for private offerings, and add a gate only if a leak path exists.

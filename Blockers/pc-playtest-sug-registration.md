@@ -1,8 +1,12 @@
 # Blocker: PC playtest SUG (`PC_PLAYTEST`) must be registered at the platform level
 
-**Status:** Open — blocks end-to-end PC playtest streaming. All three dependent PRs are drafts, pinned to
-`PC_PLAYTEST` / `STANDARD_NC64AS_T4_V3` / `WESTUS2`, and ready once the SUG exists.
-**Owners:** Timi Bolaji (OS Targets + `SystemUpdateGroup` Ids registration) · Melanie Chen (matches the name across the 3 PRs)
+**Status:** Mostly unblocked (2026-06-22) — the `PC_PLAYTEST` SUG is **registered (merged) in Test + Int** and the
+dynamic-config quota is **applied (merged) in Int**. One open item remains: confirm Int actually has
+`STANDARD_NC64AS_T4_V3` (NC64) GPU capacity in WESTUS2. The two code PRs (15896502, 15949594) are Active with all review
+threads resolved. The SUG parent is left as `PC_GA`, which the user confirmed is acceptable for Test/Int.
+**Owners:** Melanie Chen (SUG definition + offering/poll PRs) · Timi Bolaji (GPU capacity / `IncludePredictions` confirm) ·
+Jack Heuberger (resolution walkthroughs)
+Timi Bolaji (dynamic-config quota / GPU capacity / `SystemUpdateGroup` Ids recognition)
 
 ## Problem
 The whole PC playtest install/readiness chain references a **distinct PC playtest System Update Group (SUG)** — a named
@@ -30,16 +34,21 @@ Setting up `PC_PLAYTEST` is **two** steps:
 2. **SUG definition** — register the SUG itself on the **PC SUG Definitions** page
    (`https://americas.gssv-dev-prod.xboxlive.com/PcSugDefinitions`). A SUG definition (`PCSystemUpdateGroup` in OS Targets)
    assigns the **OS image versions** (the Windows/OS build the GPU servers run) per SKU via *flighting configs*.
-   **Timi's recommendation: create `PC_PLAYTEST` to *inherit from* a stable release SUG — `PC_TAKEHOME` (currently the most
-   solid).** On the page: New SUG → `Id = PC_PLAYTEST`, `InheritsFrom = PC_TAKEHOME`, inherit configs + dev options — so it
-   automatically picks up PC_TAKEHOME's known-good OS images for `STANDARD_NC64AS_T4_V3` instead of hand-picking image
-   definitions. This page writes the OS Targets SUG entry (satisfying the OS-Targets requirement above). Owner: Timi (or
-   whoever has edit access to the page).
+   **Jack's recommendation (2026-06-22): create `PC_PLAYTEST` to *inherit from* a stable release SUG — `PC_TAKEHOME`
+   (currently the most solid) — and NOT `PC_GA`.** On the page: **Add PC Sug Definition** → `Sug Id = PC_PLAYTEST`,
+   `Inherits From = PC_TAKEHOME`, then **Link to Parent** for Developer Settings *and* Flighting Configs so it inherits
+   PC_TAKEHOME's known-good OS images for the SKU instead of hand-picking image versions. (If you don't inherit, the page
+   demands a manual Flighting Config row with a non-empty Version — "At least one Flighting Config is required when configs
+   are not inherited" — which is exactly what inheriting avoids.) This page writes the OS Targets SUG entry.
+   **Owner: Melanie can self-serve this** — Jack: *"you need to go to the PC SUG configuration page and set up the SUG."*
+   Step-by-step: [`../FuturePlans/pc-playtest-dynamic-config-and-sug-setup.md`](../FuturePlans/pc-playtest-dynamic-config-and-sug-setup.md) §3.
 
 ## What's already done (all pinned to `PC_PLAYTEST`)
-- **services.contenttargets** [PR 15946980](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contenttargets/pullrequest/15946980) — superseded by dynamic config; appsettings changes reverted, recommend abandon after Timi applies the quota.
-- **services.partnerregistry** [PR 15949594](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.partnerregistry/pullrequest/15949594) — set the SUG on the playtest offering.
-- **services.contentingestion** [PR 15896502](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contentingestion/pullrequest/15896502) — the readiness poll + pin it to the SUG/region/SKU.
+- **services.data.partnerregistry SUG definitions — MERGED:** [PR 15965750](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.data.partnerregistry/pullrequest/15965750) (Test) + [PR 15965763](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.data.partnerregistry/pullrequest/15965763) (Int) register `PCSystemUpdateGroup/PC_PLAYTEST`. The as-built definitions inherit from `"PC_GA"` (with null flighting configs); the user confirmed that `PC_GA` is acceptable for Test/Int, so no parent change is needed.
+- **services.data.partnerregistry dynamic-config quota — MERGED (Int):** [PR 15966616](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.data.partnerregistry/pullrequest/15966616) adds `STANDARD_NC64AS_T4_V3 → WESTUS2 → PC_PLAYTEST = 1` under `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` (Option A; live NC8/D4S blocks untouched). Test got the SUG def but **no quota** (WESTUS2/WESTUS3 mismatch — defer per setup doc).
+- **services.contenttargets** [PR 15946980](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contenttargets/pullrequest/15946980) — superseded by dynamic config PR 15966616; abandoned.
+- **services.partnerregistry** [PR 15949594](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.partnerregistry/pullrequest/15949594) — sets the SUG + weights on the playtest offering (all review threads resolved).
+- **services.contentingestion** [PR 15896502](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contentingestion/pullrequest/15896502) — the readiness poll + pin it to the SUG/SKU (all review threads resolved).
 
 ## Questions for Timi (the unblockers)
 1. **Exact SUG name** — `PC_PLAYTEST`, or something else? (Will be matched across all three PRs.)

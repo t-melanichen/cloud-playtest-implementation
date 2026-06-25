@@ -3,8 +3,8 @@
 - **Pull Request:** 15946980
 - **Repo:** services.contenttargets (Xbox.Streaming)
 - **Source branch:** `t-melanichen/pc-playtest-install-on-attach` → `main`
-- **Status:** Active — appsettings reverted (enable+quota now dynamic config); **retained as a tests-only PR** (retitled)
-- **Opened:** 2026-06-19  |  **Closed:** —
+- **Status:** Abandoned (2026-06-22) — superseded by the dynamic-config quota (PR [22](./22-DCFG-15966616-contenttargets-pc-playtest-quota.md), Int); the 3 regression tests were its only remaining value
+- **Opened:** 2026-06-19  |  **Closed:** 2026-06-22
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contenttargets/pullrequest/15946980
 
 ## Summary
@@ -12,12 +12,14 @@ Per Timi's review feedback, the PC playtest **enable + quota** settings must be 
 config, not checked into `appsettings`. The PR's `appsettings.ContentTargets.Int.json` and
 `appsettings.ContentTargets.Test.json` additions were reverted in commit `04ac32c`; the remaining branch diff is tests only.
 
-**Decision — not abandoned.** The PR is retained and retitled *"[CTGT] Add tests for PC_PLAYTEST SUG resolution/enablement"*
+**Decision — abandoned (2026-06-22).** The PR was abandoned on ADO once the dynamic-config quota landed via PR [22](./22-DCFG-15966616-contenttargets-pc-playtest-quota.md) (Int), superseding its reverted appsettings. It had been retitled *"[CTGT] Add tests for PC_PLAYTEST SUG resolution/enablement"*
 because the 3 remaining tests are valuable regression coverage for the behavior the dynamic config produces:
 `IncludePredictions_WithPlaytestSugOverride_EnablesOnlyPlaytestPcServerSet` (override scoped to PC_PLAYTEST only),
 `ResolveTargets_WithPlaytestSugEnabled_ProducesConcurrencyOfOne` (enabled → exactly one server), and
-`ResolveTargets_WithPlaytestSugDisabled_ProducesNoTarget` (disabled → none). Tests 24/24. Confirm with Timi (his repo)
-whether to merge them or have him own that coverage.
+`ResolveTargets_WithPlaytestSugDisabled_ProducesNoTarget` (disabled → none). Tests 24/24. With the PR abandoned, that coverage now lives only on the abandoned branch — if it's still wanted, Timi can
+re-home it in his repo. Both prerequisites this PR waited on are now done: the SUG is registered (PRs
+[20](./20-PTNR-DATA-15965750-add-pc-playtest-sug-test.md) / [21](./21-PTNR-DATA-15965763-add-pc-playtest-sug-int.md)) and the
+quota is applied in Int (PR [22](./22-DCFG-15966616-contenttargets-pc-playtest-quota.md)).
 
 Dynamic-config quota to apply instead:
 `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` →

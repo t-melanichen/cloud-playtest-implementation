@@ -124,7 +124,7 @@ feat(play-xbox/game-stream): apply launch-link offeringId to the active offering
 # Context
 
 Bayside is the surface a playtester lands on when they click a shared streaming link,
-`https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}`. Today the
+`https://play.xbox.com/play/launch/{productId}?offering.id=xpt{PlaytestProductId}`. Today the
 cloud-stream route reads only the `productId` path param and ignores the `offeringId` query param,
 so a clicked playtest link streams the default **retail** offering instead of the private,
 DNA-gated **playtest** offering. This change threads `offeringId` into Bayside's existing offering
@@ -137,7 +137,7 @@ the denial / "still preparing" UX are tracked as follow-ups.
 
 # Changes
 
--   **Feature:** `apps/play-xbox/src/app/routes/CloudConsoleStreamRoute.tsx` now reads `?offeringId`
+-   **Feature:** `apps/play-xbox/src/app/routes/CloudConsoleStreamRoute.tsx` now reads `?offering.id`
     via `useSearchParams` and applies it with `setActiveOfferingId({ offeringId, shouldPersist: true })`
     in an effect before streaming. A ref-guard applies each distinct id once; absent param = no-op.
 ```

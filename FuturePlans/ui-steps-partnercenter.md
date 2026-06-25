@@ -19,7 +19,7 @@ Service legend: **xPlaytest** = `Xbox.Xbet.Service` · **CTIN** = `services.cont
 
 **Goal:** "Xplaytest portal has a link that can be shared to members of the playtest that lets them
 stream." After a streaming playtest is published & ready, show/copy the launch URL
-`https://play.xbox.com/play/launch/{productId}?offeringId=xpt{PlaytestProductId}`.
+`https://play.xbox.com/play/launch/{productId}?offering.id=xpt{PlaytestProductId}`.
 
 **Status:** not started. A non‑streaming `SharePlaytestModal` already exists.
 
