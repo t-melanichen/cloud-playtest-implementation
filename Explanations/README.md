@@ -14,6 +14,7 @@ Conceptual companion docs for the Instantly Shareable Playtest project: how xPla
 | [Future start dates and provisioning](./future-start-dates-and-provisioning.md) | Explains why future start dates do not require go-live trigger logic: provisioning starts before player-facing availability. |
 | [Expiration cap and storage](./expiration-cap-and-storage.md) | Explains the storage reason for the 30-day cap and why expiry changes are title metadata updates, not content re-ingests. |
 | [Handling Xbox vs PC differences](./handling-xbox-vs-pc-differences.md) | Actionable guide for implementing the known platform differences: expiration, dates, polling, future starts, and metadata updates. |
+| [XBET PR 15834601 — review responses](./xbet-15834601-review-responses.md) | Per-comment record for the PR 15834601 review: the fix (with commit) and a paste-ready reply for every active thread. |
 
 ## Relationship to the rest of the repo
 

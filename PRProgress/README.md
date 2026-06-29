@@ -35,15 +35,19 @@ so the on-disk file numbers are not strictly ascending in the table. Click a tit
 | 19 | 15965750 | PTNR-DATA | services.data.partnerregistry | Merged | [Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Test)](./20-PTNR-DATA-15965750-add-pc-playtest-sug-test.md) |
 | 20 | 15965763 | PTNR-DATA | services.data.partnerregistry | Merged | [Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Int)](./21-PTNR-DATA-15965763-add-pc-playtest-sug-int.md) |
 | 21 | 15966616 | DCFG | services.data.partnerregistry | Merged | [Update CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION — PC_PLAYTEST quota (Int)](./22-DCFG-15966616-contenttargets-pc-playtest-quota.md) |
+| 22 | 15996626 | CTIN | services.contentingestion | Active | [Accept bare-GUID audience for cross-tenant v1.0 tokens](./23-CTIN-15996626-crosstenant-audience-validation-fix.md) |
+| 23 | 15983599 | CTIN | services.contentingestion | Active | [Don't scope playtest resolution package search to the GA flight](./24-CTIN-15983599-resolution-no-ga-flight.md) |
+| 24 | 15946761 | GPM | Xbox.Gpx.PartnerCenter.Client | Draft | [Enable Playtest Cloud Streaming (Partner Center form toggle)](./25-GPM-15946761-enable-cloud-streaming-toggle.md) |
 
-**Totals:** 21 tracked PRs — **16 merged**, **3 active**, **2 draft**.
+**Totals:** 24 tracked PRs — **16 merged**, **5 active**, **3 draft**.
 
 **Status legend:** Merged = completed/merged · Active = open and in review · Draft = open draft.
 
 **Area legend:** PTNR = services.partnerregistry · PTNR-DATA = services.data.partnerregistry (offering / SUG-definition data) ·
 AUTH = services.auth · DEVAPI = services.devapi · CTIN = services.contentingestion ·
 SAGE = services.serviceapigateway · XBET = Xbox.Xbet.Service · XORC = xorc (Xbox.Services) ·
-CTGT = services.contenttargets · DCFG = services.data.partnerregistry (dynamic config — CONTENTTARGETS ServerSetsConfiguration).
+CTGT = services.contenttargets · DCFG = services.data.partnerregistry (dynamic config — CONTENTTARGETS ServerSetsConfiguration) ·
+GPM = Xbox.Gpx.PartnerCenter.Client (Partner Center creator UI) · JS = Xbox.JS (Bayside player client).
 
 ## Superseded / abandoned PRs
 
@@ -57,3 +61,4 @@ retained and linked. (Trivial throwaway PRs — `g`, `Remove Hyphen`, `Unused PR
 | 15733268 | XBET | Xbox.Xbet.Service | 2026-06-02 | *Add PlaytestIngestionJobParameters + StoreAsset contracts* — early hand-written local wire contracts; superseded by PR 15834601 (payload builder) and the move to consume the published GSSV contract (board task 62696974). |
 | 15737351 | SAGE | services.serviceapigateway | 2026-06-16 | *Register Playtest ingestion proxy routes* — first attempt at the SAGE proxy routes; superseded by PR 15829639 (the live routes PR, #09 above). |
 | 15946980 | CTGT | services.contenttargets | 2026-06-22 | *[Tests-only: PC playtest enable + quota moved to dynamic config](./18-CTGT-15946980-pc-playtest-install-on-attach.md)* — checked-in `appsettings` quota was reverted per Timi; superseded by the **dynamic-config** quota PR 15966616 (Int, #21 above). File retained for its 3 regression tests. |
+| 15946666 | JS | Xbox.JS | 2026-06-19 | *feat(play-xbox/game-stream): apply launch-link offeringId to the active offering* — Bayside "C1" wire that set the shared-link `offeringId=xpt{ProductId}` as the active offering before streaming (so a playtest link streams the private DNA-gated offering, not retail). Draft, later abandoned; the Bayside player-flow work is tracked in [`../FuturePlans/bayside-playxbox-playtest-modifications.md`](../FuturePlans/bayside-playxbox-playtest-modifications.md). |
