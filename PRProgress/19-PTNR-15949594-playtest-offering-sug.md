@@ -3,8 +3,8 @@
 - **Pull Request:** 15949594
 - **Repo:** services.partnerregistry (Xbox.Streaming)
 - **Source branch:** `t-melanichen/playtest-offering-sug` → `main`
-- **Status:** Active
-- **Opened:** 2026-06-19  |  **Closed:** —
+- **Status:** Merged
+- **Opened:** 2026-06-19  |  **Closed:** 2026-06-29
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.partnerregistry/pullrequest/15949594
 
 ## Summary

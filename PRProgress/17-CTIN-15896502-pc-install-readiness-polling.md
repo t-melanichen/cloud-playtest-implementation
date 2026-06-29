@@ -3,8 +3,8 @@
 - **Pull Request:** 15896502
 - **Repo:** services.contentingestion (Xbox.Streaming)
 - **Source branch:** `t-melanichen/playtest-pc-install-polling` → `main`
-- **Status:** Active
-- **Opened:** 2026-06-15  |  **Closed:** —
+- **Status:** Merged
+- **Opened:** 2026-06-15  |  **Closed:** 2026-06-29
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contentingestion/pullrequest/15896502
 
 ## Summary

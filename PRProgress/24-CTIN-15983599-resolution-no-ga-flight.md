@@ -3,8 +3,8 @@
 - **Pull Request:** 15983599
 - **Repo:** services.contentingestion (Xbox.Streaming)
 - **Source branch:** `t-melanichen/resolution-playtest-no-ga-flight` → `main`
-- **Status:** Active
-- **Opened:** 2026-06-24
+- **Status:** Merged
+- **Opened:** 2026-06-24  |  **Closed:** 2026-06-29
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contentingestion/pullrequest/15983599
 
 ## Summary

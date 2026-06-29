@@ -29,17 +29,17 @@ so the on-disk file numbers are not strictly ascending in the table. Click a tit
 | 13 | 15876080 | DEVAPI | services.devapi | Active | [Testing workflow ingestion (Playtest Title Ingestion UI/client)](./10-DEVAPI-15876080-testing-workflow-ingestion.md) |
 | 14 | 15892276 | PTNR | services.partnerregistry | Merged | [Set Xbox AuthenticationOptions on playtest offerings](./11-PTNR-15892276-playtest-offering-authentication-type.md) |
 | 15 | 15894506 | XORC | xorc | Merged | [Expose Xbox Live TitleId on the product Xbox Live config response](./16-XORC-15894506-expose-xbox-live-title-id.md) |
-| 16 | 15896502 | CTIN | services.contentingestion | Active | [Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow](./17-CTIN-15896502-pc-install-readiness-polling.md) |
+| 16 | 15896502 | CTIN | services.contentingestion | Merged | [Implement PC install-readiness polling in PlaytestTitleIngestionWorkflow](./17-CTIN-15896502-pc-install-readiness-polling.md) |
 | 17 | 15905881 | CTIN | services.contentingestion | Merged | [Gate playtest title ingestion endpoints with CrossTenantS2S policy](./12-CTIN-15905881-gate-playtest-ingestion-crosstenant-s2s.md) |
-| 18 | 15949594 | PTNR | services.partnerregistry | Active | [Set PC_PLAYTEST SUG on the playtest offering](./19-PTNR-15949594-playtest-offering-sug.md) |
+| 18 | 15949594 | PTNR | services.partnerregistry | Merged | [Set PC_PLAYTEST SUG on the playtest offering](./19-PTNR-15949594-playtest-offering-sug.md) |
 | 19 | 15965750 | PTNR-DATA | services.data.partnerregistry | Merged | [Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Test)](./20-PTNR-DATA-15965750-add-pc-playtest-sug-test.md) |
 | 20 | 15965763 | PTNR-DATA | services.data.partnerregistry | Merged | [Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Int)](./21-PTNR-DATA-15965763-add-pc-playtest-sug-int.md) |
 | 21 | 15966616 | DCFG | services.data.partnerregistry | Merged | [Update CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION — PC_PLAYTEST quota (Int)](./22-DCFG-15966616-contenttargets-pc-playtest-quota.md) |
 | 22 | 15996626 | CTIN | services.contentingestion | Active | [Accept bare-GUID audience for cross-tenant v1.0 tokens](./23-CTIN-15996626-crosstenant-audience-validation-fix.md) |
-| 23 | 15983599 | CTIN | services.contentingestion | Active | [Don't scope playtest resolution package search to the GA flight](./24-CTIN-15983599-resolution-no-ga-flight.md) |
+| 23 | 15983599 | CTIN | services.contentingestion | Merged | [Don't scope playtest resolution package search to the GA flight](./24-CTIN-15983599-resolution-no-ga-flight.md) |
 | 24 | 15946761 | GPM | Xbox.Gpx.PartnerCenter.Client | Draft | [Enable Playtest Cloud Streaming (Partner Center form toggle)](./25-GPM-15946761-enable-cloud-streaming-toggle.md) |
 
-**Totals:** 24 tracked PRs — **16 merged**, **5 active**, **3 draft**.
+**Totals:** 24 tracked PRs — **19 merged**, **2 active**, **3 draft**.
 
 **Status legend:** Merged = completed/merged · Active = open and in review · Draft = open draft.
 

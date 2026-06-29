@@ -18,3 +18,6 @@
 
 ## Owners
 Melanie Chen · Brian Bowman · Timi Bolaji · PC-server team (Nate).
+
+## ADO tracking
+**AB#62907370** — "[Playtest] Long-term region configuration and routing for streamable playtests" (Proposed), under the reactivated **[Intern] Stretch Goals** deliverable `62684196`. Filed from Brian's "what's the long term plan?" comment on PR 15949594.
