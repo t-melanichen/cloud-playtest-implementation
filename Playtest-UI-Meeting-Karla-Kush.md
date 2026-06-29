@@ -18,6 +18,13 @@ remaining internship time, and get design + PM decisions on the open UX question
 now largely merged; the remaining work is the **two UIs that bookend it** — the creator turning it on and sharing,
 and the tester clicking in and streaming.
 
+> **Forward-looking consideration (raise early):** eventually playtest builds may be **created programmatically** —
+> e.g. automated / nightly build pipelines calling the publish path directly to spin up a playtest — rather than a
+> creator clicking through Partner Center. If that becomes the primary path, creators may use **little of the
+> playtest creator UI**. That should shape how much we invest in the Partner Center side now vs. keeping the
+> create/publish path API-first, while the **tester-facing Bayside UI stays essential** either way (a human still
+> clicks the link and streams). Worth deciding which creator-UI pieces are truly P0 vs. "nice but bypassable."
+
 ---
 
 ## Partner Center (creator) — what I plan to change
@@ -65,6 +72,7 @@ Already merged: **C1** — the launch link's `offering.id` is read and set as th
 - Where does the **audience-restriction explanation** live in the creator form (inline helper text, tooltip, disabled-with-reason)?
 
 **For Kush (PM / scope):**
+- **Automation vs. UI:** since playtests may eventually be **created by automated build pipelines** (not the Partner Center UI), how much should we invest in the creator UI now vs. keeping the publish path API-first? Which creator-UI pieces are genuinely P0 vs. bypassable by automation? (The tester-facing Bayside UI stays essential regardless.)
 - **Priority call for the remaining time:** confirm P0 set = Partner Center #1 (share link) + #2 (audience) and Bayside #5 (denial) + #6 (metadata) + #8 (preparing). Agree what's explicitly out (install #7, launch-args #4).
 - **Stream-only for v1?** Defer the "install locally" branch (Garrison/Bastion) entirely?
 - **Feature-flag / private-preview gating (#9)** — who's on the allow-list for first testing, and is ECS the gating mechanism (David K owns it)?
