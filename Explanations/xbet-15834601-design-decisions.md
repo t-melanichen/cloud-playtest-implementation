@@ -36,8 +36,8 @@ stage when streaming was opted in.
 ### 1. Streaming is opt-in, decided in PlayTest (one place)
 - `PlaytestBusinessLogic.QueuePublishJobAsync` computes **`EnableStreaming`**. Today that's
   `IsStreamingEnabled(sellerId)` == the **pilot seller `65050620`** — a temporary gate so the full flow can
-  be exercised in prod scoped to one seller. (AB#62878234 replaces it with a persisted flag from the UX
-  checkbox; AB#62684638 ECS-allowlists who sees the checkbox.)
+  be exercised in prod scoped to one seller. (ADO#62878234 replaces it with a persisted flag from the UX
+  checkbox; ADO#62684638 ECS-allowlists who sees the checkbox.)
 - The Xbox Live title id is resolved from XORc via `IProductsBusinessLogic.GetXboxServicesConfigAsync`
   **only when `EnableStreaming` is true**. Download-only publishes never call XORc.
 - If a publish opts in but the product isn't Xbox-Live-configured, resolution **fails fast** with a
@@ -63,7 +63,7 @@ The job parameters carry `EnableStreaming` (bool) + `StreamingParameters` (null 
 ### 4. Validation moved into the synchronous rule pipeline
 Publish validations are `IPlaytestRule`s on the Publish trigger that return **structured errors**
 (surfaceable to the UI). The end-date-in-future check was **broadened from streaming-only to all
-playtests** as `PlaytestEndDateMustBeInFutureRule` (AB#62908755) — publishing an already-expired playtest
+playtests** as `PlaytestEndDateMustBeInFutureRule` (ADO#62908755) — publishing an already-expired playtest
 is now blocked for everyone. (The two async checks — GMS flight-id resolution and the XORc XBL-config
 lookup — don't fit the synchronous rule contract yet and stay in the publish path.)
 
@@ -97,13 +97,13 @@ This supersedes the earlier snapshot in [review responses](./xbet-15834601-revie
 
 | Item | Work |
 |---|---|
-| **AB#62878234** | Replace the pilot seller-id gate with a persisted `EnableStreaming` flag flowed from the publish request (UX streaming checkbox) through the ProductConfigurationFD / Playtest contracts + a new Playtest SQL column. |
-| **AB#62684638** | ECS allowlist controlling who sees the streaming checkbox; externalize the poll interval / max-wait alongside the gate. |
-| **AB#62893742** | Multiple market groups (distinct servicing content ids). |
-| **AB#62881046** | Real per-package `ApplicationId` (v1.1). |
-| **AB#62893743** | Derive `ServerPlatform` from the published package format (MSIXVC / XVC). |
-| **AB#62907370** | Region configuration / routing. |
-| **AB#62908755** | ✅ Done — end-date-in-future rule, broadened to all playtests. |
+| **ADO#62878234** | Replace the pilot seller-id gate with a persisted `EnableStreaming` flag flowed from the publish request (UX streaming checkbox) through the ProductConfigurationFD / Playtest contracts + a new Playtest SQL column. |
+| **ADO#62684638** | ECS allowlist controlling who sees the streaming checkbox; externalize the poll interval / max-wait alongside the gate. |
+| **ADO#62893742** | Multiple market groups (distinct servicing content ids). |
+| **ADO#62881046** | Real per-package `ApplicationId` (v1.1). |
+| **ADO#62893743** | Derive `ServerPlatform` from the published package format (MSIXVC / XVC). |
+| **ADO#62907370** | Region configuration / routing. |
+| **ADO#62908755** | ✅ Done — end-date-in-future rule, broadened to all playtests. |
 
 ## Related
 

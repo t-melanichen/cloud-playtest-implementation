@@ -1,9 +1,63 @@
 # Playtest UI meeting prep — Karla & Kush
 
-**Date:** TBD · **Attendees:** Melanie Chen, Karla (design/UX), David Kushmerick (Kush, PM) · **Owner:** @t-melanichen
+**Date:** 2026-06-30 (Design Brainstorm — Playtest UX) · **Attendees:** Melanie Chen, Karla (design/UX), David Kushmerick (Kush, PM) + Garrison/Bayside · **Owner:** @t-melanichen
 
 **Purpose:** Align on the playtest UI changes across the two front ends, agree on priority/scope for the
 remaining internship time, and get design + PM decisions on the open UX questions.
+
+> Source transcript: `Transcripts/Design Brainstorm - Playtest UX.docx` (local-only, git-ignored).
+
+---
+
+## Meeting conclusions (2026-06-30 Design Brainstorm)
+
+**The headline UX decision — how testers discover a playtest in their library:**
+
+- **A dedicated playtest *section* at the top of the library** — move the existing library content down
+  and surface playtests as their own section at the top. This is the agreed approach.
+- **NOT a library filter.** Library filtering was judged **too hard** to land in time, and — more
+  importantly — burying playtests behind a filter is a **poor discovery experience** (a tester would
+  have to know to go into filters to find the build they were invited to). Melanie pushed back on the
+  filter/pill idea for exactly this reason.
+- **NOT a separate "playtest" tab / left-nav element.** A dedicated left-nav was considered and
+  rejected ("not final", over-weighted for a pilot surface).
+- Net: *section within the library, not filters, not a tab.* A section-at-top was called "totally
+  acceptable" as the fallback once filtering was ruled out. See
+  [`FuturePlans/library-playtest-discovery.md`](./FuturePlans/library-playtest-discovery.md).
+
+**Platform differences (click-through behavior):**
+
+| Surface | Click a playtest in library → |
+|---------|-------------------------------|
+| **PC / web (Bayside)** | Goes to the **playtest details page**, then install / stream. |
+| **Console (Garrison)** | Opens a **flash card** — a pop-over pane (not a full separate view) that flips between **stats** on one side and **product metadata** on the other, with **Install** and **Play** buttons. A custom playtest flash card. |
+
+Differentiating the product **as a playtest** in the library (badge/pill) is important so testers know
+it's a non-public build.
+
+**Discovery mechanism (backend):**
+
+- Library hydration is **authenticated** (via X tokens) — when a tester populates their library, an
+  authenticated hydration call returns the playtest content they have access to.
+- **CAS decides** whether to return playtest content. The web client calls a specific CAS endpoint
+  (the equivalent of PC's "low amber 0 / high diamond 1"); **console needs a new CAS contract
+  endpoint** ("console normal" vs "console playtest"). **Must not break existing console test support.**
+- Because a playtest offering is "no different than any other offering," the library that sorts content
+  from configured offering groups gets playtest offerings largely for free.
+
+**Testing — new PC video graphics:** validate the end-to-end stream with the ATG PC **VideoTexture12**
+sample (an obvious moving image) via the Xbox Stream harness. See
+[`testing/pc-video-graphics-stream-test.md`](./testing/pc-video-graphics-stream-test.md).
+
+**E2E status & blockers:**
+
+- ✅ Streaming is "good to go" pending Anthony's review/merge; **PC polling merges soon**, then UX/ECS.
+- ⚠️ **Confirmed pilot gate:** "streaming is only enabled if it's my seller id" — e2e must run as the
+  pilot seller **65050620**.
+- 🔴 **E2E blocker — signed-out / cached playtest content leak:** signing out of Garrison and then
+  launching the deep link still showed the playtest content (believed cached) — "getting all sorts of
+  playtests I shouldn't be seeing." Violates the login-first / no-leak requirement (#5). See
+  [`Blockers/playtest-content-leak-signed-out.md`](./Blockers/playtest-content-leak-signed-out.md).
 
 ---
 

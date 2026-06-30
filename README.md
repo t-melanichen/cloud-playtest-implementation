@@ -82,7 +82,7 @@ Run them per the cadence in [`AGENTS.md`](./AGENTS.md). They require `az` login 
 ## Conventions
 
 - **Branches:** `t-melanichen/<topic>`.
-- **Work items:** referenced as `AB#<id>`; the project lives on the ADO **Juno** board
+- **Work items:** referenced as `ADO#<id>`; the project lives on the ADO **Juno** board
   (`microsoft/Xbox`, area path `Xbox\Developer\Juno`, scenario `62490517`). Cancel state is `Cut`.
 - **Local-only content:** `Connect/` (internship Connect docs) and `Transcripts/` (meeting recordings) are
   **git-ignored** — they contain personal/sensitive material and are kept locally, not pushed.
