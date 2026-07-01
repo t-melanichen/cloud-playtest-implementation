@@ -17,6 +17,16 @@
 4. CTIN selects the cross-tenant bearer scheme by JWT `aud`, validates the token against the Green tenant, checks the caller `appid` allowlist, starts `PlaytestTitleIngestionWorkflow`, and returns a workflow id.
 5. xPackage stores/polls workflow status until terminal, following the existing Start*/Poll* retry state-machine pattern in `XPackagePlaytestPublishWorkflow`.
 
+### Receiver scheduling semantics (confirmed 2026-06-30)
+
+CTIN's `PlaytestTitleIngestion` is **not** caller-id idempotent (unlike the Greenbelt blade-leasing service). `WorkflowsProcessor.ScheduleJobAsync` creates each job with a server-generated `Id.NewGuid()`; the caller does not supply the job id, and `PlaytestId` is used only as `GetLockId()` — a concurrency lock that blocks *simultaneous* duplicate workflows. Implications for the caller (B1–B3):
+
+- **Persist the returned workflow id and guard re-scheduling on it** (B3): a re-POST creates a *new* instance rather than returning the existing one, so without the guard a workflow re-entry after a failure/restart would orphan the first job.
+- **Do not retry POST at the HTTP layer** — only GET (status) is safe to retry; a POST retry can spin up a second workflow.
+- The returned `OperationStatus.Id` is always populated (the fresh GUID), so caller-side null-id handling is defensive only.
+
+Source: services.contentingestion `WorkflowsProcessor.cs` (`CreateRequest(Id.NewGuid(), …)`), `PlaytestTitleIngestionWorkflow.CreateRequest` (`… parameters.GetLockId()`), contracts `IIngestionParameters.GetLockId` ("prevent multiple concurrent workflows with the same parameters").
+
 ---
 
 ## Steps

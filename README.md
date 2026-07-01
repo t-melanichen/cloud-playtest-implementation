@@ -59,9 +59,9 @@ For a plain-English walkthrough of every PR in that chain, see
 
 ## Status snapshot
 
-- **PRs:** 24 tracked — **19 merged, 2 active, 3 draft** (see [`PRProgress/README.md`](./PRProgress/README.md) for the live ledger).
-- **Spine merged to `main`:** audience model, offering + title-id, the ingestion workflow, the PC server lane, the readiness poll, and the resolution fix.
-- **Remaining:** the SAGE send/poll loop, the Partner Center creator toggle, the Bayside launch surface, and the UI work tracked in [`FuturePlans/`](./FuturePlans/).
+- **PRs:** 25 tracked — **20 merged, 2 active, 3 draft** (see [`PRProgress/README.md`](./PRProgress/README.md) for the live ledger).
+- **Spine merged to `main`:** audience model, offering + title-id, the ingestion workflow, the PC server lane, the readiness poll, the resolution fix, and the **xPlaytest → SAGE streaming send/poll loop** (PR 15834601).
+- **Remaining:** the Partner Center creator toggle, the Bayside launch surface, and the UI work tracked in [`FuturePlans/`](./FuturePlans/). E2E is gated on external blockers — see [`FuturePlans/xbet-15834601-rubber-duck-followups.md`](./FuturePlans/xbet-15834601-rubber-duck-followups.md) and the pre-E2E checklist in [`PC-Polling-Status.md`](./PC-Polling-Status.md).
 
 ---
 

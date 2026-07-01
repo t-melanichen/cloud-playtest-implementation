@@ -1,0 +1,25 @@
+{
+  "PlaytestId": "p2-test-0953be56e9924998b8eb662faf34baf7",
+  "PartnerId": "MICROSOFT",
+  "PlaytestProductId": "2SDT4X91KMWM",
+  "StoreAsset": {
+    "StoreEntry": {
+      "ProductId": "2SDT4X91KMWM",
+      "Flags": "GAME",
+      "Name": "Xbox Stream Test",
+      "Description": "A private streaming playtest build for PC install-readiness polling test.",
+      "PublisherId": "65050620",
+      "ParentProductIds": [],
+      "IsPrivateAudience": true
+    },
+    "Markets": ["US"],
+    "Platform": "PC",
+    "ContentId": "058b81f9-eefb-4984-982b-4b6fbb761f7c",
+    "XboxTitleId": "2053707080",
+    "PackageFamilyName": "946B6A6E.NINJAGAIDEN2Black_dkffhzhmh6pmy",
+    "AumID": "946B6A6E.NINJAGAIDEN2Black_dkffhzhmh6pmy!App"
+  },
+  "AllowedDnaGroups": ["4611686019004512103"],
+  "ExpirationTime": "2026-07-07T00:00:00Z",
+  "AllowedSandboxId": "RETAIL"
+}
