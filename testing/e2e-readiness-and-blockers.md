@@ -12,7 +12,13 @@ Consolidated from a deep end-to-end review (2026-07-01) after PR 15834601 (xPlay
 
 ## CRITICAL blockers (block E2E)
 
-1. **Cross-tenant S2S (Green→Corp).** Verify SAGE route + CTIN `CrossTenantS2S` gate + CTIN bare-GUID audience fix (15996626) are merged **and CI/CD-deployed** in the target env; decode the token and confirm `aud == <bare CTIN Green app id>` and `appid` is allow-listed. Refs: `Blockers/cross-tenant-s2s.md`, `FuturePlans/s2s-cross-tenant-call.md`, `PRProgress/23-CTIN-15996626-*`.
+> **Live merge-status check (2026-07-01):** Two E2E-critical PRs are **still Active (not merged to `main`)**:
+> - **SAGE routes `15829639`** (`services.serviceapigateway`) — the xPackage→CTIN proxy path does not exist in `main` yet.
+> - **CTIN bare-GUID audience fix `15996626`** (`services.contentingestion`) — the 401 audience fix is not in `main` yet (it *was* manually deployed to **Test** earlier and confirmed resolving the 401, but it's unmerged, so Int/Prod don't have it and Test is non-permanent).
+>
+> Everything else on the path is merged: CTIN CrossTenantS2S gate `15905881`, CTIN workflow `15800964`, CTIN PC-polling `15896502`, CTIN resolution `15983599`, XORc title-id `15894506` (merged to `develop`), partner-registry SUG `15949594`, data.partnerregistry SUG defs + quota `15965750`/`15965763`/`15966616`. Content-targets `15946980` abandoned (superseded by dynamic-config `15966616`). **Merged ≠ deployed** — still verify the CI/CD rollout to the target env.
+
+1. **Cross-tenant S2S + SAGE route (the gating pair above).** Get SAGE `15829639` and CTIN `15996626` **merged and CI/CD-deployed** in the target env, then decode the token and confirm `aud == <bare CTIN Green app id>` and `appid` is allow-listed. Refs: `Blockers/cross-tenant-s2s.md`, `FuturePlans/s2s-cross-tenant-call.md`, `PRProgress/23-CTIN-15996626-*`.
 2. **Signed-out / cached content leak.** Signed-out Garrison deep link still showed playtest content. Must fix server-side no-leak + cache scoping + login-first gate before any pilot share-link test. Refs: `Blockers/playtest-content-leak-signed-out.md`, `Playtest-UI-Meeting-Karla-Kush.md`.
 3. **PC readiness polls before offering attach is live.** CTIN can start the PC Orchestrator poll before the Partner Registry offering PR is merged/propagated → no install triggered, 6h timeout vs ~48h approval. Gate polling on offering merge/propagation, or split "approval wait" from "server install wait." Refs: `PC-Polling-Status.md` (B5b), `FuturePlans/pc-install-readiness-polling-implementation.md`.
 

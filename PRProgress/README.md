@@ -22,8 +22,8 @@ so the on-disk file numbers are not strictly ascending in the table. Click a tit
 | 06 | 15800964 | CTIN | services.contentingestion | Merged | [Playtest Title Ingestion Workflow](./05-CTIN-15800964-playtest-title-ingestion-workflow.md) |
 | 07 | 15815668 | PTNR | services.partnerregistry | Merged | [Configure playtest offering regions and id naming](./14-PTNR-15815668-configure-offering-regions-id-naming.md) |
 | 08 | 15821813 | PTNR | services.partnerregistry | Merged | [Centralize playtest offering id on PlaytestRequest.GetOfferingId](./15-PTNR-15821813-centralize-offering-id-on-request.md) |
-| 09 | 15829639 | SAGE | services.serviceapigateway | Draft | [Register Playtest ingestion proxy routes for services.contentingestion](./06-SAGE-15829639-register-playtest-ingestion-routes.md) |
-| 10 | 15834601 | XBET | Xbox.Xbet.Service | Draft | [Playtest Ingestion Payload Builder](./07-XBET-15834601-playtest-ingestion-payload-builder.md) |
+| 09 | 15829639 | SAGE | services.serviceapigateway | Active | [Register Playtest ingestion proxy routes for services.contentingestion](./06-SAGE-15829639-register-playtest-ingestion-routes.md) |
+| 10 | 15834601 | XBET | Xbox.Xbet.Service | Merged | [Playtest Ingestion Payload Builder](./07-XBET-15834601-playtest-ingestion-payload-builder.md) |
 | 11 | 15849944 | PTNR | services.partnerregistry | Merged | [Remove GetPackageSourceId from Playtest contract](./08-PTNR-15849944-remove-getpackagesourceid.md) |
 | 12 | 15860243 | PTNR | services.partnerregistry | Merged | [Refactor playtest title ID](./09-PTNR-15860243-refactor-playtest-title-id.md) |
 | 13 | 15876080 | DEVAPI | services.devapi | Active | [Testing workflow ingestion (Playtest Title Ingestion UI/client)](./10-DEVAPI-15876080-testing-workflow-ingestion.md) |
@@ -39,7 +39,7 @@ so the on-disk file numbers are not strictly ascending in the table. Click a tit
 | 23 | 15983599 | CTIN | services.contentingestion | Merged | [Don't scope playtest resolution package search to the GA flight](./24-CTIN-15983599-resolution-no-ga-flight.md) |
 | 24 | 15946761 | GPM | Xbox.Gpx.PartnerCenter.Client | Draft | [Enable Playtest Cloud Streaming (Partner Center form toggle)](./25-GPM-15946761-enable-cloud-streaming-toggle.md) |
 
-**Totals:** 24 tracked PRs — **19 merged**, **2 active**, **3 draft**.
+**Totals (live-verified 2026-07-01):** 24 tracked PRs — **20 merged**, **2 active** (SAGE 15829639, CTIN 15996626), **2 draft** (GPM 15946761, DEVAPI 15876080 now active). **E2E-critical PRs still open:** SAGE routes 15829639 and CTIN bare-GUID audience fix 15996626 — see [`../testing/e2e-readiness-and-blockers.md`](../testing/e2e-readiness-and-blockers.md).
 
 **Status legend:** Merged = completed/merged · Active = open and in review · Draft = open draft.
 
