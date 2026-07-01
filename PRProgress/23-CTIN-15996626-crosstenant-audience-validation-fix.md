@@ -3,8 +3,8 @@
 - **Pull Request:** 15996626
 - **Repo:** services.contentingestion (Xbox.Streaming)
 - **Source branch:** `t-melanichen/fix-crosstenant-audience-validation` → `main`
-- **Status:** Active
-- **Opened:** 2026-06-24
+- **Status:** Merged
+- **Opened:** 2026-06-24  |  **Closed:** 2026-07-01  |  **Merge commit:** a16f6f325e
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.contentingestion/pullrequest/15996626
 
 ## Summary

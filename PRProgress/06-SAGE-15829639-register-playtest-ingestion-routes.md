@@ -3,8 +3,8 @@
 - **Pull Request:** 15829639
 - **Repo:** services.serviceapigateway (Xbox.Streaming)
 - **Source branch:** `t-melanichen/sage-playtest-ingestion-routes` → `main`
-- **Status:** Draft
-- **Opened:** 2026-06-09  |  **Closed:** —
+- **Status:** Merged
+- **Opened:** 2026-06-09  |  **Closed:** 2026-07-01  |  **Merge commit:** d4b0808a42
 - **Link:** https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.serviceapigateway/pullrequest/15829639
 
 ## Summary
