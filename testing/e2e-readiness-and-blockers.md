@@ -6,6 +6,8 @@ Consolidated from a deep end-to-end review (2026-07-01) after PR 15834601 (xPlay
 
 **The merged XBET backend path is correctly wired, but the full E2E is not yet reliably runnable** — the remaining blockers are **external** (deploy/auth/env/UI), not in the merged payload-builder/workflow code.
 
+> **PROD deployment update (2026-07-02 ~10:00 PT):** first real prod publishes surfaced a `400 → PlaytestUnknown`. Root cause = the **streaming title-id gate** throwing because **prod XORc didn't expose the TitleId** (PR 15894506 was only in `develop`/devnet; XORc needs a *separate* prod deploy — Anthony queued it 2026-07-02). Remaining prod gate: **SAGE prod Ring 1 is stuck at a gated checkpoint** (route not live in any prod region yet); **CTIN prod Ring 1 is done** (Ring 2 rolling). Publishing from **prod Partner Center** hits the **Production** Xbet env → **prod** SAGE/CTIN + prod app ids (not test). See `Documentation/xbet-15834601-spec-deltas.md` → "Deployment & operational learnings".
+
 **Critical path:** pilot seller gate → PlayTest publish → XORc title-id resolution → XBET workflow schedules SAGE ingestion → CTIN `PlaytestTitleIngestionWorkflow` → asset ingestion / configure offering → PC install-readiness poll → readiness/status → launch link → Bayside stream.
 
 **Single most likely first break:** **xPackage → SAGE → CTIN cross-tenant auth/route** — if the SAGE route and the CTIN bare-GUID audience fix (PR 15996626) aren't merged **and deployed** in the target env, the POST 401s before ingestion starts.
