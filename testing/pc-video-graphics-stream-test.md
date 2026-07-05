@@ -39,6 +39,69 @@ Use the Microsoft **ATG (Advanced Technology Group) PC sample "video texture"** 
 Configuring a playtest → publishing (PlayTest → XORc title-id resolution → workflow → SAGE ingestion) →
 launching the deep link → **seeing the spinning/bouncing video render** over the cloud stream end to end.
 
+## Build & packaging log — DONE (2026-07-05)
+
+The plan above was executed: the ATG VideoTexture sample was built and packaged into an
+xCloud-ingestible **MSIXVC** (a **test** package with placeholder identity — see "Next steps").
+
+### Exact sample
+`microsoft/Xbox-ATG-Samples` → **`PCSamples/Graphics/VideoTexturePC12`** (`VideoTexturePC12.sln`).
+Plain Win32 **DirectX 12** app; uses Media Foundation (`MediaEnginePlayer`) to play
+`Media/Videos/SampleVideo.mp4` onto a texture. It is **not** a GDK project — it builds to a plain `.exe`.
+
+### Machine / environment (verified 2026-07-05)
+- Visual Studio **Community 2026 (18.6.3)**, MSVC 14.44 (`v143`) / 14.51 (`v145`), Windows SDK **10.0.26100**.
+- **Microsoft GDK not installed** and the account is **not local admin** → used a **BWOI** extract of the GDK.
+- ⚠️ Machine has **`NoDefaultCurrentDirectoryInExePath`** set: cmd will not run a `.cmd`/`.bat` by bare name from
+  the current dir — invoke via explicit `.\name.cmd`. This otherwise breaks DirectXTK's shader pre-build step.
+
+### Build
+Clone out of OneDrive, retarget the old `v141`/SDK-`19041` project to `v143`/`10.0.26100`, and (because of the
+lockdown above) pre-compile DirectXTK's shaders with an explicit `.\` path — all inside `vcvars64`:
+```bat
+cd C:\Users\t-melanichen\source
+git clone --depth 1 https://github.com/microsoft/Xbox-ATG-Samples.git
+call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"
+cd /d C:\Users\t-melanichen\source\Xbox-ATG-Samples\Kits\DirectXTK12\Src\Shaders
+call ".\CompileShaders.cmd"
+cd /d C:\Users\t-melanichen\source\Xbox-ATG-Samples\PCSamples\Graphics\VideoTexturePC12
+msbuild VideoTexturePC12.sln /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143 /p:WindowsTargetPlatformVersion=10.0.26100.0
+```
+Ready-to-run helper: `C:\Users\t-melanichen\source\_build_vt.bat`.
+**Output:** `...\PCSamples\Graphics\VideoTexturePC12\x64\Release\VideoTexturePC12.exe` (x64).
+
+### Package into an MSIXVC (Gaming.Desktop)
+1. **BWOI-extract the GDK** (no admin) — public GDK **April 2026 Update 2 (v2604.2.7849)** from
+   `github.com/microsoft/GDK` releases; then
+   `msiexec /a "<Installers>\Microsoft GRDK x86 Common-x86_en-us.msi" /qn TARGETDIR=<dir>` (+ GDK Common,
+   PC Development). → `makepkg.exe` under `<dir>\Microsoft GDK\bin\`.
+2. **Layout** (`...\_gdk\layout\`): the `.exe`, `Media\Videos\SampleVideo.mp4`, `Media\Fonts\*.spritefont`,
+   placeholder logos, and `MicrosoftGame.config`.
+3. **`MicrosoftGame.config`** essentials: `<Identity>`, `<ExecutableList><Executable Name="VideoTexturePC12.exe"/>`,
+   `<ShellVisuals StoreLogo/Square150x150Logo/Square44x44Logo/SplashScreenImage>`, and
+   `<DesktopRegistration><DependencyList><KnownDependency Name="VC14"/></DependencyList></DesktopRegistration>`
+   (required — the Win32 exe depends on the VC++ runtime).
+4. **Pack for PC:**
+   ```bat
+   set GameDKLatest=<dir>\Microsoft GDK\260402\
+   set GRDKLatest=<dir>\Microsoft GDK\260402\windows\
+   makepkg genmap /f chunks.xml /d layout
+   makepkg pack   /f chunks.xml /d layout /pd out /pc
+   ```
+   Validator gotchas fixed: **StoreLogo must be 100×100** (not 50×50); binary needs the **`VC14`** KnownDependency.
+**Output (all Submission Validator checks SUCCEEDED):**
+`C:\Users\t-melanichen\source\_gdk\out\MelanieATG.VideoTexturePC12_1.0.0.0_x64__qfz1z4rvaj27y.msixvc` (~10 MB).
+
+### Next steps (to make it a real ingest, not just a test package)
+- Replace the placeholder **identity** (`MelanieATG.VideoTexturePC12` / `CN=MelanieATGTest`) and the "VT"
+  placeholder **logos** with real assets, and re-pack with a real **ProductId**:
+  `makepkg pack ... /pc /productid <id>` (current `ProductId` is all-zeros). Confirm identity/StoreId with Brian.
+- To *see* it render (spinning video quad), run the `.exe` on a machine with a GPU/display; iterate on visuals
+  (multiple shapes/spheres) from there.
+- Ingest via the usual PC playtest flow (X1 test publisher, pilot seller `65050620`, PC install-readiness polling).
+- **Upload → ingest runbook:** [`videotexture-upload-and-ingest-runbook.md`](./videotexture-upload-and-ingest-runbook.md)
+  — step-by-step to get this package onto a PC server via **xPackage → DevApi → CTIN**.
+
 ## References
 
 - `Transcripts/Design Brainstorm - Playtest UX.docx` (local-only) — the testing discussion.

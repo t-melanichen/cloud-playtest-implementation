@@ -1,0 +1,25 @@
+{
+  "PlaytestId": "p2-test-REPLACE-WITH-NEW-GUID-PER-RUN",
+  "PartnerId": "MICROSOFT",
+  "PlaytestProductId": "2SDT4X91KMWM",
+  "StoreAsset": {
+    "StoreEntry": {
+      "ProductId": "2SDT4X91KMWM",
+      "Flags": "GAME",
+      "Name": "Xbox Stream Test",
+      "Description": "VideoTexture DX12 PC build used as streaming playtest test content.",
+      "PublisherId": "65050620",
+      "ParentProductIds": [],
+      "IsPrivateAudience": true
+    },
+    "Markets": ["US"],
+    "Platform": "PC",
+    "ContentId": "REPLACE-WITH-CONTENTID-FROM-XPACKAGE-UPLOAD",
+    "XboxTitleId": "2053707080",
+    "PackageFamilyName": "MelanieATG.VideoTexturePC12_qfz1z4rvaj27y",
+    "AumID": "MelanieATG.VideoTexturePC12_qfz1z4rvaj27y!Game"
+  },
+  "AllowedDnaGroups": ["4611686019004512103"],
+  "ExpirationTime": "2026-07-19T00:00:00Z",
+  "AllowedSandboxId": "RETAIL"
+}
