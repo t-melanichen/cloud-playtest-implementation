@@ -10,11 +10,17 @@ This is the xCloud-side ingest test only (not the full Partner Center publish pa
 hand-crafted `StoreAsset` straight at CTIN.
 
 ## The package under test
-- MSIXVC: `C:\Users\t-melanichen\source\_gdk\out\MelanieATG.VideoTexturePC12_1.0.0.0_x64__qfz1z4rvaj27y.msixvc`
-- Identity `Name` = `MelanieATG.VideoTexturePC12`, `Publisher` = `CN=MelanieATGTest`, `Version` 1.0.0.0, x64
-- **PackageFamilyName** = `MelanieATG.VideoTexturePC12_qfz1z4rvaj27y`
-- **AumID** = `MelanieATG.VideoTexturePC12_qfz1z4rvaj27y!Game`  (ApplicationId `Game`)
-- makepkg ContentId = `D1172C85-8FD3-6502-29B8-CE5BF4FDD367` (store may assign its own on upload — see Phase 1)
+- MSIXVC: `C:\Users\t-melanichen\source\_gdk\out\xCloudTestPublishing.XboxStreamTestHarness_1.0.0.0_x64__fht854sfanw4j.msixvc`
+- Built from the **"Mel is awesome" + looping** VideoTexturePC12 build; packed with the **real reserved identity**
+  for product **9NPMGXTRGW9H** so Partner Center accepts the upload.
+- Identity `Name` = `xCloudTestPublishing.XboxStreamTestHarness`,
+  `Publisher` = `CN=FDCD61E8-89F8-47C8-8746-47AB9A80436B`, `StoreId` = `9NPMGXTRGW9H`, Version 1.0.0.0, x64
+  (verified: this Publisher hashes to the product PFN suffix `fht854sfanw4j`).
+- **PackageFamilyName** = `xCloudTestPublishing.XboxStreamTestHarness_fht854sfanw4j`
+- **AumID** = `xCloudTestPublishing.XboxStreamTestHarness_fht854sfanw4j!Game`  (ApplicationId `Game`)
+- **Partner Center upload files** (in `out\`): **Package file** = the `.msixvc`; **EKB file** = the `..._Full_*.ekb`;
+  **Submission Validator file** (optional) = `Validator_*.xml`; Symbol/Disc-layout = skip.
+- makepkg ContentId = `D1172C85-8FD3-6502-29B8-CE5BF4FDD367` (store assigns its own on upload — capture it in Phase 1).
 
 ## Checklist
 - [ ] 0. Confirm the PC lane is set up in the target env (SUG + quota + offering) — pick **Int** first

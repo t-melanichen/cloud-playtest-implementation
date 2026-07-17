@@ -6,7 +6,7 @@
 
 **Clone used:** `C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\xorc-1` (active clone).  
 **Branch:** `t-melanichen/playtest-xbox-live-title-id` / `playtest-xbox-live-title-id`.  
-**Base found:** `origin/master`; merge-base `f1a12792ee83c4a98c800cab2209797c179c3bd0`.  
+**Base found:** `origin/master` (diff-analysis base only); merge-base `f1a12792ee83c4a98c800cab2209797c179c3bd0`. **PR 15894506 merged to `develop`** (xorc integrates `develop` → `master`), not to `master`.  
 **Pushed/local:** branch is pushed and local is even with `origin/t-melanichen/playtest-xbox-live-title-id` (`rev-list --left-right --count` = `0 0`).  
 **PRProgress:** no `PRProgress` file found in `xorc-1`; treat as branch-only/draft.
 
@@ -16,6 +16,13 @@
 - Populated response `TitleId` in `ProductXboxLiveConfigurationHandler` from `product.TitleId`, returning `null` when the stored value is `0`.
 - Kept existing Xbox Live config fields (`XboxLiveEmbargoDate`, `EmbargoInvitesEnabled`) sourced from SCID/XCon service config.
 - Follow-up commits adjusted comments and removed an unnecessary cast/nit.
+- **Test-coverage follow-up — PR 16158158 (Active; Task 63048045).** After PR 15894506 merged, Brian Trevethan
+  flagged (on the `develop` → `master` PR 16061059) that the handler tests never exercised the populated
+  `titleConfig` branch: `GetXboxLiveTitleConfigAsync` is an extension method over `GetScidDocumentsAsync`, so the
+  loose mock always yielded the null path. Branch `t-melanichen/add-populated-titleconfig-coverage` stubs
+  `GetScidDocumentsAsync` with a productdeveloper document to cover the populated embargo branch and strengthens
+  the null-path assertions. See
+  [`../PRProgress/37-XORC-16158158-populated-titleconfig-coverage.md`](../PRProgress/37-XORC-16158158-populated-titleconfig-coverage.md).
 
 ### Other changes present on this branch vs merge-base
 
@@ -26,8 +33,8 @@ The branch diff also includes two broader merged changes that are present in the
 
 ### Key files
 
-- `Contracts/Web/XboxLiveTitleConfig.cs` — adds nullable `uint? TitleId` JSON response field.
-- `Service/Handlers/ProductXboxLiveConfigurationHandler.cs` — sets `TitleId = product.TitleId != 0 ? unchecked((uint)product.TitleId) : null` in the response.
+- `Contracts/Web/XboxLiveTitleConfig.cs` — adds nullable `int? TitleId` JSON response field (the **raw signed** stored value; `DefaultValueHandling.Ignore` omits it when `null`).
+- `Service/Handlers/ProductXboxLiveConfigurationHandler.cs` — sets `TitleId = product.TitleId != 0 ? product.TitleId : default(int?)` in the response (**no unsigned cast** — the raw signed int is returned as-is).
 - `Documentation/AiPlans/PlaytestPgManagerTool.md` — added by the carried merged PR.
 
 ### Commits
@@ -72,7 +79,7 @@ From `Blockers\xbox-live-title-id.md` in `cloud-playtest-implementation`:
 - Active repo: `C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\xorc-1`
 - Other clone checked: `C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\xorc`
 - Branch: `t-melanichen/playtest-xbox-live-title-id`
-- Base: `origin/master`
+- Base: `origin/master` (diff-analysis base; the PR itself merged to `develop`)
 - Merge-base: `f1a12792ee83c4a98c800cab2209797c179c3bd0`
 - Primary driver doc: `C:\Users\t-melanichen\OneDrive - Microsoft\Desktop\cloud-playtest-implementation\Blockers\xbox-live-title-id.md`
 - Context: Playtest needs `StoreAsset.XboxTitleId`; resolution path is **Playtest → XORc service-config API → Xbox Live service config sourced from XCon**.

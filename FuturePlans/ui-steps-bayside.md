@@ -62,28 +62,44 @@ title/art/metadata. Eligible member proceeds.
 
 ---
 
-## #6 — Playtest title/genre/art metadata display  ·  P0  ·  🟢 (FE) / 🟡 if CAS work needed
+## #6 — Playtest title/genre/art metadata display  ·  P0  ·  🟢 (FE) — CAS shipped; gated on the xToken playtest claim
 
 **Goal:** "testers know this is a non-public version…as much metadata as possible (title, genre, art)
 …is available to be seen."
 
 ### Frontend (`Xbox.JS`)
-1. Validate `play.queries.titleInfo` + catalog resolve name/art for the **private** playtest product
-   under the active offering (art at `GameStreamPage.tsx:83-105`).
-2. If catalog can't serve a private product, add a playtest-aware metadata fallback (the page already
-   supports a local fallback — `ProductDetailPage.tsx:68-87`).
-3. Optional "preview / non-public build" badge so testers know it's a playtest.
+1. Surface the playtest title/art/genre from **CAS hydration** (see backend), keyed to the active
+   playtest offering, on the tile and the PDP.
+2. When metadata is not yet available, render a playtest-aware placeholder (the library "My playtests"
+   tab already does this — a beaker placeholder tile captioned with the product id).
+3. **Playtest badge** — a white beaker on a pink box, lower-left, overlaying the tile art (and beside
+   the title on the PDP), so testers know it is a non-public build. Design: Chris / design team;
+   reference `Documentation\playtest-badge-beaker.png`.
 
 ### Backend (per service)
-- **CAS / Catalog / Hydration**: per intern-doc OUTCOME #2, a relationship/endpoint must support
-  **private offering / playtest content metadata**. The generated playtest product is a real (private)
-  XProduct entry, so catalog *should* resolve — **validate**; if not, CAS work is required (this is the
-  larger backend unknown).
+- **CAS / Catalog / Hydration** — *CAS shipped this (≈2026-07); no CAS service work remains.* A private
+  playtest product is **never** in the retail Display Catalog ("big cat"); its title/art/genre come from
+  **CAS (Content Access Service) hydration**. CAS made Playtest a **standard access type** and now
+  returns playtest data whenever it sees a **new xToken _playtest user claim_** (created by the playtest
+  team) in the caller's token — gating that matches #5 no-leak. CAS has **no client-specific
+  endpoints/contracts**; the client just consumes the shared hydration proto.
+  **Client action (Bayside):** (1) get the caller's **xToken to carry the playtest claim** — owner
+  **Anthony Keller** (playtest lead); (2) **snag the new contract proto** into
+  `packages/@xbox-js/-service-sdk/catalog/src/hydration/baysideTypes.ts` if CAS added fields (today it
+  vends `BaysideLowTopaz0` = the "Topaz 0" contract, which **already** carries `title`, `KeyArt` (art)
+  and `Categories` (genre)). **Bayside is already wired:** the PDP hydrates via `CatalogSystem`
+  (`packages/@play-xbox/-system/catalog/src/CatalogSystem.ts`), which already special-cases private
+  offerings (skeleton-from-title-info fallback + `augment*ForPrivateOffering`). So once the token carries
+  the claim, the existing PDP should render the metadata with little/no new FE code.
 - **xPlaytest / XProduct**: ensures the product entry (name/art/genre) exists for the playtest.
 
 ### Dependencies
-- Open question: does retail catalog serve metadata for a private playtest product? (W3 in the bayside
-  plan.) Determines 🟢 vs 🟡/🔴.
+- **Resolved (6/30 Design Brainstorm; confirmed 2026-07-02 CAS thread):** metadata does **not** come
+  from big cat — it comes from CAS hydration, which CAS has now **shipped**, gated on the xToken
+  playtest claim (see `Explanations\transcript-decisions.md` → "CAS shipped playtest hydration").
+- **Owners to enlist:** **Anthony Keller** (playtest lead — how to get the xToken _playtest claim_
+  minted for test users + gotchas). CAS itself needs **no service work**; **Oscar** / the **CAS team**
+  (Juno-side relationship) remain useful context only.
 
 ### Acceptance
 Eligible tester sees correct title, art (and genre if available) for the private build before/while

@@ -152,6 +152,16 @@ belongs in ConfigSection `CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION`, as:
 test SUGs such as `PC_TAKEHOME` already have working quotas in dynamic config without an obvious per-SUG
 `IncludePredictions` override, so non-prod may already have predictions enabled through another path.
 
+> **✅ RESOLVED (2026-07-08) — the override IS required, and prod is now enabled.** Without it, content-targets never
+> computes a predicted target for the SUG, so nothing installs → `ContentOffline`/`NOMATCHINGSERVER`. Timi applied it in
+> **prod** via [PR 16114214](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.data.partnerregistry/pullrequest/16114214),
+> **inverting** the shape above because `ConfigItem.Override` allows only one override and XBOX already held it:
+> `IncludePredictions.DefaultValue = true` + a single PC override setting `Value: false` for a **deny-list of internal PC
+> test SUGs** that excludes `PC_PLAYTEST` (so it stays true). This is also why the existing PC test SUGs work "without an
+> obvious override" — they inherit the default. The content-distribution twin `IncludePredictedTargets` had to be enabled
+> too ([PR 16114118](https://dev.azure.com/microsoft/Xbox.Streaming/_git/services.data.partnerregistry/pullrequest/16114118)).
+> Full chain: [`../Explanations/pc-playtest-streaming-allocation-e2e.md`](../Explanations/pc-playtest-streaming-allocation-e2e.md).
+
 ### PR‑B · `services.partnerregistry` · PR #15949594
 **Plain English:** "Put the playtest game's listing **on the `PC_PLAYTEST` lane**, so content-targets knows where to send it."
 
@@ -331,6 +341,8 @@ A review of all three PRs raised these; each is resolved or flagged:
    `CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION` for the chosen SKU / `WESTUS2`. Open: does Int/Test also need
    `CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION` `IncludePredictions.Override` for `PC_PLAYTEST`, or are PC predictions
    already enabled for existing non-prod PC SUGs?
+   > **✅ RESOLVED (2026-07-08):** the quota (16103771) **and** the predictions enable are both required and now live in
+   > prod. Predictions enabled via `IncludePredictions` (16114214) + `IncludePredictedTargets` (16114118).
 4. **Server type** — `STANDARD_NC64AS_T4_V3` is a hardcoded placeholder (a `const` with a "resolve dynamically" TODO,
    and validation only checks it is non‑empty). The existing non‑prod content-targets fleet uses a *different* T4 SKU
    (`STANDARD_NC8AS_T4_V3`), so this needs confirming. Is `STANDARD_NC64AS_T4_V3` the right SKU, and should we config‑drive it?
@@ -340,6 +352,10 @@ A review of all three PRs raised these; each is resolved or flagged:
    `PC_PLAYTEST` lane? If not, the Test config is a harmless no‑op until that infra exists.
 6. **Production** — the enable mechanism currently allows only one override, already used by Xbox; production needs that
    extended (and a different region, `NorthCentralUs`).
+   > **✅ RESOLVED (2026-07-08):** correct prediction — the single-override limit was the real prod snag. Rather than
+   > extending `Override` to a list, Timi **inverted** to `DefaultValue: true` + a PC deny-list that excludes
+   > `PC_PLAYTEST`, enabling both XBOX and PC_PLAYTEST through one override (PR 16114214). Region for playtest is
+   > `WESTUS2` (the prod `PC_MAIN` pool is WESTUS2-only), not `NorthCentralUs`.
 7. **Resolution business logic for playtests (needs Jack walkthrough).** PR‑C review: *"Resolution code needs some special business
    logic for playtests."* Schedule the walkthrough. Concrete questions to bring: does the resolver mark a just‑ingested
    playtest version `IsCurrent` (`AvailableFrom == null`) immediately under the playtest's flights + sandbox? Can multiple

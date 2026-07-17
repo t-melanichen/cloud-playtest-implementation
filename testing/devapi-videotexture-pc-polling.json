@@ -16,8 +16,8 @@
     "Platform": "PC",
     "ContentId": "REPLACE-WITH-CONTENTID-FROM-XPACKAGE-UPLOAD",
     "XboxTitleId": "2053707080",
-    "PackageFamilyName": "MelanieATG.VideoTexturePC12_qfz1z4rvaj27y",
-    "AumID": "MelanieATG.VideoTexturePC12_qfz1z4rvaj27y!Game"
+    "PackageFamilyName": "xCloudTestPublishing.XboxStreamTestHarness_fht854sfanw4j",
+    "AumID": "xCloudTestPublishing.XboxStreamTestHarness_fht854sfanw4j!Game"
   },
   "AllowedDnaGroups": ["4611686019004512103"],
   "ExpirationTime": "2026-07-19T00:00:00Z",

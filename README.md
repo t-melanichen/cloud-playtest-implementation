@@ -59,9 +59,10 @@ For a plain-English walkthrough of every PR in that chain, see
 
 ## Status snapshot
 
-- **PRs:** 25 tracked — **20 merged, 2 active, 3 draft** (see [`PRProgress/README.md`](./PRProgress/README.md) for the live ledger).
+- **PRs:** 35 tracked — **31 merged, 3 active, 1 draft** (see [`PRProgress/README.md`](./PRProgress/README.md) for the live ledger).
 - **Spine merged to `main`:** audience model, offering + title-id, the ingestion workflow, the PC server lane, the readiness poll, the resolution fix, and the **xPlaytest → SAGE streaming send/poll loop** (PR 15834601).
 - **Remaining:** the Partner Center creator toggle, the Bayside launch surface, and the UI work tracked in [`FuturePlans/`](./FuturePlans/). E2E is gated on external blockers — see [`FuturePlans/xbet-15834601-rubber-duck-followups.md`](./FuturePlans/xbet-15834601-rubber-duck-followups.md) and the pre-E2E checklist in [`PC-Polling-Status.md`](./PC-Polling-Status.md).
+- **Prod streaming (2026-07-13):** the publish + ingestion pipeline runs end to end (create playtest → XORc title → SAGE → CTIN → auto-PR → PC offering + title), and after the **5-PR ContentId fix** (STORECLIENT 16128230 · XBET 16130422 · CTIN 16129840 · CTDR 16137972 merged · SESSIONS 16140301 active) the build now **installs + provisions** on the PC server — the `ERROR_NOT_FOUND` install blocker is resolved ([`Blockers/pc-playtest-msixvc-install-error-not-found.md`](./Blockers/pc-playtest-msixvc-install-error-not-found.md)). **Current blocker:** the cloud launch **times out** (`LaunchByContentIdV1`, TimeoutException) — a server-side **GRTS build** issue Nate's team is fixing ([`Blockers/pc-playtest-launch-timeout-grts.md`](./Blockers/pc-playtest-launch-timeout-grts.md)). Ingestion routing pin (Xbet PR 16102792, [`Blockers/sage-ctin-region-routing.md`](./Blockers/sage-ctin-region-routing.md)) is still active, landing at the Monday deploy.
 
 ---
 

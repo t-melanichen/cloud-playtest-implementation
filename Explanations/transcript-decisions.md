@@ -154,6 +154,59 @@ setup, so no substantive design decision was captured from it.
   `Explanations\expiration-cap-and-storage.md` and
   `Explanations\internsync4-summary.md`.
 
+### Player-facing UI decisions (Design Brainstorm — Playtest UX, 2026-06-30)
+
+- **Playtest metadata comes from CAS hydration, not the retail Display Catalog ("big cat").**
+  Source: `Design Brainstorm - Playtest UX.docx` — a private playtest product will never be in big
+  cat; CAS instead gates and returns playtest content only to authorized members (matches the
+  signed-out no-leak requirement). Bayside already calls `catalog.gamepass.com` with a versioned,
+  codenamed hydration "contract" (gemstones — web ≈ "Sapphire"; the Bayside contract shown in chat
+  was "Topaz 0"); each surface (Bayside / Garrison / console) has its own contract. Action (superseded
+  2026-07-02 — see "CAS shipped playtest hydration" below): originally "ask CAS to extend the
+  contract"; CAS has since shipped it, gated on the xToken playtest claim. Reflected in
+  `FuturePlans\ui-steps-bayside.md` #6.
+- **Playtests are a separate tab/section, not a library filter.** Source: same — the team explicitly
+  moved away from "playtests are just a filter on your library" to a dedicated playtest tab shown only
+  when the user has been assigned a playtest; an offering can contain more than one title, organized by
+  offering name.
+- **Playtest badge = white beaker on a pink box, lower-left, overlaying the tile art; also on the PDP
+  next to the title.** Source: same — designed by Chris and reviewed by the design team; beaker+pink is
+  the agreed treatment across surfaces for consistency (less critical with a dedicated playtest tab, but
+  kept for consistency). Reference asset: `Documentation\playtest-badge-beaker.png`.
+- **Playtest details page offers Stream now + Install (deep-links to Garrison), with a non-public
+  banner.** Source: same — streaming starts directly (no install button needed to stream), but an
+  install option that deep-links to Garrison is also wanted; a custom flash/flip card (install/play,
+  stats on one side, product metadata on the flip) was prototyped.
+- **In-game feedback via TCUI / user-research overlay (stretch).** Source: same — a pause-and-survey
+  API the game implements (title-callable UI), richer than thumbs-up/down on the PDP.
+- **A signed-out content-leak bug exists on Garrison.** Source: same — flagged live during the meeting;
+  reinforces the #5 no-leak work.
+- **People to enlist:** CAS hydration contract — **Oscar** (sponsor/support, not the implementer) and
+  the **CAS team** via the Juno-side relationship (a CAS alias was dropped in the meeting chat for
+  Melanie to reach out); badge/visual — **Chris** (designer) + design team; ECS feature-flag gating —
+  **David Kushmerick**; `cloudConnect` offering-id — game-stream/auth package owners; install-vs-stream
+  — Garrison/Bastion team.
+
+### CAS shipped playtest hydration (CAS email thread, 2026-07-02)
+
+- **CAS has already deployed playtest hydration.** Melanie was introduced to the CAS team, who
+  confirmed they deployed code "this week" that makes **Playtest a standard access type** (the previous
+  "optional" concept was removed). CAS returns playtest data whenever it detects a **new xToken user
+  claim** the playtest team created; if the claim is present in the token, CAS calls for playtest data.
+- **No CAS service work is required for Bayside.** CAS has **no client-specific contracts or
+  endpoints** — "it is enabled right now, you just need to snag the new contract proto file." This
+  **supersedes** the 6/30 action item ("ask CAS to extend the contract").
+- **Next step / owner:** talk to **Anthony Keller** (heading up the playtest project) about **how to
+  get the xToken playtest user claim added** to test tokens and any gotchas.
+- **Bayside impact (verified in code):** the client is essentially already wired — the PDP hydrates via
+  `CatalogSystem` (`packages/@play-xbox/-system/catalog/src/CatalogSystem.ts`), which already
+  special-cases private offerings (skeleton-from-title-info fallback + `augment*ForPrivateOffering`), and
+  the vendored hydration contract `BaysideLowTopaz0`
+  (`packages/@xbox-js/-service-sdk/catalog/src/hydration/baysideTypes.ts`) already carries `title`,
+  `KeyArt` (art) and `Categories` (genre). Once the caller's token carries the playtest claim, the
+  existing product detail page should render the metadata with little/no new FE code; only snag the new
+  proto if CAS added fields.
+
 ## Transcript coverage notes
 
 - `Aditya1.docx` — extracted, no substantive design content.
@@ -172,3 +225,6 @@ setup, so no substantive design decision was captured from it.
   availability/audience, POST plus status GET.
 - `XCloudIngestion.docx` — PC install/readiness behavior, PC playtest SUG/quota,
   Orchestrator polling direction, MVP skip-poll option, offering/title id shape.
+- `Design Brainstorm - Playtest UX.docx` (2026-06-30) — player-facing UI: CAS
+  hydration for playtest metadata (not big cat), separate playtest tab, beaker+pink
+  badge, install-vs-stream, in-game surveys/TCUI, and a signed-out no-leak bug.

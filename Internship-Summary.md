@@ -1,10 +1,10 @@
-# Internship summary — Instantly Shareable Playtest (as of 2026-07-01)
+# Internship summary — Instantly Shareable Playtest (as of 2026-07-13)
 
 **Intern:** Melanie Chen (@t-melanichen) · **Team:** Xbox / Juno (xPlaytest × xCloud streaming)
 
 ## The problem I worked
 Let a game creator share an unreleased build that an invited tester **streams from the cloud in seconds** —
-no multi-gigabyte install. That meant threading a build through a chain that spans two orgs and ~8 services:
+no multi-gigabyte install. That meant threading a build through a chain that spans two orgs and ~13 services:
 
 > **audience** (who may see it) → **offering** (publish) → **payload** (StoreAsset + DNA groups from xPlaytest)
 > → **cross-tenant send** (MSFTGreen → Corp through SAGE) → **CTIN ingestion workflow** (bind title id + offering,
@@ -56,19 +56,43 @@ each hop and getting it reviewed/merged across the different service repos.
 - Set the `PC_PLAYTEST` **SUG** on the playtest offering, registered the SUG definitions (Test + Int), and added
   the Content Targets **quota** via dynamic config (PRs 15949594, 15965750, 15965763, 15966616).
 
-## Where it stands on 2026-07-01
-- **22 of 24 tracked PRs merged.** The entire backend spine is in `main`: audience → offering → title id →
-  **payload builder** → **SAGE cross-tenant route** → **CTIN ingest + bind + readiness poll**.
-- The two last cross-tenant gates (**SAGE 15829639**, **CTIN 15996626**) merged today, and **PlayTest +
-  XPackageWorkflow are deployed from `main`** with the streaming change — so a publish by the pilot seller now
-  actually fires the Green→SAGE→CTIN call.
-- **Remaining:** the two front ends (Partner Center creator toggle + shareable link; Bayside tester landing/stream)
-  and a set of tracked follow-ups/blockers (signed-out content-leak, PC region/quota env alignment, launch-link
-  404 window, 30-day expiration cap). See [`testing/e2e-readiness-and-blockers.md`](./testing/e2e-readiness-and-blockers.md)
-  and [`FuturePlans/`](./FuturePlans/).
+**7. Distribution + provisioning — get the build onto the server (the ContentId fix)**
+- Root-caused why a PC playtest wouldn't install: the streaming `StoreAsset` sent the SUCU **`servicingContentId`**
+  as `ContentId`, but the PC MSIXVC is keyed on the **real `contentId`**, so installs failed with
+  `ERROR_NOT_FOUND`. Fixed with a **5-PR ContentId separation** — STORECLIENT 16128230, XBET 16130422,
+  CTIN 16129840, CTDR 16137972 (merged), SESSIONS 16140301 (active) — so sourcing keeps the SourceId while
+  distribution/provisioning use the real content id. The build now **installs and provisions** on a PC server.
+- Provisioned the **`PC_PLAYTEST` lane in PROD**: SUG definition (16103484), Content Targets quota (16103771),
+  predicted-targets overrides (16114214 / 16114118), `DefaultAllocationPools` (16112987), and the offering data
+  (16139815). Pinned playtest ingestion to the **Americas SAGE cluster** so submit + status-poll agree
+  (16102792, active — CTIN is Americas-only and jobs are cluster-local).
+
+**8. Client (Bayside) — surface the playtest to the tester**
+- Built the new **"My playtests" tab** in the play.xbox.com web client (Xbox.JS), gated to appear only for a user
+  who has an `xpt` playtest offering, handling the **signed-out** and **not-invited** states. Tiles show the
+  offering's friendly name; **game art + display metadata are still blocked** — private playtests aren't in
+  BigCat and CAS's playtest contract carries access flags only, so where developer-provided art lives is an open
+  question with Anthony / CAS.
+- Built a small **"collect the stars"** GDK desktop package as a real, playable (non-stub) demo title.
+
+## Where it stands on 2026-07-13
+- **31 of 36 tracked PRs merged** (4 active, 1 draft), across ~13 service areas and 3 ADO projects. The backend
+  spine is in `main` and **deployed to prod**.
+- **The full pipeline runs end to end in prod** under the pilot seller (`65050620`): create a playtest → XORc
+  resolves the Xbox title → the Xbet builder assembles the payload → SAGE routes to CTIN → CTIN ingests and opens
+  an **auto-PR** → the PC offering + title go live. After the **ContentId 5-PR fix**, the build now **installs and
+  provisions** on a cloud PC server (the `ERROR_NOT_FOUND` install blocker is resolved).
+- **One blocker from a live stream:** the cloud launch (`LaunchByContentIdV1`) currently **times out** — a
+  **server-side GRTS build issue** Nate's server team is fixing. Once that rolls to the `PC_TAKEHOME`/`PC_GA` lanes
+  `PC_PLAYTEST` draws from, the same prod path should stream.
+- **Remaining beyond that:** the Partner Center creator toggle (GPM 15946761, draft), the Bayside tile
+  **art/metadata source** (BigCat/CAS open question), dropping the Americas ingestion pin once durable SAGE→CTIN
+  routing lands, and the tracked follow-ups/blockers. See [`PC-Polling-Status.md`](./PC-Polling-Status.md),
+  [`Blockers/`](./Blockers/), and [`FuturePlans/`](./FuturePlans/).
 
 ## In one sentence
 I built and shipped the **backend spine** of Instantly Shareable Playtest end to end — from resolving audience/
 StoreAsset/DNA-group/title-id inputs in xPlaytest, to sending them MSFTGreen → Corp through SAGE, to the CTIN
-workflow that binds the title id and offering and polls PC/Xbox servers for streaming readiness — across ~8
-services and 22 merged PRs.
+workflow that binds the title id and offering, into the distribution/provisioning path that now **installs and
+provisions the build on a cloud PC server in prod** — plus the Bayside "My playtests" tab — across ~13 service
+areas and 31 merged PRs, with a single server-side GRTS fix now standing between this and a live stream.

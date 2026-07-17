@@ -1,0 +1,463 @@
+PR 16187662 - code comments added/changed (working tree vs origin/main)
+Total comment lines: 399  |  Files: 15
+
+==================================================================
+packages/@play-xbox/-route/library/src/components/PlaytestSection/PlaytestSection.tsx   (48 comment lines)
+==================================================================
+    1: // Copyright (c) Microsoft Corporation. All rights reserved.
+   32: // One small square render size; a single default width is enough for the tile.
+   38: /**
+   39:  * A single playtest title tile. When the authenticated Hydration path returns
+   40:  * the product, the tile shows its friendly title and box art; otherwise it
+   41:  * falls back to a branded pink square with a playtest (beaker) glyph. Pressing
+   42:  * the tile launches the playtest's cloud stream directly.
+   43:  */
+   96: /**
+   97:  * Hydrates a playtest tile's title and box art from the catalog by product id
+   98:  * (authenticated Hydration user path). Falls back to the placeholder when the
+   99:  * product is not returned (e.g. an anonymous or not-yet-provisioned token).
+  100:  */
+  119: /**
+  120:  * A single playtest offering rendered as a labelled grid of placeholder tiles.
+  121:  * Pressing a tile switches the active offering to this playtest and launches
+  122:  * its cloud stream (`/stream/{productId}/{titleId}`), so the private title
+  123:  * resolves under its own offering.
+  124:  */
+  157:     // Resolve the tiles-per-row from the same responsive config the main
+  158:     // library grid uses, so playtest tiles are exactly the same size as the
+  159:     // games elsewhere in the library at every breakpoint/density.
+  166:     // Only show a heading when the offering has a friendly name; a raw `xpt…`
+  167:     // id is developer noise and looks out of place in the library.
+  173:             // Switch the active offering to this playtest so the stream page
+  174:             // resolves the private title under it, then launch the stream. The
+  175:             // title id slug (`xpt{productid}-{name}-pc`) is the stream path's
+  176:             // display segment.
+  196:     // Only titles that resolved a product id can render as tiles. Derive the
+  197:     // renderable list once and use it for both the empty-state check and the
+  198:     // grid, so a rail whose titles all lack a product id shows the empty
+  199:     // message instead of a blank grid.
+  290:         // Vet real access to the offering before fetching its games. Being in
+  291:         // the user's persisted playtest list does not guarantee a live
+  292:         // invite, so a revoked/expired playtest resolves to `denied` and the
+  293:         // rail surfaces a "not invited" message instead of a generic error.
+  318:         // The titles query stays disabled (and therefore reports `isPending`)
+  319:         // until access is confirmed accessible, so only fold its pending/error
+  320:         // state in once it can actually run. Surface an access-query failure as
+  321:         // an error rather than an endless load.
+  332: /**
+  333:  * Content of the library's "My playtests" tab: the games available in each
+  334:  * playtest (xpt) offering the user has been invited to, one grid per offering.
+  335:  *
+  336:  * Playtest membership is tied to the signed-in user, so a signed-out visitor
+  337:  * (e.g. a shared `?tab=playtests` link) is prompted to sign in. A fully
+  338:  * signed-in user with no playtest offerings sees a friendly empty state.
+  339:  */
+
+==================================================================
+packages/@play-xbox/-route/library/src/components/TabsHeader/TabsHeader.tsx   (5 comment lines)
+==================================================================
+   30:     // The "My playtests" tab only appears for users invited to at least one
+   31:     // playtest (xpt) offering, and the "Play history" tab only when that page
+   32:     // is enabled. Both sit between My games and Full library. Tab identity is
+   33:     // keyed off this ordered list so the numeric index InlineTabs uses maps
+   34:     // back to the right tab regardless of which optional tabs are present.
+
+==================================================================
+packages/@play-xbox/-route/library/src/LibraryPage.tsx   (19 comment lines)
+==================================================================
+   95:     // Resolve a single view discriminant for the active tab instead of a set
+   96:     // of overlapping `showX` booleans. The full library tab renders the catalog
+   97:     // view when it is enabled for a signed-in, online user; otherwise it falls
+   98:     // back to the game grid.
+  120:     // Render the body for the resolved view. Keeping this in one place (rather
+  121:     // than a chain of `showX &&` siblings) makes the tab-to-content mapping
+  122:     // explicit and keeps adding a tab to a single spot.
+  253:     // Fall back from a `playtests` tab to myGames only when it was resolved
+  254:     // from stored state (not an explicit `?tab=playtests` deep link), the user
+  255:     // is signed in, and the offerings query has settled with no playtests.
+  256:     // Keeping an explicit deep link on `playtests` lets PlaytestSection render
+  257:     // its own signed-out / empty / not-invited states instead of being
+  258:     // silently redirected away.
+  314:     // sync. Defer until both gates settle: the play history gate must have a
+  315:     // resolved boolean (while `undefined`, `resolveCurrentTab` falls back to
+  316:     // `myGames`), and the playtest offerings query must not be pending or
+  317:     // errored. A transient offerings failure yields an empty list that would
+  318:     // flip a stored `playtests` tab to `myGames`; persisting that would
+  319:     // silently overwrite the preference, so hold off until the gates resolve.
+
+==================================================================
+packages/@play-xbox/-route/library/src/utils/usePlaytestOfferings.ts   (24 comment lines)
+==================================================================
+    1: // Copyright (c) Microsoft Corporation. All rights reserved.
+    7: /**
+    8:  * A playtest (additional) offering the signed-in user has joined. Shape mirrors
+    9:  * the `additionalOfferings` auth query: an id, a friendly name (falls back to
+   10:  * the id), and whether the offering is private.
+   11:  */
+   18: /**
+   19:  * Resolves the `xpt`-prefixed additional offerings the signed-in user can
+   20:  * actually stream.
+   21:  *
+   22:  * A playtest id in the persisted additional-offerings list does not imply a
+   23:  * live invite: a user can type an arbitrary `xpt-…` id into developer settings,
+   24:  * and an invite can be revoked. Each candidate is vetted against the
+   25:  * offering-access query, and only the ones that resolve to `accessible` are
+   26:  * returned — so the "My playtests" tab (which gates on a non-empty list) never
+   27:  * lights up for a fat-fingered or revoked offering.
+   28:  *
+   29:  * Shared by the tab header (to decide whether to show the tab) and the tab's
+   30:  * content (to render a rail per offering), so both derive "does the user have
+   31:  * an authorized playtest" from the same source.
+   32:  */
+   56:     // Vet each candidate against the offering-access query; keep only the ones
+   57:     // the user can actually stream. React Query dedupes these by key, so the
+   58:     // per-rail access check in PlaytestSection reuses the same result.
+
+==================================================================
+packages/@play-xbox/-system/-service/-game-stream/authentication/src/GameStreamAuthenticationServiceSystem.test.ts   (3 comment lines)
+==================================================================
+  488: // ---------------------------------------------------------------------------
+  489: // Pure config (de)serialization helpers
+  490: // ---------------------------------------------------------------------------
+
+==================================================================
+packages/@play-xbox/-system/-service/-game-stream/authentication/src/GameStreamAuthenticationServiceSystem.ts   (160 comment lines)
+==================================================================
+   93: /**
+   94:  * Resolved access status for an additional offering (playtest offerings are one
+   95:  * kind), produced by the `additionalOfferingAccess` query. `denied` is a
+   96:  * settled (non-error) outcome — the user is simply not entitled — whereas
+   97:  * transient failures (network etc.) surface as the query's own error state so
+   98:  * the UI can retry.
+   99:  */
+  104: /**
+  105:  * Parses the persisted `streaming.auth.additionalOfferings` config value
+  106:  * (a JSON string array) into a normalized, de-duplicated, uppercase list
+  107:  * of offering ids. Tolerant of malformed input — returns `[]`.
+  108:  */
+  147: /**
+  148:  * Serializes a list of offering ids back into the JSON string form
+  149:  * persisted in `streaming.auth.additionalOfferings`.
+  150:  */
+  155: /**
+  156:  * Parses a persisted per-offering settings map (a JSON object mapping
+  157:  * uppercase offering id to a string value, e.g.
+  158:  * `streaming.auth.regionByOffering` or
+  159:  * `streaming.session.systemUpdateGroupByOffering`). Tolerant of malformed
+  160:  * input — returns `{}`. Keys are normalized to uppercase; non-string values
+  161:  * and empty entries are dropped.
+  162:  */
+  204: /**
+  205:  * Serializes a per-offering settings map back into the JSON string form
+  206:  * persisted in config. Keys are normalized to uppercase.
+  207:  */
+  752:         /**
+  753:          * The list of additional offering ids the user has
+  754:          * opted into, statically resolved from the persisted
+  755:          * `streaming.auth.additionalOfferings` config (a JSON string
+  756:          * array) WITHOUT a `streamUser` login — so SSR and the nav can
+  757:          * read it cheaply. Ids are uppercase-normalized and de-duplicated.
+  758:          *
+  759:          * Additional offerings are *additive*: they do not replace the
+  760:          * default offering/catalog. Surfaced in the Playtests tab and
+  761:          * usable as an explicit offering provenance when streaming.
+  762:          */
+  947:         /**
+  948:          * Resolves {@link additionalOfferingIdsQuery} into display-ready
+  949:          * entries by joining each id against the GSSV `offerings` list
+  950:          * (for the friendly name / privacy bit). Ids the user is not a
+  951:          * member of in GSSV (or when the offerings fetch fails, e.g.
+  952:          * signed out) fall back to an id-only entry so the Playtests
+  953:          * surface still renders. Best-effort: never rejects on a missing
+  954:          * offering.
+  955:          */
+  992:         /**
+  993:          * Vets whether the active user can actually log a stream user into a
+  994:          * given (additional/playtest) offering. Drives the warning + "Try
+  995:          * again" affordance in the Playtests surfaces and the Developer
+  996:          * settings manager.
+  997:          *
+  998:          * Deliberately kept *separate* from {@link additionalOfferingsQuery}
+  999:          * (which must stay cheap for nav/SSR and never performs a per-offering
+ 1000:          * GSSV login). Resolving this query performs the real
+ 1001:          * {@link streamUserQuery} login for the offering:
+ 1002:          *
+ 1003:          *  - success                      → `{ status: 'accessible' }`
+ 1004:          *  - `OfferingAccessDeniedError`  → `{ status: 'denied' }` (resolved,
+ 1005:          *    not thrown — denial is an expected, non-retryable outcome)
+ 1006:          *  - any other error (network …)  → rethrown, so the query enters its
+ 1007:          *    error state and the UI can offer a retry.
+ 1008:          */
+ 1094:         // ─── Per-offering streaming settings ────────────────────────────
+ 1095:         //
+ 1096:         // Region and system update group are stored independently per
+ 1097:         // offering id (see `streaming.auth.regionByOffering` /
+ 1098:         // `streaming.session.systemUpdateGroupByOffering`). These queries
+ 1099:         // expose the persisted maps and the available options for a given
+ 1100:         // offering, keyed by offering id — they never switch the active
+ 1101:         // offering.
+ 1141:         // The region currently persisted for a specific offering id (empty
+ 1142:         // string when none is set).
+ 1155:         // The regions available for a specific offering, derived from that
+ 1156:         // offering's stream user (logs the user into the offering on demand).
+ 1171:         // The system update group currently persisted for a specific offering
+ 1172:         // id (empty string when none is set).
+ 1185:         // The system update groups available for a specific offering. These
+ 1186:         // belong to the offering's selected region (falling back to its first
+ 1187:         // region when none is selected yet).
+ 1219:         // Whether a given offering actually exposes configurable streaming
+ 1220:         // settings, derived from that offering's stream user. Not every
+ 1221:         // offering allows region selection (when `allowRegionSelection` is
+ 1222:         // false the service hands back only the single default region) or
+ 1223:         // ships non-default system update groups. The settings gear is hidden
+ 1224:         // entirely when neither is true.
+ 1236:                     // More than one region means the service allowed region
+ 1237:                     // selection for this offering.
+ 1240:                     // Any non-empty update group (across regions) means the
+ 1241:                     // offering ships selectable update groups beyond the
+ 1242:                     // service-chosen default.
+ 1254:         // ─── Active-offering resolution (bridge) ────────────────────────
+ 1255:         //
+ 1256:         // Read-only convenience queries that resolve the effective region /
+ 1257:         // update group for the *active* offering, preferring its per-offering
+ 1258:         // value and falling back to the global override. The stream launch
+ 1259:         // path reads these so per-offering settings take effect for whichever
+ 1260:         // offering is active, without ever switching the active offering.
+ 1475:             /**
+ 1476:              * Adds an offering id to the persisted additional offerings
+ 1477:              * list. Idempotent — re-adding an existing id is a
+ 1478:              * no-op. Ids are uppercase-normalized.
+ 1479:              */
+ 1502:             /**
+ 1503:              * Removes an offering id from the persisted additional
+ 1504:              * offerings list.
+ 1505:              */
+ 1518:                     // Drop any per-offering region / update-group overrides for
+ 1519:                     // the removed offering so they don't resurrect on re-add.
+ 1523:             /**
+ 1524:              * Clears all persisted additional offerings.
+ 1525:              */
+ 1534:                     // Prune per-offering settings for exactly the offerings we
+ 1535:                     // removed — never for the active/default offering, whose
+ 1536:                     // overrides are independent of the additional list.
+ 1592:             /**
+ 1593:              * Sets the streaming region for a specific offering, keyed by
+ 1594:              * offering id. Validates the region against that offering's stream
+ 1595:              * user (logging the user into the offering on demand) and
+ 1596:              * read-modify-writes the `streaming.auth.regionByOffering` map.
+ 1597:              * Never switches the active offering.
+ 1598:              */
+ 1661:             /**
+ 1662:              * Clears the per-offering streaming region override for a specific
+ 1663:              * offering id, leaving other offerings untouched.
+ 1664:              */
+ 1689:             /**
+ 1690:              * Sets the system update group for a specific offering, keyed by
+ 1691:              * offering id. Validates the group against that offering's stream
+ 1692:              * user and read-modify-writes the
+ 1693:              * `streaming.session.systemUpdateGroupByOffering` map. Never
+ 1694:              * switches the active offering.
+ 1695:              */
+ 1755:             /**
+ 1756:              * Clears the per-offering system update group override for a
+ 1757:              * specific offering id, leaving other offerings untouched.
+ 1758:              */
+ 1786:     /**
+ 1787:      * Persists a per-offering settings map (region or system update group) to
+ 1788:      * configuration and invalidates the dependent queries so the UI and the
+ 1789:      * active-offering bridge reflect the change immediately.
+ 1790:      */
+ 1809:     /**
+ 1810:      * Removes the given offering ids from BOTH per-offering settings maps
+ 1811:      * (`streaming.auth.regionByOffering` and
+ 1812:      * `streaming.session.systemUpdateGroupByOffering`) so that dropping an
+ 1813:      * additional offering does not leave orphaned region / update-group
+ 1814:      * overrides behind that would silently resurrect if the offering is
+ 1815:      * re-added later. Offering ids not present in a map are ignored. Only the
+ 1816:      * supplied ids are touched — every other offering's settings (including
+ 1817:      * the active/default offering) are preserved.
+ 1818:      */
+ 1866:     /**
+ 1867:      * Persists the additional offerings list to configuration
+ 1868:      * and invalidates the dependent `additionalOfferingIds` /
+ 1869:      * `additionalOfferings` queries so the UI reflects the change
+ 1870:      * immediately.
+ 1871:      */
+
+==================================================================
+packages/@play-xbox/-system/-service/-game-stream/play/src/GameStreamPlayServiceSystem.ts   (6 comment lines)
+==================================================================
+  453:         /**
+  454:          * Returns the full title list for an explicitly-specified offering
+  455:          * (rather than the active offering). Used by the Playtests page to
+  456:          * render a rail per additional offering. Same pagination contract as
+  457:          * `offeringTitles`, but bound to `titleManagerAdaptorByOffering`.
+  458:          */
+
+==================================================================
+packages/@play-xbox/-system/-service/catalog/src/adaptor/+CatalogServiceAdaptor.ts   (21 comment lines)
+==================================================================
+   47:      * Constructor parameters for the anonymous catalog service.
+   53:     /**
+   54:      * Constructor parameters for the authenticated (user) catalog service. Built
+   55:      * with `useXStoreAuth` so the signed-in user's MDollar token is sent as the
+   56:      * `X-Store-Authorization` header that Hydration's authenticated path requires.
+   57:      */
+   92:      * @param userTokenProvider - Token provider for authenticated (user)
+   93:      *                requests. This is the one real provider the adaptor needs:
+   94:      *                the user service is built with `useXStoreAuth`, so this
+   95:      *                token is sent as `X-Store-Authorization`, while the
+   96:      *                anonymous service is built without a token provider
+   97:      *                (retail catalog metadata is public).
+  108:      *                  new CatalogServiceAdaptor(cvProvider, userTokenProvider, 'App', '1.0.0');
+  109:      *                  new CatalogServiceAdaptor(cvProvider, userTokenProvider, 'App', '1.0.0', fetchWithAuthOnly);
+  112:      *                  new CatalogServiceAdaptor(cvProvider, userTokenProvider, 'App', '1.0.0', fetchWithTelemetryAndCV);
+  123:         // The two services share the first four constructor args and differ
+  124:         // only in the trailing token provider + `useXStoreAuth` flag.
+  132:         // Anonymous service: no token provider — retail catalog is public.
+  136:             /* useXStoreAuth */ false,
+  139:         // User service: the real provider, sent as `X-Store-Authorization`.
+  143:             /* useXStoreAuth */ true,
+
+==================================================================
+packages/@play-xbox/-system/-service/catalog/src/CatalogServiceSystem.ts   (19 comment lines)
+==================================================================
+   42: /**
+   43:  * URL used solely to resolve the signed-in user's XSTS token to the
+   44:  * `http://mp.microsoft.com/` (MDollar) relying party. Hydration's authenticated
+   45:  * (user) path accepts only an MDollar-audience token; resolving the token from
+   46:  * the `catalog.gamepass.com` request URL yields an `http://xboxlive.com` token
+   47:  * (NSAL maps `*.gamepass.com` there), which Hydration rejects.
+   48:  */
+  247:                 // Anonymous requests need no token (retail catalog metadata is
+  248:                 // public), so only the authenticated user provider is built and
+  249:                 // passed to the adaptor; its hydration types route through the
+  250:                 // user service, which sends the XSTS token below.
+  252:                 // Resolves the signed-in user's XSTS token on demand for the
+  253:                 // authenticated (user) catalog service, mirroring
+  254:                 // ContentAccessServiceSystem. Sourced from the base
+  255:                 // authentication system to avoid a gameStream dependency cycle.
+  256:                 // The token is minted for the MDollar relying party (see
+  257:                 // MDOLLAR_TOKEN_URI) that Hydration requires. Falls through
+  258:                 // unauthenticated when signed out or the token is unavailable,
+  259:                 // so the caller degrades to an empty result.
+
+==================================================================
+packages/@play-xbox/-system/-service/catalog/src/types/hydrationType.ts   (1 comment lines)
+==================================================================
+    7: // User-specific hydration types route through the authenticated catalog service.
+
+==================================================================
+packages/@play-xbox/-system/catalog/src/CatalogSystem.ts   (44 comment lines)
+==================================================================
+  104: // TODO: Confirm the long-term playtest hydration contract with the hydration /
+  105: // Bayside client team; BaysideLowUserTopaz0 is an authenticated Bayside interim.
+  111: /** Minimal playtest tile hydration: friendly title + box art uri. */
+  220:     /**
+  221:      * Gets query options that hydrate a playtest (private) product's tile info —
+  222:      * friendly title and box art — via the authenticated Hydration user path.
+  223:      * @param productId - The playtest product (store) id.
+  224:      * @returns Query options resolving to the tile's title and box art uri.
+  225:      */
+  297:                             // Signed-out users cannot use the authenticated
+  298:                             // Hydration fallback.
+  303:                             // Retail/public products resolve from the anonymous
+  304:                             // catalog. A signed-in user can also deep-link to a
+  305:                             // private/playtest product the anonymous catalog does
+  306:                             // not return; recover those via the authenticated
+  307:                             // Hydration path, which returns the same basic shape.
+  332:                             // Absent from both catalogs — surface the original
+  333:                             // not-found error.
+  405:                             // Signed-out users cannot use the authenticated
+  406:                             // Hydration fallback.
+  411:                             // Retail/public products resolve from the anonymous
+  412:                             // catalog. A signed-in user can also deep-link to a
+  413:                             // private/playtest product the anonymous catalog does
+  414:                             // not return; recover those via the authenticated
+  415:                             // Hydration path so the page shows the real title and
+  416:                             // box art instead of failing to load.
+  443:                             // Absent from both catalogs — surface the original
+  444:                             // not-found error.
+  486:                 /**
+  487:                  * A playtest hydration query via the authenticated user path.
+  488:                  */
+  926:     /**
+  927:      * Builds a detailed product info skeleton from an authenticated Bayside
+  928:      * (basic) product. Used when the anonymous catalog does not return a
+  929:      * private/playtest product but the authenticated Hydration path does: the
+  930:      * skeleton carries the real friendly title and box art so the product
+  931:      * detail page renders correct metadata.
+  932:      */
+  951:     /**
+  952:      * Produces a minimal {@link DetailedProductInfo} with the given identity,
+  953:      * title, and optional imagery. Shared by the title-info and
+  954:      * authenticated-Bayside fallbacks so both emit an identically-shaped
+  955:      * skeleton; only the populated fields differ.
+  956:      */
+
+==================================================================
+packages/@play-xbox/-system/catalog/src/mocks/InMemoryCatalogSystem.mocks.ts   (4 comment lines)
+==================================================================
+  253:     /**
+  254:      * Creates mock playtest product information (authenticated Bayside shape).
+  255:      * @returns A BasicProductInfo product with a title and box art.
+  256:      */
+
+==================================================================
+packages/@play-xbox/-types/configurations/src/streaming.ts   (29 comment lines)
+==================================================================
+   53:     /**
+   54:      * Additional (playtest) offerings the user has opted into, in
+   55:      * addition to the default offering. Persisted as a JSON string array
+   56:      * of offering ids (e.g. `["JUNOTRIALS","CLOUDGAMINGTAKEHOME"]`).
+   57:      *
+   58:      * Unlike `streaming.auth.offering` (which *replaces* the default
+   59:      * catalog/identity), additional offerings are *additive*: each
+   60:      * surfaces its titles in the Playtests tab without touching the
+   61:      * public catalog, and a title can be streamed under any of them.
+   62:      */
+   70:     /**
+   71:      * Per-offering streaming region overrides, persisted as a JSON object
+   72:      * mapping uppercase offering id to the region's friendly name
+   73:      * (e.g. `{"JUNOTRIALS":"EastUS2","CLOUDGAMINGTAKEHOME":"WestUS"}`).
+   74:      *
+   75:      * Unlike `streaming.auth.region` (a single global override applied to
+   76:      * whichever offering is active), this stores an independent region per
+   77:      * offering keyed by offering id, so each playtest offering keeps its own
+   78:      * setting regardless of which offering is currently active.
+   79:      */
+  163:     /**
+  164:      * Per-offering system update group overrides, persisted as a JSON object
+  165:      * mapping uppercase offering id to the update group name
+  166:      * (e.g. `{"JUNOTRIALS":"RETAIL","CLOUDGAMINGTAKEHOME":"BETA"}`).
+  167:      *
+  168:      * Independent of `streaming.session.systemUpdateGroup` (the single global
+  169:      * override): each offering keeps its own update group keyed by offering
+  170:      * id, regardless of which offering is currently active.
+  171:      */
+
+==================================================================
+packages/@play-xbox/-types/game-stream/src/offerings.ts   (15 comment lines)
+==================================================================
+   38: /**
+   39:  * Prefix used to identify playtest offering IDs. Playtest offerings are
+   40:  * private, additive offerings whose ID begins with this prefix, which has no
+   41:  * separator — real ids are not hyphenated (e.g. `xpt2sdt4x91krpc`), so the
+   42:  * match is on the bare `xpt` prefix.
+   43:  */
+   46: /**
+   47:  * Checks whether a given offering ID is a playtest offering.
+   48:  *
+   49:  * Playtest offerings are identified by an `xpt` prefix on the offering ID.
+   50:  * These are surfaced as their own section in the library.
+   51:  *
+   52:  * @param offeringId - The offering ID to check.
+   53:  * @returns `true` if the offering is a playtest offering.
+   54:  */
+
+==================================================================
+packages/@xbox-js/-service-sdk/catalog/src/service.test.ts   (1 comment lines)
+==================================================================
+  461:             /* useXStoreAuth */ true
+
+

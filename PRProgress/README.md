@@ -38,15 +38,29 @@ so the on-disk file numbers are not strictly ascending in the table. Click a tit
 | 22 | 15996626 | CTIN | services.contentingestion | Merged | [Accept bare-GUID audience for cross-tenant v1.0 tokens](./23-CTIN-15996626-crosstenant-audience-validation-fix.md) |
 | 23 | 15983599 | CTIN | services.contentingestion | Merged | [Don't scope playtest resolution package search to the GA flight](./24-CTIN-15983599-resolution-no-ga-flight.md) |
 | 24 | 15946761 | GPM | Xbox.Gpx.PartnerCenter.Client | Draft | [Enable Playtest Cloud Streaming (Partner Center form toggle)](./25-GPM-15946761-enable-cloud-streaming-toggle.md) |
+| 25 | 16103484 | PTNR-DATA | services.data.partnerregistry | Merged | [Add PCSystemUpdateGroup /PCSystemUpdateGroups/PC_PLAYTEST (Prod)](./26-PTNR-DATA-16103484-add-pc-playtest-sug-prod.md) |
+| 26 | 16103771 | DCFG | services.data.partnerregistry | Merged | [Update CONTENTTARGETS/DEFAULT/SERVERSETSCONFIGURATION — PC_PLAYTEST quota (Prod)](./27-DCFG-16103771-contenttargets-pc-playtest-quota-prod.md) |
+| 27 | 16114214 | DCFG | services.data.partnerregistry | Merged | [Add CONTENTTARGETS/DEFAULT/RESOLUTIONCONFIGURATION — IncludePredictions PC_PLAYTEST (Prod)](./28-DCFG-16114214-contenttargets-includepredictions-prod.md) |
+| 28 | 16114118 | DCFG | services.data.partnerregistry | Merged | [Update CONTENTDISTRIBUTION/DEFAULT/ORCHESTRATIONCONFIG — IncludePredictedTargets PC_PLAYTEST (Prod)](./29-DCFG-16114118-contentdistribution-includepredictedtargets-prod.md) |
+| 29 | 16112987 | PTNR | services.partnerregistry | Merged | [Set DefaultAllocationPools on PC playtest offering](./30-PTNR-16112987-playtest-default-allocation-pools.md) |
+| 30 | 16102792 | XBET | Xbox.Xbet.Service | Active | [Pin playtest ingestion to Americas SAGE](./31-XBET-16102792-pin-playtest-ingestion-americas.md) |
+| 31 | 16130422 | XBET | Xbox.Xbet.Service | Merged | [Send playtest ContentId to streaming ingestion (fixes install ERROR_NOT_FOUND)](./32-XBET-16130422-playtest-real-contentid.md) |
+| 32 | 16129840 | CTIN | services.contentingestion | Merged | [Add ContentId to AssetProperties; ingest under SourceId (part of ContentId fix)](./33-CTIN-16129840-assetproperties-contentid.md) |
+| 33 | 16137972 | CTDR | services.contentdistribution | Merged | [Separate SourceId from ContentId — SourceId for Sourcing, real ContentId for Distribution commands](./34-CTDR-16137972-separate-sourceid-contentid.md) |
+| 34 | 16139815 | PTNR-DATA | services.data.partnerregistry | Merged | [Set DefaultAllocationPools PC=PC_MAIN on offering XPT2SDT4X91KRR7](./35-PTNR-DATA-16139815-offering-default-allocation-pools.md) |
+| 35 | 16140301 | SESSIONS | services.sessions | Active | [Separate ContentId from SourceId — use explicit ContentId for provisioning (part of ContentId fix)](./36-SESSIONS-16140301-separate-contentid-sourceid.md) |
+| 36 | 16158158 | XORC | xorc | Active | [Add populated XboxLiveTitleConfig branch coverage (ProductXboxLiveConfigurationHandler)](./37-XORC-16158158-populated-titleconfig-coverage.md) |
 
-**Totals (live-verified 2026-07-01):** 24 tracked PRs — **22 merged**, **0 active**, **2 draft** (GPM 15946761, DEVAPI 15876080). **E2E-critical backend PRs all merged:** SAGE routes 15829639 (merged 07/01) and CTIN bare-GUID audience fix 15996626 (merged 07/01) are in; PlayTest + XPackageWorkflow deployed from `main` with the streaming change. See [`../testing/e2e-readiness-and-blockers.md`](../testing/e2e-readiness-and-blockers.md).
+**Totals (live-verified 2026-07-13):** 36 tracked PRs — **31 merged**, **4 active** (DEVAPI 15876080, XBET pin 16102792, SESSIONS 16140301, XORC 16158158), **1 draft** (GPM 15946761). The **ContentId fix** (playtest streaming sent the SUCU servicing id where the real content id was needed) spans 5 PRs: STORECLIENT 16128230, XBET 16130422, CTIN 16129840, CTDR 16137972 (all merged) and SESSIONS 16140301 (active). With those, the build **installs + provisions** on the PC server (the `ERROR_NOT_FOUND` install blocker is resolved — see [install blocker](../Blockers/pc-playtest-msixvc-install-error-not-found.md)). The current blocker is now a **server-side GRTS build issue** causing the cloud launch to time out — see [launch-timeout blocker](../Blockers/pc-playtest-launch-timeout-grts.md). Xbet pin 16102792 (Americas SAGE routing) is still active; deploys otherwise paused until the Monday window.
 
 **Status legend:** Merged = completed/merged · Active = open and in review · Draft = open draft.
 
 **Area legend:** PTNR = services.partnerregistry · PTNR-DATA = services.data.partnerregistry (offering / SUG-definition data) ·
 AUTH = services.auth · DEVAPI = services.devapi · CTIN = services.contentingestion ·
 SAGE = services.serviceapigateway · XBET = Xbox.Xbet.Service · XORC = xorc (Xbox.Services) ·
-CTGT = services.contenttargets · DCFG = services.data.partnerregistry (dynamic config — CONTENTTARGETS ServerSetsConfiguration) ·
+CTGT = services.contenttargets · DCFG = services.data.partnerregistry (dynamic config — CONTENTTARGETS ServerSetsConfiguration / ResolutionConfiguration, CONTENTDISTRIBUTION OrchestrationConfig) ·
+CTDR = services.contentdistribution (content distribution — server install/distribution commands) ·
+SESSIONS = services.sessions (streaming session provisioning) ·
 GPM = Xbox.Gpx.PartnerCenter.Client (Partner Center creator UI) · JS = Xbox.JS (Bayside player client).
 
 ## Superseded / abandoned PRs

@@ -20,6 +20,41 @@
 ## Owners
 Melanie Chen · David Kushmerick (ECS setup/permissions) · Anthony Keller.
 
+## External step (ECS portal) — the fast-follow
+
+Lighting up the Partner Center "Enable Cloud Streaming" toggle for the pilot needs an **ECS config entry**, and — depending on which ECS module hosts the flag — possibly a one-line code edit.
+
+**How emission actually works** (`ProductConfigurationFD.IndexBusinessLogic.GetFeatureFlagsForInlineScriptAsync`, lines ~405-425): it serializes **every** boolean flag from the **Gpm** module into `window.gpmFeatureFlags`, but only **allowlisted** flags from the **Packages** module — `allowedPackageFeatures = { "NewGamingPackageUXEnabled", "XboxPlaytest" }`. The existing `XboxPlaytest` flag lives in the **Packages** module (ECS project `MIXShared`, client `MarketplaceIngestion`, targeted by `SellerID`). The `Gpm` module maps to ECS project `XPD_CORS_IDC`, client `XboxDeveloper`, targeted by `PublisherID`.
+
+Two ways to make `XboxPlaytestCloudStreaming` reach the UI:
+
+- **Path A — Packages module (recommended, mirrors `XboxPlaytest`):** create a boolean `XboxPlaytestCloudStreaming` in ECS project `MIXShared`, targeted to `SellerID == 65050620`, **and** add `"XboxPlaytestCloudStreaming"` to `allowedPackageFeatures` in `IndexBusinessLogic.cs` (+ update `IndexBusinessLogicTests`). Requires an FD deploy. Keeps both playtest flags in one ECS project.
+- **Path B — Gpm module (no code):** create the boolean in ECS project `XPD_CORS_IDC`, targeted to `PublisherID == 65050620`. Gpm bools emit generically, so no allowlist edit — but it splits the two playtest flags across different ECS projects and uses `PublisherID` targeting.
+
+The client field `PlaytestCloudStreamingField.tsx` reads `isFeatureEnabled("XboxPlaytestCloudStreaming")` and defaults to `false`, so the toggle stays hidden until ECS returns it for the pilot seller. ECS is **fail-closed**. Results are cached (`EcsEnablementCacheConfiguration.TierTwoTtl = 30 min`), so allow up to ~30 min after enabling (plus a deploy if David K confirms one is required).
+
+Until the ECS entry exists, the toggle is hidden in the UI. The backend still works when the persisted
+`EnableStreaming` flag is set another way (see the reconciliation note below), which is why prod-piloting by
+seller id is viable before ECS lands.
+
+## Reconciliation note — `EnableStreaming` is now one source of truth (2026-07-08, DONE)
+
+Previously the publish path re-derived streaming from the seller check and ignored the persisted flag. **Fixed**
+on branch `t-melanichen/playtest-streaming-launch-link` (commit `4036d92`): the publish path now reads
+`publishedPlaytestEntity.EnableStreaming` (set by the UI toggle through the create/update contracts), gated to
+the pilot seller as defense-in-depth:
+
+```
+bool enableStreaming = publishedPlaytestEntity.EnableStreaming && IsStreamingPilotSeller(publishedPlaytestEntity.SellerId);
+```
+
+So: **toggle on + pilot seller ⇒ streaming ingestion + XORc title resolution + launch link all fire**;
+toggle off ⇒ nothing; non-pilot ⇒ blocked regardless. Link and ingestion now agree on one flag. Closes
+AB#62878234. (`PlaytestBusinessLogic.cs` publish gate + `IsStreamingPilotSeller`; 562 unit tests green incl. a
+new pilot-seller-with-toggle-off case.)
+
+
+
 ## Implementation plan (2026-06-20) — no code yet
 
 **Goal:** replace the hardcoded seller gate with an updatable seller allow-list (P0-5). Key insight:
